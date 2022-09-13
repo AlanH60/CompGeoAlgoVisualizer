@@ -21,6 +21,11 @@ project "CSE355"
         "%{prj.location}/**.h"
     }
 
+    includedirs
+    {
+        "%{prj.location}/Source"
+    }
+
 
 
     links
