@@ -10,12 +10,6 @@ struct Line
 	Vector2f v1, v2;
 };
 
-
-struct Polygon
-{
-	std::vector<Vector2f> vertices;
-};
-
 inline float length(const Vector2f v)
 {
 	return sqrtf(v.x * v.x + v.y * v.y);

@@ -3,6 +3,7 @@
 #include "Direct2D/Types.h"
 
 class Point;
+class Polygon;
 class App : public Application
 {
 	public:
@@ -26,9 +27,12 @@ class App : public Application
 
 	public:
 		App();
-
+		~App();
+		void onDraw() override;
 		void clearPoints();
 	private:
-		Point* mSelectedPoint = nullptr;
+		bool mDragging = false;
+		Point* pSelectedPoint = nullptr;
+		Polygon* pSelectedOutline = nullptr;
 		std::map<FLOAT2, Point*, PointCompare> mPoints;
 };

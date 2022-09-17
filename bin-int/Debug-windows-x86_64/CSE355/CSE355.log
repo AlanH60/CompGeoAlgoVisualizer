@@ -1,11 +1,10 @@
 ﻿  App.cpp
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(13,29): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(13,29): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(13,38): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(13,38): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(24): warning C4715: 'App::PointCompare::operator()': not all control paths return a value
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(14,29): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(14,29): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(14,38): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(14,38): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(25): warning C4715: 'App::PointCompare::operator()': not all control paths return a value
   Application.cpp
 C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Direct2D\Application.cpp(15,18): warning C4114: same type qualifier used more than once
-  Graphics.cpp
-  Window.cpp
+  main.cpp
   CSE355.vcxproj -> C:\Users\Hau\Documents\GitHub\CSE355\bin\Debug-windows-x86_64\CSE355\CSE355.exe

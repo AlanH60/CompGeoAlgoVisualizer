@@ -7,14 +7,15 @@ class Application
 {
 	public:
 		Application();
-		~Application();
+		virtual ~Application();
 
 		int run();
+		virtual void onDraw() {};
 		void addDrawable(Drawable* drawable);
 		void clear();
 	protected:
 		Window* pWindow;
 		Graphics* pGraphics;
-		std::vector<Drawable*> drawables;
+		std::set<Drawable*> mDrawables;
 };
 

@@ -10,6 +10,6 @@ class Polygon : public Drawable
 		~Polygon() = default;
 		void draw(Graphics& gfx) override;
 	private:
-		std::shared_ptr<Geometry> pGeometry;
+		std::unique_ptr<Geometry> pGeometry;
 		bool mFilled;
 };

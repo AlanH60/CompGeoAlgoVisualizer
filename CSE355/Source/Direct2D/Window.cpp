@@ -159,6 +159,12 @@ void Window::initEventHandle(Event& e)
 	}
 }
 
+void Window::trimQueues()
+{
+	while (mEventQueue.size() > MAX_EVENTS)
+		mEventQueue.pop();
+}
+
 LRESULT Window::handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -199,5 +205,6 @@ LRESULT Window::handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		default:
 			break;
 	}
+	trimQueues();
 	return DefWindowProc(handle, msg, wParam, lParam);
 }

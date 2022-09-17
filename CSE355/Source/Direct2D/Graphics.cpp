@@ -138,7 +138,7 @@ void Graphics::createSolidColorBrush(Color color, Microsoft::WRL::ComPtr<ID2D1So
 	ASSERT_IF_FAILED(hr, "Failed to create solid color brush!");
 }
 
-void Graphics::createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bool filled, Microsoft::WRL::ComPtr<ID2D1PathGeometry> pGeometry)
+void Graphics::createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bool filled, Microsoft::WRL::ComPtr<ID2D1PathGeometry>& pGeometry)
 {
 	HRESULT hr = pFactory2D->CreatePathGeometry(&pGeometry);
 	ASSERT_IF_FAILED(hr, "Failed to create path geometry!");

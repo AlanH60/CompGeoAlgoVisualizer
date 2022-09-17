@@ -12,7 +12,7 @@ Application::Application()
 
 Application::~Application()
 {
-	for (const auto const* d : drawables)
+	for (const auto const* d : mDrawables)
 		delete d;
 	delete pGraphics;
 	delete pWindow;
@@ -24,8 +24,9 @@ int Application::run()
 	{
 		pWindow->pollEvents();
 		pGraphics->beginFrame();
-		for (int i = 0; i < drawables.size(); i++)
-			drawables[i]->draw(*pGraphics);
+		for (Drawable* d: mDrawables)
+			d->draw(*pGraphics);
+		onDraw();
 		pGraphics->endFrame();
 	}
 	return 0;
@@ -34,14 +35,14 @@ int Application::run()
 //Input a drawable pointer allocated by heap
 void Application::addDrawable(Drawable* drawable)
 {
-	drawables.push_back(drawable);
+	mDrawables.insert(drawable);
 }
 
 void Application::clear()
 {
-	while(!drawables.empty())
+	for (Drawable* d : mDrawables)
 	{
-		delete drawables[0];
-		drawables.erase(drawables.begin());
+		delete d;
 	}
+	mDrawables.clear();
 }

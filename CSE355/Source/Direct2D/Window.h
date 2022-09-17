@@ -1,9 +1,16 @@
 #pragma once
 #include "Event.h"
-#include <Windows.h>
 
 class Window
 {
+	public:
+		const unsigned int MAX_EVENTS = 64u;
+		enum MouseButton
+		{
+			LBUTTON = 0x01,
+			RBUTTON = 0x02,
+			MBUTTON = 0x03
+		};
 	public:
 		Window(std::string title, int width, int height);
 		~Window();
@@ -19,7 +26,6 @@ class Window
 		bool lButtonPressed();
 		bool rButtonPressed();
 		bool mButtonPressed();
-		
 		bool keyPressed(unsigned char keycode);
 
 		LRESULT handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -27,6 +33,7 @@ class Window
 		static LRESULT handleAdapter(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);		
 	private:
 		void initEventHandle(Event& e);
+		void trimQueues();
 	private:
 		std::string mTitle;
 		int mWidth, mHeight;
@@ -34,12 +41,6 @@ class Window
 		bool mShouldClose = false;
 		std::queue<std::shared_ptr<Event>> mEventQueue;
 		std::function<void(Event&)> onEvent = nullptr;
-		enum MouseButton
-		{
-			LBUTTON = 0x01,
-			RBUTTON = 0x02,
-			MBUTTON = 0x03
-		};
 		std::bitset<3> mMouseState;
 		std::bitset<256> mKeyState;
 };

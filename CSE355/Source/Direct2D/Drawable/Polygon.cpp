@@ -6,7 +6,7 @@ Polygon::Polygon(Graphics& gfx, FLOAT2* vertices, unsigned int vertexCount, bool
 	Drawable(gfx, { 0,0 }, color),
 	mFilled(filled)
 {
-	pGeometry = std::shared_ptr<Geometry>(new Geometry(gfx, vertices, vertexCount, filled));
+	pGeometry = std::unique_ptr<Geometry>(new Geometry(gfx, vertices, vertexCount, filled));
 }
 
 void Polygon::draw(Graphics& gfx)
