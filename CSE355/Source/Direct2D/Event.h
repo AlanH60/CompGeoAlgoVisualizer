@@ -11,21 +11,55 @@ struct Event
 	enum class EventType
 	{
 		PRESS = 0x01,
-		RELEASE = 0x02
+		RELEASE = 0x02,
+		MOVE = 0x03
 	};
+
+	static bool isMouse(Event& e)
+	{
+		return e.mInputType == InputType::MOUSE;
+	}
+	static bool isKeyboard(Event& e)
+	{
+		return e.mInputType == InputType::KEYBOARD;
+	}
+	static bool isPress(Event& e)
+	{
+		return e.mType == EventType::PRESS;
+	}
+	static bool isRelease(Event& e)
+	{
+		return e.mType == EventType::RELEASE;
+	}
 
 	InputType mInputType;
 	EventType mType;
-	unsigned char mKeycode;
 };
 
 struct MouseEvent : public Event
 {
-	MouseEvent(EventType type, unsigned char keycode, int x, int y) : x(x), y(y) { mInputType = InputType::MOUSE; mType = type; mKeycode = keycode; }
+	MouseEvent(EventType type, unsigned char keycode, int x, int y) : x(x), y(y), mKeycode(keycode)
+	{ 
+		mInputType = InputType::MOUSE; 
+		mType = type; 
+	}
+	static bool isMove(Event& e)
+	{
+		return e.mType == EventType::MOVE;
+	}
 	int x, y;
+	unsigned char mKeycode;
 };
 
 struct KeyEvent : public Event
 {
-	KeyEvent(EventType type, unsigned char keycode) { mInputType = InputType::KEYBOARD; mType = type; mKeycode = keycode; }
+	KeyEvent(EventType type, unsigned char keycode) 
+		:
+		mKeycode(keycode)
+	{ 
+		assert((int)type <= 0x02 && "Invalid key event type!");
+		mInputType = InputType::KEYBOARD;
+		mType = type;
+	}
+	unsigned char mKeycode;
 };

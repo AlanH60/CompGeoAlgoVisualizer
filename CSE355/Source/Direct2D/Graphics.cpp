@@ -1,6 +1,8 @@
 #include "PCH.h"
 #include "Graphics.h"
 #include "Window.h"
+#include "Color.h"
+#include "Drawable/Drawable.h"
 
 using Microsoft::WRL::ComPtr;
 Graphics::Graphics(Window* pWindow)
@@ -94,16 +96,12 @@ Graphics::Graphics(Window* pWindow)
 	ASSERT_IF_FAILED(hr, "Failed to create bitmap context!");
 
 	pContext2D->SetTarget(pBitmap.Get());
-
-
-	setBrushColor({ 1, 0, 0, 1 });
 }
 
 void Graphics::beginFrame()
 {
 	pContext2D->BeginDraw();
-	pContext2D->Clear(D2D1_COLOR_F{ 0.0f, 0.0f, 0.0f, 1.0f });
-	drawGeometry(Geometry<5>{ { {0, 0}, { 100, 100 }, { 200, 150 }, { 300, 100 }, { 150, 50 }} }, true, { 0, 0, 0, 0 });
+	pContext2D->Clear(D2D1_COLOR_F{ 1.0f, 1.0f, 1.0f, 1.0f });
 }
 
 void Graphics::endFrame()
@@ -114,19 +112,44 @@ void Graphics::endFrame()
 }
 
 
-void Graphics::setBrushColor(Color c)
+void Graphics::drawLine(FLOAT2 p1, FLOAT2 p2, ID2D1SolidColorBrush* pBrush, float strokeWidth)
 {
-	HRESULT hr = pContext2D->CreateSolidColorBrush(c, &pSCBrush);
-	ASSERT_IF_FAILED(hr, "Failed to create Brush!");
+	pContext2D->DrawLine({ p1.x, p1.y }, { p2.x, p2.y }, pBrush, strokeWidth);
 }
 
-void Graphics::drawLine(Point p1, Point p2, float strokeWidth = 1.0f)
+void Graphics::drawPoint(FLOAT2 p, ID2D1SolidColorBrush* pBrush, float radius)
 {
-	pContext2D->DrawLine(p1, p2, pSCBrush.Get(), strokeWidth);
+	pContext2D->DrawEllipse(D2D1_ELLIPSE{ p.x, p.y, radius, radius}, pBrush);
+	pContext2D->FillEllipse(D2D1_ELLIPSE{ p.x, p.y, radius, radius}, pBrush);
 }
 
-void Graphics::drawPoint(Point p, float radius)
+void Graphics::drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset) 
 {
-	pContext2D->DrawEllipse(D2D1_ELLIPSE{ p, radius, radius }, pSCBrush.Get());
-	pContext2D->FillEllipse(D2D1_ELLIPSE{ p, radius, radius }, pSCBrush.Get());
+	pContext2D->SetTransform({ 1, 0, 0, 1, offset.x, offset.y });
+	pContext2D->DrawGeometry(pGeometry, pBrush);
+	if (filled)
+		pContext2D->FillGeometry(pGeometry, pBrush);
+	pContext2D->SetTransform({ 1, 0, 0, 1, 0, 0 });
+}
+
+void Graphics::createSolidColorBrush(Color color, Microsoft::WRL::ComPtr<ID2D1SolidColorBrush>& pBrush)
+{
+	HRESULT hr = pContext2D->CreateSolidColorBrush(color, &pBrush);
+	ASSERT_IF_FAILED(hr, "Failed to create solid color brush!");
+}
+
+void Graphics::createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bool filled, Microsoft::WRL::ComPtr<ID2D1PathGeometry> pGeometry)
+{
+	HRESULT hr = pFactory2D->CreatePathGeometry(&pGeometry);
+	ASSERT_IF_FAILED(hr, "Failed to create path geometry!");
+	Microsoft::WRL::ComPtr<ID2D1GeometrySink> pSink;
+	hr = pGeometry->Open(&pSink);
+	ASSERT_IF_FAILED(hr, "Failed to open geometry sink!");
+	pSink->SetFillMode(D2D1_FILL_MODE_WINDING);
+	pSink->BeginFigure({ vertices[0][0], vertices[0][1] }, (filled) ? D2D1_FIGURE_BEGIN_FILLED : D2D1_FIGURE_BEGIN_HOLLOW);
+	pSink->AddLines(reinterpret_cast<D2D1_POINT_2F*>(&vertices[0]), vertexCount);
+	pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
+
+	hr = pSink->Close();
+	ASSERT_IF_FAILED(hr, "Failed to close geometry sink!");
 }

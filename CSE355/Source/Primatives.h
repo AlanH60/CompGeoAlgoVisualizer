@@ -4,6 +4,18 @@ struct Vector2f
 {
 	float x, y;
 };
+
+struct Line
+{
+	Vector2f v1, v2;
+};
+
+
+struct Polygon
+{
+	std::vector<Vector2f> vertices;
+};
+
 inline float length(const Vector2f v)
 {
 	return sqrtf(v.x * v.x + v.y * v.y);
@@ -42,11 +54,6 @@ inline int compareY(const Vector2f& v1, const Vector2f& v2)
 }
 
 
-struct Line
-{
-	Vector2f v1, v2;
-};
-
 //Returns true if point is left of points on line.
 inline bool leftOf(const Line& line, const Vector2f& point)
 {
@@ -63,8 +70,3 @@ inline bool isConvex(const Vector2f& before, const Vector2f& current, const Vect
 	float cross = crossMag(bToA, bToC);
 	return cross <= 0;
 }
-
-struct Polygon
-{
-	std::vector<Vector2f> vertices;
-};

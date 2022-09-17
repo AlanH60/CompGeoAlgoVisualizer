@@ -2,8 +2,7 @@
 #include "Application.h"
 #include "Window.h"
 #include "Graphics.h"
-
-Application* Application::pInstance;
+#include "Drawable/Drawable.h"
 
 Application::Application()
 {
@@ -13,6 +12,8 @@ Application::Application()
 
 Application::~Application()
 {
+	for (const auto const* d : drawables)
+		delete d;
 	delete pGraphics;
 	delete pWindow;
 }
@@ -23,25 +24,24 @@ int Application::run()
 	{
 		pWindow->pollEvents();
 		pGraphics->beginFrame();
+		for (int i = 0; i < drawables.size(); i++)
+			drawables[i]->draw(*pGraphics);
 		pGraphics->endFrame();
 	}
 	return 0;
 }
 
-Application* Application::create()
+//Input a drawable pointer allocated by heap
+void Application::addDrawable(Drawable* drawable)
 {
-	assert(pInstance == nullptr && "An Instance of application already exists!");
-	pInstance = new Application();
-	return pInstance;
+	drawables.push_back(drawable);
 }
 
-Application* Application::get()
+void Application::clear()
 {
-	assert(pInstance != nullptr && "Instance of application doesn't exist!");
-	return pInstance;
-}
-
-void Application::destroy()
-{
-	delete pInstance;
+	while(!drawables.empty())
+	{
+		delete drawables[0];
+		drawables.erase(drawables.begin());
+	}
 }

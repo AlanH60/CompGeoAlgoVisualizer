@@ -2,6 +2,7 @@
 
 class Window;
 class Graphics;
+class Drawable;
 class Application
 {
 	public:
@@ -9,13 +10,11 @@ class Application
 		~Application();
 
 		int run();
-
-		static Application* create();
-		static Application* get();
-		static void destroy();
-	private:
-		static Application* pInstance;
+		void addDrawable(Drawable* drawable);
+		void clear();
+	protected:
 		Window* pWindow;
 		Graphics* pGraphics;
+		std::vector<Drawable*> drawables;
 };
 

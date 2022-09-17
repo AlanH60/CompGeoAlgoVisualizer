@@ -3,7 +3,7 @@
 #include "Primatives.h"
 #include "Loader.h"
 
-#include "Direct2D/Application.h"
+#include "App.h"
 
 #include <Windows.h>
 
@@ -37,10 +37,10 @@ int CALLBACK WinMain(
 	int         nCmdShow
 )
 {
-	Application* app = Application::create();
+	App* app = new App();
 
 	int ret = app->run();
 
-	Application::destroy();
+	delete app;
 	return ret;
 }

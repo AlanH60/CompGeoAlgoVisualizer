@@ -4,6 +4,12 @@
     <Filter Include="Direct2D">
       <UniqueIdentifier>{36C11AE1-228E-75EC-4BA7-639437D3AA7A}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Direct2D\Drawable">
+      <UniqueIdentifier>{f410629d-4a16-4c9a-87d4-3e4a54244644}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direct2D\DrawRes">
+      <UniqueIdentifier>{99acc987-cef1-492c-bd94-3817b3d2cdc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Algorithms.h" />
@@ -22,6 +28,34 @@
     <ClInclude Include="Source\Direct2D\Event.h">
       <Filter>Direct2D</Filter>
     </ClInclude>
+    <ClInclude Include="Source\App.h" />
+    <ClInclude Include="Source\Direct2D\Drawable\Drawable.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\Line.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\Point.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\Polygon.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Color.h">
+      <Filter>Direct2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Types.h">
+      <Filter>Direct2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\DrawRes\Bitmap.h">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\DrawRes\Brush.h">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\DrawRes\Geometry.h">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
@@ -39,6 +73,34 @@
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\Direct2D\Event.cpp">
       <Filter>Direct2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\App.cpp" />
+    <ClCompile Include="Source\Direct2D\Drawable\Drawable.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\Line.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\Point.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\Polygon.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Color.cpp">
+      <Filter>Direct2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Types.cpp">
+      <Filter>Direct2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\DrawRes\Brush.cpp">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\DrawRes\Geometry.cpp">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\DrawRes\Bitmap.cpp">
+      <Filter>Direct2D\DrawRes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

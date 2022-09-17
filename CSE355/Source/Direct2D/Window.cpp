@@ -90,8 +90,35 @@ void Window::pollEvents()
 	{
 		std::shared_ptr<Event> e = mEventQueue.front();
 		mEventQueue.pop();
+		initEventHandle(*e);
+		if (onEvent != nullptr)
+			onEvent(*e);
 	}
 
+}
+
+void Window::setOnEvent(const std::function<void(Event&)>& onEvent)
+{
+	this->onEvent = onEvent;
+}
+
+bool Window::lButtonPressed()
+{
+	return mMouseState[LBUTTON];
+}
+bool Window::rButtonPressed()
+{
+	return mMouseState[RBUTTON];
+}
+bool Window::mButtonPressed()
+{
+	return mMouseState[MBUTTON];
+}
+
+bool Window::keyPressed(unsigned char keycode)
+{
+	assert(keycode >= 0 && keycode < 256 && "Invalid keycode!");
+	return mKeyState[keycode];
 }
 
 //Retrieves the Window instance from the creation LParam and puts it into GWLP_USERDATA
@@ -114,6 +141,22 @@ LRESULT CALLBACK Window::handleAdapter(HWND handle, UINT msg, WPARAM wParam, LPA
 {
 	Window* window = reinterpret_cast<Window*>(GetWindowLongPtr(handle, GWLP_USERDATA));
 	return window->handleMsg(handle, msg, wParam, lParam);
+}
+
+void Window::initEventHandle(Event& e)
+{
+	if (Event::isPress(e) || Event::isRelease(e))
+	{
+		if (Event::isMouse(e))
+		{
+			unsigned char keycode = ((MouseEvent&)e).mKeycode;
+			if (keycode > 2)
+				keycode = 2;
+			mMouseState[keycode] = (Event::isPress(e)) ? 1 : 0;
+		}
+		if (Event::isKeyboard(e))
+			mKeyState[((KeyEvent&)e).mKeycode] = (Event::isPress(e)) ? 1 : 0;
+	}
 }
 
 LRESULT Window::handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -149,6 +192,9 @@ LRESULT Window::handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		case WM_MBUTTONUP:
 			mEventQueue.emplace(new MouseEvent{ Event::EventType::RELEASE, VK_MBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			break;
+		case WM_MOUSEMOVE:
+			mEventQueue.emplace(new MouseEvent{ Event::EventType::MOVE, VK_NONAME, LOWORD(lParam), HIWORD(lParam) });
 			break;
 		default:
 			break;

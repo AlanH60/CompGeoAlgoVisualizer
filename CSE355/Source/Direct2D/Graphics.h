@@ -1,74 +1,30 @@
 #pragma once
-#include <d2d1_2.h>
+#include "Types.h"
+#include <d2d1_3.h>
 #include <d3d11.h>
 #include <wrl.h>
-
 
 #define ASSERT_IF_FAILED(hr, message) if (!FAILED(hr)){} else{ assert(false && message); }
 
 class Window;
+struct Color;
 class Graphics
 {
-	public:
-		struct Point
-		{
-			float x, y;
-
-			operator D2D1_POINT_2F()
-			{
-				return { x, y };
-			}
-		};
-		template<unsigned int sides>
-		struct Geometry
-		{
-			Point vertices[sides];
-		};
-		struct Color
-		{
-			float r, g, b, a;
-
-			operator D2D1_COLOR_F()
-			{
-				return { r, g, b, a };
-			}
-		};
 	public:
 		Graphics(Window* pWindow);
 		void beginFrame();
 		void endFrame();
 
-		void setBrushColor(Color c);
-		void drawLine(Point p1, Point p2, float strokeWidth);
-		void drawPoint(Point p, float radius);
+		void drawLine(FLOAT2 p1, FLOAT2 p2, ID2D1SolidColorBrush* pBrush, float strokeWidth = 1.0f);
+		void drawPoint(FLOAT2 p, ID2D1SolidColorBrush* pBrush, float radius = 10.0f);
 
-		template<unsigned int v>
-		void drawGeometry(Geometry<v> g, bool filled, Color fillColor)
-		{
-			HRESULT hr = pFactory2D->CreatePathGeometry(&pGeometry);
-			ASSERT_IF_FAILED(hr, "Failed to create path geometry!");
-			Microsoft::WRL::ComPtr<ID2D1GeometrySink> pSink;
-			hr = pGeometry->Open(&pSink);
-			ASSERT_IF_FAILED(hr, "Failed to open geometry sink!");
-			pSink->SetFillMode(D2D1_FILL_MODE_WINDING);
-			pSink->BeginFigure(g.vertices[0], (filled) ? D2D1_FIGURE_BEGIN_FILLED : D2D1_FIGURE_BEGIN_HOLLOW);
-			pSink->AddLines(reinterpret_cast<D2D1_POINT_2F*>(&g.vertices[0]), v);
-			pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
-
-			hr = pSink->Close();
-			ASSERT_IF_FAILED(hr, "Failed to close geometry sink!");
-			
-			pContext2D->DrawGeometry(pGeometry.Get(), pSCBrush.Get());
-			if (filled)
-				pContext2D->FillGeometry(pGeometry.Get(), pSCBrush.Get());
-		}
+		void drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset = { 0, 0 });
+		void createSolidColorBrush(Color color, Microsoft::WRL::ComPtr<ID2D1SolidColorBrush>& pBrush);
+		void createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bool filled, Microsoft::WRL::ComPtr<ID2D1PathGeometry> pGeometry);
 		
 	private:
 		Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
 		Microsoft::WRL::ComPtr<ID2D1Device> pDevice2D;
 		Microsoft::WRL::ComPtr<ID2D1DeviceContext> pContext2D;
 		Microsoft::WRL::ComPtr<ID2D1Factory2> pFactory2D;
-
-		Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> pSCBrush;
-		Microsoft::WRL::ComPtr<ID2D1PathGeometry> pGeometry;
 };

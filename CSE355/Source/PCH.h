@@ -2,7 +2,12 @@
 #include <assert.h>
 #include <iostream>
 #include <fstream>
+#include <functional>
+#include <memory>
 
 #include <string>
 #include <vector>
 #include <queue>
+#include <bitset>
+#include <set>
+#include <map>
