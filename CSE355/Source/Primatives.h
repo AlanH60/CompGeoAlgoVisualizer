@@ -99,7 +99,7 @@ inline bool tIntersect(const Vector2f& a, const Vector2f& b, const Vector2f c, c
 			between(c, d, b)	);
 }
 
-//Return if lines ab and lines cd intersect at one point.
+//Return true if lines ab and lines cd intersect at one point.
 inline bool intersect(const Vector2f& a, const Vector2f& b, const Vector2f c, const Vector2f d)
 {
 	return (!leftOn(a, b, c) != !leftOf(a, b, d) && !leftOn(c, d, a) != !leftOf(c, d, b));

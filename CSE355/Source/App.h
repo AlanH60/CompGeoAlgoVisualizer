@@ -3,42 +3,26 @@
 #include "Direct2D/Types.h"
 
 class Point;
+class Line;
 class Polygon;
+class Drawable;
 class App : public Application
 {
 	public:
-		class PointCompare
-		{
-			public:
-				bool operator()(const FLOAT2& p1, const FLOAT2& p2) const 
-				{
-					if (std::abs(p1.x - p2.x) < 10.0f && std::abs(p1.y - p2.y) < 10.0f)
-						return false;
-					if (p1.x < p2.x)
-						return true;
-					if (p1.x > p2.x)
-						return false;
-					if (p1.y < p2.y)
-						return true;
-					if (p1.y > p2.y)
-						return false;
-				}
-		};
-		class PosCompare
+		static const unsigned int CHUNK_SIZE = 100;
+	public:
+		class ChunkCompare
 		{
 			public:
 				bool operator()(const FLOAT2& p1, const FLOAT2& p2) const
 				{
-					if (std::abs(p1.x - p2.x) < 10.0f && std::abs(p1.y - p2.y) < 10.0f)
-						return false;
-					if (p1.x < p2.x)
+					FLOAT2 p1Chunk = { (int)p1.x / CHUNK_SIZE, (int)p1.y / CHUNK_SIZE };
+					FLOAT2 p2Chunk = { (int)p2.x / CHUNK_SIZE, (int)p2.y / CHUNK_SIZE };
+					if (p1Chunk.x < p2Chunk.x)
 						return true;
-					if (p1.x > p2.x)
-						return false;
-					if (p1.y < p2.y)
+					else if (p1Chunk.x == p2Chunk.x && p1Chunk.y < p2Chunk.y)
 						return true;
-					if (p1.y > p2.y)
-						return false;
+					return false;
 				}
 		};
 
@@ -46,11 +30,15 @@ class App : public Application
 		App();
 		~App();
 		void onDraw() override;
-		void clearPoints();
+		void clear();
+		void addDrawable(Drawable* pDrawable);
+		bool removeDrawable(Drawable* pDrawable);
+		bool deleteDrawable(Drawable* pDrawable);
+		Drawable* getDrawable(FLOAT2 pos);
 	private:
 		bool mDragging = false;
 		Point* pSelectedPoint = nullptr;
 		Polygon* pSelectedOutline = nullptr;
-		std::map<FLOAT2, Point*, PointCompare> mPoints;
-		std::map<FLOAT2, Point*, PosCompare> mPointts;
+		std::vector<Line*> mGridLines;
+		std::map<FLOAT2, std::vector<Drawable*>, ChunkCompare> mChunks;
 };

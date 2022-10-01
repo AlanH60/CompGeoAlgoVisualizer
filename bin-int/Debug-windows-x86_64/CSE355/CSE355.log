@@ -1,8 +1,16 @@
 ﻿  App.cpp
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(14,29): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(14,29): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(14,38): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(14,38): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(25): warning C4715: 'App::PointCompare::operator()': not all control paths return a value
-  main.cpp
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(19,35): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(19,35): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(19,59): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(19,59): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(20,35): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(20,35): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(20,59): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(20,59): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(11,20): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(15,20): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(26,30): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(26,30): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(26,39): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(26,39): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   CSE355.vcxproj -> C:\Users\Hau\Documents\GitHub\CSE355\bin\Debug-windows-x86_64\CSE355\CSE355.exe
