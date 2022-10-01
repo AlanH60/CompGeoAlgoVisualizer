@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "Window.h"
-
+#include "Graphics.h"
 
 Window::Window(std::string title, int width, int height)
 	:
@@ -121,6 +121,12 @@ bool Window::keyPressed(unsigned char keycode)
 	return mKeyState[keycode];
 }
 
+void Window::setGraphics(Graphics* gfx)
+{
+	assert(pGraphics == nullptr && "Can't assign more than one graphics to window!");
+	pGraphics = gfx;
+}
+
 //Retrieves the Window instance from the creation LParam and puts it into GWLP_USERDATA
 LRESULT CALLBACK Window::handleSetup(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -201,6 +207,10 @@ LRESULT Window::handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		case WM_MOUSEMOVE:
 			mEventQueue.emplace(new MouseEvent{ Event::EventType::MOVE, VK_NONAME, LOWORD(lParam), HIWORD(lParam) });
+			break;
+		case WM_SIZE:
+			if (pGraphics)
+				pGraphics->onResize(LOWORD(lParam), HIWORD(lParam));
 			break;
 		default:
 			break;

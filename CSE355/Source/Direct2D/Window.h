@@ -1,6 +1,6 @@
 #pragma once
 #include "Event.h"
-
+class Graphics;
 class Window
 {
 	public:
@@ -28,6 +28,8 @@ class Window
 		bool mButtonPressed();
 		bool keyPressed(unsigned char keycode);
 
+		void setGraphics(Graphics* gfx);
+
 		LRESULT handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
 		static LRESULT handleSetup(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
 		static LRESULT handleAdapter(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);		
@@ -35,7 +37,7 @@ class Window
 		void initEventHandle(Event& e);
 		void trimQueues();
 	private:
-		std::string mTitle;
+		Graphics* pGraphics = nullptr;
 		int mWidth, mHeight;
 		HWND mHandle;
 		bool mShouldClose = false;
@@ -43,5 +45,6 @@ class Window
 		std::function<void(Event&)> onEvent = nullptr;
 		std::bitset<3> mMouseState;
 		std::bitset<256> mKeyState;
+		std::string mTitle;
 };
 

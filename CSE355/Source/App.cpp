@@ -50,6 +50,7 @@ App::App()
 					if (mDragging)
 						mDragging = false;
 					break;
+				//POINTS DELETED WHEN THEY'RE OVERLAPPED
 				case Event::EventType::MOVE:
 					if (onPoint && pSelectedPoint != nullptr && pWindow->lButtonPressed() && pSelectedPoint == mPoints[mousePos])
 						mDragging = true;
@@ -93,11 +94,11 @@ void App::onDraw()
 	{
 		if (pSelectedOutline)
 			delete pSelectedOutline;
-		FLOAT2 f[4] = { {pSelectedPoint->getPos().x - 10, pSelectedPoint->getPos().y - 10 },
-						{pSelectedPoint->getPos().x + 10, pSelectedPoint->getPos().y - 10 },
-						{pSelectedPoint->getPos().x + 10, pSelectedPoint->getPos().y + 10 },
-						{pSelectedPoint->getPos().x - 10, pSelectedPoint->getPos().y + 10 } };
-		pSelectedOutline = new Polygon(*pGraphics, f, 4, false, { 0.0f, 0.0f, 1.0f, 0.75f });
+		FLOAT2 f[4] = { {pSelectedPoint->getPos().x - 15, pSelectedPoint->getPos().y - 15 },
+						{pSelectedPoint->getPos().x + 15, pSelectedPoint->getPos().y - 15 },
+						{pSelectedPoint->getPos().x + 15, pSelectedPoint->getPos().y + 15 },
+						{pSelectedPoint->getPos().x - 15, pSelectedPoint->getPos().y + 15 } };
+		pSelectedOutline = new Polygon(*pGraphics, f, 4, false, { 0.0f, 0.5f, 1.0f, 0.8f });
 		pSelectedOutline->draw(*pGraphics);
 	}
 }

@@ -96,6 +96,8 @@ Graphics::Graphics(Window* pWindow)
 	ASSERT_IF_FAILED(hr, "Failed to create bitmap context!");
 
 	pContext2D->SetTarget(pBitmap.Get());
+
+	pWindow->setGraphics(this);
 }
 
 void Graphics::beginFrame()
@@ -152,4 +154,37 @@ void Graphics::createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bo
 
 	hr = pSink->Close();
 	ASSERT_IF_FAILED(hr, "Failed to close geometry sink!");
+}
+
+void Graphics::onResize(int width, int height)
+{
+	//Obtain the buffer from swap chain
+	ComPtr<IDXGISurface> pSurface;
+	HRESULT hr = pSwapChain->GetBuffer(0, _uuidof(IDXGISurface), &pSurface);
+	ASSERT_IF_FAILED(hr, "Failed to obtain IDXGISurface from Swap Chain!");
+	pSurface.Reset(); //Buffer has to be released before resizing
+
+	//Recreate the buffers with the same flags and format.
+	DXGI_SWAP_CHAIN_DESC desc;
+	hr = pSwapChain->GetDesc(&desc);
+	ASSERT_IF_FAILED(hr, "Failed to obtain swap chain description");
+	pSwapChain->ResizeBuffers(2u, width, height, desc.BufferDesc.Format, desc.Flags);
+
+	//Obtain the new buffer as a IDXGI surface.
+	hr = pSwapChain->GetBuffer(0, _uuidof(IDXGISurface), &pSurface);
+	ASSERT_IF_FAILED(hr, "Failed to obtain IDXGISurface from Swap Chain!");
+
+	//Create a bitmap target of swapchain's buffer for 2D Context to draw on.
+	ComPtr<ID2D1Bitmap1> pBitmap;
+	D2D1_BITMAP_PROPERTIES1 bmpProps;
+	bmpProps.dpiX = 0;
+	bmpProps.dpiY = 0;
+	bmpProps.bitmapOptions = D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW;
+	bmpProps.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	bmpProps.pixelFormat.alphaMode = D2D1_ALPHA_MODE_IGNORE;
+	bmpProps.colorContext = nullptr;
+	hr = pContext2D->CreateBitmapFromDxgiSurface(pSurface.Get(), bmpProps, &pBitmap);
+	ASSERT_IF_FAILED(hr, "Failed to create bitmap context!");
+
+	pContext2D->SetTarget(pBitmap.Get());
 }
