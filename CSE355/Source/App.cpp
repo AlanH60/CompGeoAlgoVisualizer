@@ -1,5 +1,7 @@
 #include "PCH.h"
 #include "App.h"
+#include "Primatives.h"
+#include "Algorithms.h"
 #include "Direct2D/Window.h"
 #include "Direct2D/Drawable/Drawable.h"
 #include "Direct2D/Drawable/Point.h"
@@ -75,15 +77,15 @@ App::App()
 						}
 					}
 					break;
+				}
 			}
-		}
-		if (Event::isKeyboard(e))
-		{
-			if (Event::isPress(e))
+			if (Event::isKeyboard(e))
 			{
-				KeyEvent& key = (KeyEvent&)e;
-				switch (key.mKeycode)
+				if (Event::isPress(e))
 				{
+					KeyEvent& key = (KeyEvent&)e;
+					switch (key.mKeycode)
+					{
 					case VK_SPACE:
 						clear();
 						pSelectedPoint = nullptr;
@@ -95,6 +97,29 @@ App::App()
 							deleteDrawable(pSelectedPoint);
 							pSelectedPoint = nullptr;
 						}
+						break;
+					case VK_RETURN:
+						if (!mHullLines.empty())
+						{
+							for (auto* l : mHullLines)
+								delete l;
+							mHullLines.clear();
+						}
+						std::vector<Vector2f> points = std::vector<Vector2f>();
+						for (auto& a : mChunks)
+						{
+							for (Drawable* d : a.second)
+								points.push_back(*reinterpret_cast<Vector2f*>(&d->getPos()));
+						}
+						//std::vector<Vector2f> hull = convexHullGW(points);
+						//std::vector<Vector2f> hull = convexHullGraham(points);
+						std::vector<Vector2f> hull = quickHull(points);
+						for (int i = 0; i < hull.size(); i++)
+						{
+							Line* l = new Line(*pGraphics, { hull[i].x, hull[i].y }, { hull[(i + 1) % hull.size()].x, hull[(i + 1) % hull.size()].y});
+							mHullLines.push_back(l);
+						}
+
 						break;
 				}
 			}
@@ -116,6 +141,8 @@ App::~App()
 void App::onDraw()
 {
 	for (auto* pLine : mGridLines)
+		pLine->draw(*pGraphics);
+	for (auto* pLine : mHullLines)
 		pLine->draw(*pGraphics);
 	for (auto& drawables : mChunks)
 	{
@@ -146,6 +173,12 @@ void App::clear()
 		}
 		drawables.second.clear();
 	}
+	if (!mHullLines.empty())
+	{
+		for (auto* l : mHullLines)
+			delete l;
+		mHullLines.clear();
+	}
 }
 
 void App::addDrawable(Drawable* pDrawable)
@@ -164,6 +197,7 @@ Drawable* App::getDrawable(FLOAT2 pos)
 		if (abs(diff.x) <= 20 && abs(diff.y) <= 20)
 			d = pDrawable;
 	}
+	//If can't find it in current chunk, check the chunk's neighbors.
 	if (!d)
 	{
 		for (int i = -1; i <= 1; i++)

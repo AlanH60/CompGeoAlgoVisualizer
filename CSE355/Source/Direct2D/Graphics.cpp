@@ -168,7 +168,7 @@ void Graphics::onResize(int width, int height)
 	DXGI_SWAP_CHAIN_DESC desc;
 	hr = pSwapChain->GetDesc(&desc);
 	ASSERT_IF_FAILED(hr, "Failed to obtain swap chain description");
-	pSwapChain->ResizeBuffers(2u, width, height, desc.BufferDesc.Format, desc.Flags);
+	pSwapChain->ResizeBuffers(0, width, height, desc.BufferDesc.Format, desc.Flags);
 
 	//Obtain the new buffer as a IDXGI surface.
 	hr = pSwapChain->GetBuffer(0, _uuidof(IDXGISurface), &pSurface);
@@ -185,6 +185,5 @@ void Graphics::onResize(int width, int height)
 	bmpProps.colorContext = nullptr;
 	hr = pContext2D->CreateBitmapFromDxgiSurface(pSurface.Get(), bmpProps, &pBitmap);
 	ASSERT_IF_FAILED(hr, "Failed to create bitmap context!");
-
 	pContext2D->SetTarget(pBitmap.Get());
 }

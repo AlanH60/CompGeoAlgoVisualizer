@@ -27,6 +27,18 @@ int main(int argc, char** argv)
 	{
 		std::cout << "(" << v.x << ", " << v.y << ")" << std::endl;
 	}
+	std::cout << "Graham" << std::endl;
+	c = convexHullGraham(vertices);
+	for (const auto& v : c)
+	{
+		std::cout << "(" << v.x << ", " << v.y << ")" << std::endl;
+	}
+	std::cout << "Quick Hull" << std::endl;
+	c = quickHull(vertices);
+	for (const auto& v : c)
+	{
+		std::cout << "(" << v.x << ", " << v.y << ")" << std::endl;
+	}
 	return WinMain(GetModuleHandle(nullptr), nullptr, GetCommandLineA(), SW_SHOW);
 }
 

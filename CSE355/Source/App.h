@@ -40,5 +40,6 @@ class App : public Application
 		Point* pSelectedPoint = nullptr;
 		Polygon* pSelectedOutline = nullptr;
 		std::vector<Line*> mGridLines;
+		std::vector<Line*> mHullLines;
 		std::map<FLOAT2, std::vector<Drawable*>, ChunkCompare> mChunks;
 };

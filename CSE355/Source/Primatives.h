@@ -4,12 +4,30 @@ struct Vector2f
 {
 	float x, y;
 };
-
-struct Line
+inline Vector2f operator+(const Vector2f& v1, const Vector2f& v2)
 {
-	Vector2f v1, v2;
-};
-
+	return { v1.x + v2.x, v1.y + v2.y };
+}
+inline Vector2f operator-(const Vector2f& v1, const Vector2f& v2)
+{
+	return { v1.x - v2.x, v1.y - v2.y };
+}
+inline Vector2f operator/(const Vector2f& v1, float s)
+{
+	return { v1.x / s, v1.y / s };
+}
+inline Vector2f operator*(const Vector2f& v1, float s)
+{
+	return { v1.x * s, v1.y * s };
+}
+inline bool operator==(const Vector2f& v1, const Vector2f& v2)
+{
+	return v1.x == v2.x && v1.y == v2.y;
+}
+inline bool operator!=(const Vector2f& v1, const Vector2f& v2)
+{
+	return v1.x != v2.x || v1.y != v2.y;
+}
 inline float length(const Vector2f v)
 {
 	return sqrtf(v.x * v.x + v.y * v.y);
@@ -22,21 +40,11 @@ inline float cross(const Vector2f& v1, const Vector2f& v2)
 {
 	return v1.x * v2.y - v1.y * v2.x;
 }
-inline Vector2f operator+(const Vector2f& v1, const Vector2f& v2)
+inline Vector2f normalize(const Vector2f& v)
 {
-	return { v1.x + v2.x, v1.y + v2.y };
-}
-inline Vector2f operator-(const Vector2f& v1, const Vector2f& v2)
-{
-	return { v1.x - v2.x, v1.y - v2.y };
-}
-inline bool operator==(const Vector2f& v1, const Vector2f& v2)
-{
-	return v1.x == v2.x && v1.y == v2.y;
-}
-inline bool operator!=(const Vector2f& v1, const Vector2f& v2)
-{
-	return v1.x != v2.x || v1.y != v2.y;
+	if (v.x == 0 && v.y == 0)
+		return { 0 , 0 };
+	return v / length(v);
 }
 inline int compareX(const Vector2f& v1, const Vector2f& v2)
 {
@@ -63,20 +71,12 @@ inline bool between(const Vector2f& a, const Vector2f& b, const Vector2f c)
 }
 
 //Returns true if point is left of the line.
-inline bool leftOf(const Line& line, const Vector2f& point)
-{
-	return cross(line.v2 - line.v1, point - line.v1) > 0;
-}
 inline bool leftOf(const Vector2f& a, const Vector2f& b, const Vector2f& point)
 {
 	return cross(b - a, point - a) > 0;
 }
 
 //Returns true if point is left or on the line.
-inline bool leftOn(const Line& line, const Vector2f& point)
-{
-	return cross(line.v2 - line.v1, point - line.v1) >= 0;
-}
 inline bool leftOn(const Vector2f& a, const Vector2f& b, const Vector2f& point)
 {
 	return cross(b - a, point - a) >= 0;
