@@ -9,11 +9,15 @@ class Drawable;
 class App : public Application
 {
 	public:
+		//Size of each partition of the grid space.
 		static const unsigned int CHUNK_SIZE = 100;
 	public:
+		//Compare class used in mChunks
 		class ChunkCompare
 		{
 			public:
+				//Compares the chunks p1 and p2 are in.  Returns if p1's chunks should come before p2's chunk in mChunks.
+				//If they are in different chunks, the x's are compared and the y's are compared to break ties.
 				bool operator()(const FLOAT2& p1, const FLOAT2& p2) const
 				{
 					FLOAT2 p1Chunk = { (int)p1.x / CHUNK_SIZE, (int)p1.y / CHUNK_SIZE };
@@ -41,5 +45,6 @@ class App : public Application
 		Polygon* pSelectedOutline = nullptr;
 		std::vector<Line*> mGridLines;
 		std::vector<Line*> mHullLines;
+		//Map of chunks, or grid partitions, to make it faster to find drawables based on where the user clicks.
 		std::map<FLOAT2, std::vector<Drawable*>, ChunkCompare> mChunks;
 };

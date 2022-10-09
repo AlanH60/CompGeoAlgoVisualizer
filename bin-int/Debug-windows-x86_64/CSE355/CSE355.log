@@ -8,6 +8,10 @@ C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(20,35): warning C4244: 
 C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(20,59): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
 C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(20,59): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
 C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(49,2): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(78,15): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(79,16): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(80,2): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(85,2): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
 C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(13,20): warning C4018: '<=': signed/unsigned mismatch
 C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(17,20): warning C4018: '<=': signed/unsigned mismatch
 C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(28,30): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion

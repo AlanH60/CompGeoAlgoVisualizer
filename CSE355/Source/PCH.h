@@ -4,6 +4,7 @@
 #include <fstream>
 #include <functional>
 #include <memory>
+#include <chrono>
 
 #include <string>
 #include <vector>

@@ -73,7 +73,6 @@ bool Window::shouldClose()
 	return mShouldClose;
 }
 
-//Reacts to Window Events. If Window is closed, return false. Otherwise, return true.
 void Window::pollEvents()
 {
 	MSG msg;

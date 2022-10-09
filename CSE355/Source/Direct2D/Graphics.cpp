@@ -71,13 +71,14 @@ Graphics::Graphics(Window* pWindow)
 #endif
 	cProps.options = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
 
+	ComPtr<ID2D1Device> pDevice2D;
 	hr = pFactory2D->CreateDevice(pIDXGIDevice.Get(), &pDevice2D);
 	ASSERT_IF_FAILED(hr, "Failed to create 2D Device!");
 
 	//Create a IDXGISurface for the 2D context to draw on
 	ComPtr<IDXGISurface> pSurface;
 	hr = pSwapChain->GetBuffer(0, _uuidof(IDXGISurface), &pSurface);
-	ASSERT_IF_FAILED(hr, "Failed to obtain IDXGISurface from Swap Chain!")
+	ASSERT_IF_FAILED(hr, "Failed to obtain IDXGISurface from Swap Chain!");
 
 	//Create 2D Context for graphics and draw commands
 	hr = pDevice2D->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &pContext2D);

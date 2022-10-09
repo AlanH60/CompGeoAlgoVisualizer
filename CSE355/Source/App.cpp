@@ -112,14 +112,14 @@ App::App()
 								points.push_back(*reinterpret_cast<Vector2f*>(&d->getPos()));
 						}
 						//std::vector<Vector2f> hull = convexHullGW(points);
-						//std::vector<Vector2f> hull = convexHullGraham(points);
-						std::vector<Vector2f> hull = quickHull(points);
+						
+						std::vector<Vector2f> hull = convexHullGraham(points);
+						//std::vector<Vector2f> hull = quickHull(points);
 						for (int i = 0; i < hull.size(); i++)
 						{
 							Line* l = new Line(*pGraphics, { hull[i].x, hull[i].y }, { hull[(i + 1) % hull.size()].x, hull[(i + 1) % hull.size()].y});
 							mHullLines.push_back(l);
 						}
-
 						break;
 				}
 			}

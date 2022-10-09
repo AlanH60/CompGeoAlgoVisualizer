@@ -43,7 +43,7 @@ inline std::vector<Vector2f> convexHullGW(std::vector<Vector2f>& points)
 }
 
 
-inline size_t partition(std::vector<Vector2f>& points, std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t end)
+inline size_t partition(std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t end)
 {
 	size_t i = start;
 	for (int j = start; j < end; j++)
@@ -62,14 +62,51 @@ inline size_t partition(std::vector<Vector2f>& points, std::vector<int>& indices
 	return --i;
 }
 
-inline void quickSort(std::vector<Vector2f>& points, std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t end)
+inline void quickSort(std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t end)
 {
 	if (end - start <= 1)
 		return;
 
-	size_t p = partition(points, indices, dots, start, end);
-	quickSort(points, indices, dots, start, p);
-	quickSort(points, indices, dots, p, end);
+	size_t p = partition(indices, dots, start, end);
+	quickSort(indices, dots, start, p);
+	quickSort(indices, dots, p, end);
+}
+
+inline void merge(std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t middle, size_t end, 
+		std::vector<int>& cpyIdx, std::vector<float>& cpyDots)
+{
+	int i = start;
+	int j = middle;
+	for (int k = start; k < end; k++)
+	{
+		cpyIdx[k] = indices[k];
+		cpyDots[k] = dots[k];
+	}
+	for (int k = start; k < end; k++)
+	{
+		if (i != middle && (j == end || cpyDots[i] >= cpyDots[j]))
+		{
+			indices[k] = cpyIdx[i];
+			dots[k] = cpyDots[i++];
+		}
+		else
+		{
+			indices[k] = cpyIdx[j];
+			dots[k] = cpyDots[j++];
+		}
+	}
+}
+
+inline void split(std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t end, 
+		std::vector<int>& cpyIdx, std::vector<float>& cpyDots)
+{
+	if (end - start <= 1)
+		return;
+	size_t middle = (end - start) / 2 + start;
+	
+	split(indices, dots, start, middle, cpyIdx, cpyDots);
+	split(indices, dots, middle, end, cpyIdx, cpyDots);
+	merge(indices, dots, start, middle, end, cpyIdx, cpyDots);
 }
 
 //Graham Scan - O(nlogn) - we choose an extreme point, pivot, that is guaranteed to be on the convex hull.
@@ -96,8 +133,10 @@ inline std::vector<Vector2f> convexHullGraham(std::vector<Vector2f>& points)
 	{
 		dots[i] = dot({ 1, 0 }, normalize(Vector2f{ points[i] - points[pivot] }));
 	}
-	//Quick sort used to sort points in O(nlogn)
-	quickSort(points, indices, dots, 0, points.size());
+	//Merge sort used to sort points in O(nlogn)
+	std::vector<int> cpyIdx = std::vector<int>(indices.size());
+	std::vector<float> cpyDots = std::vector<float>(dots.size());
+	split(indices, dots, 0, points.size(), cpyIdx, cpyDots);
 
 	//"Stack", but I use an array.
 	std::vector<int> hullI = std::vector<int>();
