@@ -99,9 +99,17 @@ inline bool tIntersect(const Vector2f& a, const Vector2f& b, const Vector2f c, c
 			between(c, d, b)	);
 }
 
-//Return true if lines ab and lines cd intersect at one point.
-inline bool intersect(const Vector2f& a, const Vector2f& b, const Vector2f c, const Vector2f d)
+//Return true if lines ab and lines cd intersect at one point, not including endpoints.
+inline bool intersectProp(const Vector2f& a, const Vector2f& b, const Vector2f c, const Vector2f d)
 {
-	return (!leftOn(a, b, c) != !leftOf(a, b, d) && !leftOn(c, d, a) != !leftOf(c, d, b));
+	Vector2f ab = b - a;
+	Vector2f cd = d - c;
+	float abc = cross(ab, c - a);
+	float abd = cross(ab, d - a);
+	float cda = cross(cd, a - c);
+	float cdb = cross(cd, b - c);
+	if (abc == 0 || abd == 0 || cda == 0 || cdb == 0)
+		return false;
+	return (!(abc > 0) != !(abd > 0) && !(cda > 0) != !(cdb > 0));
 }
 

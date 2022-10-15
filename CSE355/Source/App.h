@@ -34,6 +34,7 @@ class App : public Application
 		App();
 		~App();
 		void onDraw() override;
+		//Clear all drawables on the grid
 		void clear();
 		void addDrawable(Drawable* pDrawable);
 		bool removeDrawable(Drawable* pDrawable);
@@ -45,6 +46,6 @@ class App : public Application
 		Polygon* pSelectedOutline = nullptr;
 		std::vector<Line*> mGridLines;
 		std::vector<Line*> mHullLines;
-		//Map of chunks, or grid partitions, to make it faster to find drawables based on where the user clicks.
-		std::map<FLOAT2, std::vector<Drawable*>, ChunkCompare> mChunks;
+		//Map of chunks, or grid partitions, to make it faster to find points based on where the user clicks.
+		std::map<FLOAT2, std::vector<Drawable*>, ChunkCompare> mDrawables;
 };

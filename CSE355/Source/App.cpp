@@ -43,9 +43,9 @@ App::App()
 							if (!pHoveredDrawable)
 							{
 								Point* pPoint = new Point(*pGraphics, mousePos);
-								if (mChunks.find(mousePos) == mChunks.end())
-									mChunks[mousePos] = std::vector<Drawable*>();
-								mChunks[mousePos].push_back(pPoint);
+								if (mDrawables.find(mousePos) == mDrawables.end())
+									mDrawables[mousePos] = std::vector<Drawable*>();
+								mDrawables[mousePos].push_back(pPoint);
 								pSelectedPoint = nullptr;
 							}
 						}
@@ -106,18 +106,21 @@ App::App()
 							mHullLines.clear();
 						}
 						std::vector<Vector2f> points = std::vector<Vector2f>();
-						for (auto& a : mChunks)
+						for (auto& a : mDrawables)
 						{
 							for (Drawable* d : a.second)
 								points.push_back(*reinterpret_cast<Vector2f*>(&d->getPos()));
 						}
-						//std::vector<Vector2f> hull = convexHullGW(points);
-						
 						std::vector<Vector2f> hull = convexHullGraham(points);
-						//std::vector<Vector2f> hull = quickHull(points);
 						for (int i = 0; i < hull.size(); i++)
 						{
 							Line* l = new Line(*pGraphics, { hull[i].x, hull[i].y }, { hull[(i + 1) % hull.size()].x, hull[(i + 1) % hull.size()].y});
+							mHullLines.push_back(l);
+						}
+						std::vector<std::pair<Vector2f, Vector2f>> triangulation = triangulate(hull);
+						for (const auto& d : triangulation)
+						{
+							Line* l = new Line(*pGraphics, { d.first.x, d.first.y }, { d.second.x, d.second.y });
 							mHullLines.push_back(l);
 						}
 						break;
@@ -144,7 +147,7 @@ void App::onDraw()
 		pLine->draw(*pGraphics);
 	for (auto* pLine : mHullLines)
 		pLine->draw(*pGraphics);
-	for (auto& drawables : mChunks)
+	for (auto& drawables : mDrawables)
 	{
 		for (auto* drawable : drawables.second)
 			drawable->draw(*pGraphics);
@@ -164,7 +167,7 @@ void App::onDraw()
 
 void App::clear()
 {
-	for (auto& drawables : mChunks)
+	for (auto& drawables : mDrawables)
 	{
 		for (int i = 0; i < drawables.second.size(); i ++)
 		{
@@ -183,15 +186,15 @@ void App::clear()
 
 void App::addDrawable(Drawable* pDrawable)
 {
-	if (mChunks.find(pDrawable->getPos()) == mChunks.end())
-		mChunks[pDrawable->getPos()] = std::vector<Drawable*>();
-	mChunks[pDrawable->getPos()].push_back(pDrawable);
+	if (mDrawables.find(pDrawable->getPos()) == mDrawables.end())
+		mDrawables[pDrawable->getPos()] = std::vector<Drawable*>();
+	mDrawables[pDrawable->getPos()].push_back(pDrawable);
 }
 
 Drawable* App::getDrawable(FLOAT2 pos)
 {
 	Drawable* d = nullptr;
-	for (auto* pDrawable : mChunks[pos])
+	for (auto* pDrawable : mDrawables[pos])
 	{
 		FLOAT2 diff = pDrawable->getPos() - pos;
 		if (abs(diff.x) <= 20 && abs(diff.y) <= 20)
@@ -204,9 +207,9 @@ Drawable* App::getDrawable(FLOAT2 pos)
 		{
 			for (int j = -1; j <= 1; j++)
 			{
-				if ((j == 0 && i == 0) || mChunks[pos] == mChunks[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
+				if ((j == 0 && i == 0) || mDrawables[pos] == mDrawables[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
 					continue;
-				for (auto* pDrawable : mChunks[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
+				for (auto* pDrawable : mDrawables[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
 				{
 					FLOAT2 diff = pDrawable->getPos() - pos;
 					if (abs(diff.x) <= 20 && abs(diff.y) <= 20)
@@ -222,9 +225,9 @@ bool App::removeDrawable(Drawable* pDrawable)
 {
 	std::vector<Drawable*>::iterator it;
 	FLOAT2 pos = pDrawable->getPos();
-	if ((it = std::find(mChunks[pos].begin(), mChunks[pos].end(), pDrawable)) != mChunks[pos].end())
+	if ((it = std::find(mDrawables[pos].begin(), mDrawables[pos].end(), pDrawable)) != mDrawables[pos].end())
 	{
-		mChunks[pos].erase(it);
+		mDrawables[pos].erase(it);
 		return true;
 	}
 	return false;
@@ -234,10 +237,10 @@ bool App::deleteDrawable(Drawable* pDrawable)
 {
 	std::vector<Drawable*>::iterator it;
 	FLOAT2 pos = pDrawable->getPos();
-	if ((it = std::find(mChunks[pos].begin(), mChunks[pos].end(), pDrawable)) != mChunks[pos].end())
+	if ((it = std::find(mDrawables[pos].begin(), mDrawables[pos].end(), pDrawable)) != mDrawables[pos].end())
 	{ 
 		delete *it;
-		mChunks[pos].erase(it);
+		mDrawables[pos].erase(it);
 		return true;
 	}
 	return false;

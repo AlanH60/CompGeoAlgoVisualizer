@@ -45,10 +45,10 @@ inline std::vector<Vector2f> convexHullGW(std::vector<Vector2f>& points)
 
 inline size_t partition(std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t end)
 {
-	size_t i = start;
-	for (int j = start; j < end; j++)
+	size_t i = start + 1;
+	for (size_t j = start + 1; j < end; j++)
 	{
-		if (dots[j] >= dots[end - 1])
+		if (dots[j] > dots[start])
 		{
 			int temp = indices[i];
 			indices[i] = indices[j];
@@ -59,7 +59,14 @@ inline size_t partition(std::vector<int>& indices, std::vector<float>& dots, siz
 			i++;
 		}
 	}
-	return --i;
+	i--;
+	int temp = indices[i];
+	indices[i] = indices[start];
+	indices[start] = temp;
+	float tempf = dots[i];
+	dots[i] = dots[start];
+	dots[start] = tempf;
+	return i;
 }
 
 inline void quickSort(std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t end)
@@ -69,47 +76,10 @@ inline void quickSort(std::vector<int>& indices, std::vector<float>& dots, size_
 
 	size_t p = partition(indices, dots, start, end);
 	quickSort(indices, dots, start, p);
-	quickSort(indices, dots, p, end);
+	quickSort(indices, dots, p + 1, end);
 }
 
-inline void merge(std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t middle, size_t end, 
-		std::vector<int>& cpyIdx, std::vector<float>& cpyDots)
-{
-	int i = start;
-	int j = middle;
-	for (int k = start; k < end; k++)
-	{
-		cpyIdx[k] = indices[k];
-		cpyDots[k] = dots[k];
-	}
-	for (int k = start; k < end; k++)
-	{
-		if (i != middle && (j == end || cpyDots[i] >= cpyDots[j]))
-		{
-			indices[k] = cpyIdx[i];
-			dots[k] = cpyDots[i++];
-		}
-		else
-		{
-			indices[k] = cpyIdx[j];
-			dots[k] = cpyDots[j++];
-		}
-	}
-}
-
-inline void split(std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t end, 
-		std::vector<int>& cpyIdx, std::vector<float>& cpyDots)
-{
-	if (end - start <= 1)
-		return;
-	size_t middle = (end - start) / 2 + start;
-	
-	split(indices, dots, start, middle, cpyIdx, cpyDots);
-	split(indices, dots, middle, end, cpyIdx, cpyDots);
-	merge(indices, dots, start, middle, end, cpyIdx, cpyDots);
-}
-
-//Graham Scan - O(nlogn) - we choose an extreme point, pivot, that is guaranteed to be on the convex hull.
+//Graham Scan- O(nlogn) - we choose an extreme point, pivot, that is guaranteed to be on the convex hull.
 //Then we sort the points by angle from the pivot point, using dot product. 
 //We can then use left tests and "wrap" the points in sorted counter-clockwise order.
 inline std::vector<Vector2f> convexHullGraham(std::vector<Vector2f>& points)
@@ -133,10 +103,8 @@ inline std::vector<Vector2f> convexHullGraham(std::vector<Vector2f>& points)
 	{
 		dots[i] = dot({ 1, 0 }, normalize(Vector2f{ points[i] - points[pivot] }));
 	}
-	//Merge sort used to sort points in O(nlogn)
-	std::vector<int> cpyIdx = std::vector<int>(indices.size());
-	std::vector<float> cpyDots = std::vector<float>(dots.size());
-	split(indices, dots, 0, points.size(), cpyIdx, cpyDots);
+	//Quick sort to sort vertices by dot product. Note: Average: O(nlogn), Worse: O(n^2), so this graham scan has worse case O(n^2).
+	quickSort(indices, dots, 0, points.size());
 
 	//"Stack", but I use an array.
 	std::vector<int> hullI = std::vector<int>();
@@ -169,8 +137,10 @@ inline std::vector<Vector2f> convexHullGraham(std::vector<Vector2f>& points)
 	return hullPoints;
 }
 
+//Recursive function for quickHull
 inline std::vector<Vector2f> quickHull(std::vector<Vector2f>& points, Vector2f left, Vector2f right)
 {
+	//Base case, no points remaining.
 	if (points.empty())
 		return std::vector<Vector2f>();
 	Vector2f top;
@@ -179,14 +149,18 @@ inline std::vector<Vector2f> quickHull(std::vector<Vector2f>& points, Vector2f l
 	for (Vector2f& p : points)
 	{
 		Vector2f leftToP = p - left;
+		//Projects the point p onto line from left to right.
 		Vector2f projection = leftRightUnit * dot(leftToP, leftRightUnit);
+		//From this projection, we take the y component from the vector from projection to point.
 		float dist = abs((leftToP - projection).y);
+		//Maximize this y component to find the next vertex of the hull.
 		if (dist > maxDist)
 		{
 			maxDist = dist;
 			top = p;
 		}
 	}
+	//Once found we find the next vertex of the hull, top, we divide the points that are left of vector(left->c) and vector(c->right).
 	std::vector<Vector2f> leftPoints;
 	std::vector<Vector2f> rightPoints;
 	for (Vector2f& p : points)
@@ -196,8 +170,11 @@ inline std::vector<Vector2f> quickHull(std::vector<Vector2f>& points, Vector2f l
 		else if (leftOf(top, right, p))
 			rightPoints.push_back(p);
 	}
+	//Recursively find the hull of the points between left and top, and top and right.
 	std::vector<Vector2f> leftHull = quickHull(leftPoints, left, top);
 	std::vector<Vector2f> rightHull = quickHull(rightPoints, top, right);
+
+	//Once we find the left and right hulls.  We combine them accordingly.
 	std::vector<Vector2f> topHull;
 	for (Vector2f& p : rightHull)
 		topHull.push_back(p);
@@ -207,10 +184,12 @@ inline std::vector<Vector2f> quickHull(std::vector<Vector2f>& points, Vector2f l
 	return topHull;
 }
 
+//Quick Hull- Average - O(nlogn), Worse - O(n^2)
 inline std::vector<Vector2f> quickHull(std::vector<Vector2f>& points)
 {
 	Vector2f left = points[0];
 	Vector2f right = points[0];
+	//Find the top-leftmost point and the top-rightmost point.
 	for (Vector2f& p : points)
 	{
 		if (p.x < left.x)
@@ -222,6 +201,7 @@ inline std::vector<Vector2f> quickHull(std::vector<Vector2f>& points)
 		else if (p.x == right.x)
 			right = (p.y > right.y) ? p : right;
 	}
+	//Divide the points into a set of points above and below the line from the left to right points.
 	std::vector<Vector2f> topPoints;
 	std::vector<Vector2f> bottomPoints;
 	for (Vector2f& p : points)
@@ -231,9 +211,11 @@ inline std::vector<Vector2f> quickHull(std::vector<Vector2f>& points)
 		else if (p != left && p != right)
 			bottomPoints.push_back(p);
 	}
+	//Find the top convex hull and bottom convex hull.
 	std::vector<Vector2f> topHull = quickHull(topPoints, left, right);
 	std::vector<Vector2f> bottomHull = quickHull(bottomPoints, right, left);
 
+	//Combine the results of the top hull and bottom hull accordingly.
 	std::vector<Vector2f> hull;
 	hull.push_back(right);
 	for (Vector2f& v : topHull)
@@ -242,4 +224,64 @@ inline std::vector<Vector2f> quickHull(std::vector<Vector2f>& points)
 	for (Vector2f& v : bottomHull)
 		hull.push_back(v);
 	return hull;
+}
+
+//Tests whether a diagonal is inside the polygon.  Only works with polygon diagonals, where a and b are vertices of the polygon.
+inline bool diagonalInPolygon(std::vector<Vector2f>& polygon, Vector2f a, Vector2f b)
+{
+	for (int i = 1; i < polygon.size(); i++)
+	{
+		if (intersectProp(a, b, polygon[i - 1], polygon[i]))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+//O(n)
+inline bool isEar(std::vector<Vector2f>& polygon, int idx, int prev, int next)
+{
+	return diagonalInPolygon(polygon, polygon[prev], polygon[next]);
+}
+
+//Contains the index of the previous vertex, next vertex, whether this vertex is an ear, and whether is has been clipped.
+struct VertexStatus
+{
+	size_t prev = 0;
+	size_t next = 0;
+	bool isEar = false;
+	bool isClipped = false;
+};
+
+//Ear-Clipping triangulation algorithm.  Cut off ears and update ear status of adjacent vertices.  Loop around the polygon until triangulation is done.
+inline std::vector<std::pair<Vector2f, Vector2f>> triangulate(std::vector<Vector2f>& polygon)
+{
+	//Vector of diagonals
+	std::vector<std::pair<Vector2f, Vector2f>> diagonals;
+	//Vector of VertexStatus of each vertex of the polygon
+	std::vector<VertexStatus> vertexStatus = std::vector<VertexStatus>(polygon.size());
+	//Intialize the VertexStatus of each vertex - O(n^2)
+	for (int i = 0; i < polygon.size(); i++)
+		vertexStatus[i] = { (i == 0) ? (polygon.size() - 1) : i - 1, (i + 1) % polygon.size(), isEar(polygon, i, (i == 0) ? (polygon.size() - 1) : i - 1, (i + 1) % polygon.size()), false};
+
+	int i = 0;
+	while(diagonals.size() != (polygon.size() - 3)) //There are always n - 3 non-crossing diagonals.
+	{
+		i %= polygon.size();
+		//If the vertex is an ear and is not already clipped, clip it.  Then update its prev and next vertices' ear status and their next and prev vertex respectively.
+		if (!vertexStatus[i].isClipped && vertexStatus[i].isEar)
+		{
+			VertexStatus& v = vertexStatus[i];
+			diagonals.push_back({ polygon[v.prev], polygon[v.next] });
+			vertexStatus[v.prev].next = v.next;
+			vertexStatus[v.next].prev = v.prev;
+			vertexStatus[v.prev].isEar = isEar(polygon, v.prev, vertexStatus[v.prev].prev, v.next);
+			vertexStatus[v.next].isEar = isEar(polygon, v.next, v.prev, vertexStatus[v.next].next);
+			vertexStatus[i].isClipped = true;
+		}
+		i++;
+	}
+
+	return diagonals;
 }
