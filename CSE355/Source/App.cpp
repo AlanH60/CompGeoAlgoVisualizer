@@ -21,113 +21,32 @@ App::App()
 	//*******************************************//
 
 	pWindow->setOnEvent([this](Event& e)-> void
+	{
+		if (Event::isKeyboard(e))
 		{
-			if (Event::isMouse(e))
+			KeyEvent& keyEvent = (KeyEvent&)e;
+			switch (keyEvent.mKeycode)
 			{
-				MouseEvent& mouse = (MouseEvent&)e;
-				FLOAT2 mousePos = { mouse.x, mouse.y };
-				Drawable* pHoveredDrawable = getDrawable(mousePos);
-				switch (mouse.mType)
-				{
-				case Event::EventType::PRESS:
-					switch (mouse.mKeycode)
-					{
-					case VK_LBUTTON:
-						if (pWindow->keyPressed(VK_SHIFT) && pSelectedPoint != nullptr)
-						{
-							/*if (!onPoint)
-								addDrawable(new Line(*pGraphics, pSelectedPoint->getPos(), mousePos));*/
-						}
-						if (pWindow->keyPressed(VK_SHIFT) || pWindow->keyPressed(VK_CONTROL))
-						{
-							if (!pHoveredDrawable)
-							{
-								Point* pPoint = new Point(*pGraphics, mousePos);
-								if (mDrawables.find(mousePos) == mDrawables.end())
-									mDrawables[mousePos] = std::vector<Drawable*>();
-								mDrawables[mousePos].push_back(pPoint);
-								pSelectedPoint = nullptr;
-							}
-						}
-						else
-						{
-							if (pHoveredDrawable)
-								pSelectedPoint = (Point*)/*Temporary Cast*/pHoveredDrawable;
-							else
-								pSelectedPoint = nullptr;
-						}
-						break;
-					default:
-						break;
-					}
-					break;
-				case Event::EventType::RELEASE:
-					if (mDragging)
-						mDragging = false;
-					break;
-				case Event::EventType::MOVE:
-					if (pHoveredDrawable && pSelectedPoint != nullptr && pWindow->lButtonPressed() && pSelectedPoint == pHoveredDrawable)
-						mDragging = true;
-					if (mDragging)
-					{
-						if (removeDrawable(pSelectedPoint))
-						{
-							pSelectedPoint->setPos(mousePos);
-							addDrawable(pSelectedPoint);
-						}
-					}
-					break;
-				}
-			}
-			if (Event::isKeyboard(e))
-			{
-				if (Event::isPress(e))
-				{
-					KeyEvent& key = (KeyEvent&)e;
-					switch (key.mKeycode)
-					{
-					case VK_SPACE:
+				case VK_F1:
+					if (mState != CONVEX_HULL)
 						clear();
-						pSelectedPoint = nullptr;
-						break;
-					case VK_DELETE:
-					case VK_BACK:
-						if (pSelectedPoint != nullptr)
-						{
-							deleteDrawable(pSelectedPoint);
-							pSelectedPoint = nullptr;
-						}
-						break;
-					case VK_RETURN:
-						if (!mHullLines.empty())
-						{
-							for (auto* l : mHullLines)
-								delete l;
-							mHullLines.clear();
-						}
-						std::vector<Vector2f> points = std::vector<Vector2f>();
-						for (auto& a : mDrawables)
-						{
-							for (Drawable* d : a.second)
-								points.push_back(*reinterpret_cast<Vector2f*>(&d->getPos()));
-						}
-						std::vector<Vector2f> hull = convexHullGraham(points);
-						for (int i = 0; i < hull.size(); i++)
-						{
-							Line* l = new Line(*pGraphics, { hull[i].x, hull[i].y }, { hull[(i + 1) % hull.size()].x, hull[(i + 1) % hull.size()].y});
-							mHullLines.push_back(l);
-						}
-						std::vector<std::pair<Vector2f, Vector2f>> triangulation = triangulate(hull);
-						for (const auto& d : triangulation)
-						{
-							Line* l = new Line(*pGraphics, { d.first.x, d.first.y }, { d.second.x, d.second.y });
-							mHullLines.push_back(l);
-						}
-						break;
-				}
+					mState = CONVEX_HULL;
+					break;
+				case VK_F2:
+					if (mState != TRIANGULATE)
+						clear();
+					mState = TRIANGULATE;
+					break;
+				case VK_SPACE:
+					clear();
+					pSelectedPoint = nullptr;
+					break;
 			}
 		}
-		
+		if (mState == CONVEX_HULL)
+			convexHullEventHandler(e);
+		else if (mState == TRIANGULATE)
+			triangulateEventHandler(e);
 	});
 }
 
@@ -145,13 +64,23 @@ void App::onDraw()
 {
 	for (auto* pLine : mGridLines)
 		pLine->draw(*pGraphics);
-	for (auto* pLine : mHullLines)
-		pLine->draw(*pGraphics);
-	for (auto& drawables : mDrawables)
+	for (auto& drawables : mPoints)
 	{
 		for (auto* drawable : drawables.second)
 			drawable->draw(*pGraphics);
 	}
+	if (mState == CONVEX_HULL)
+		for (auto* pLine : mHullLines)
+			pLine->draw(*pGraphics);
+	else if (mState == TRIANGULATE)
+	{
+		for (auto* pLine : mPolygonLines)
+			pLine->draw(*pGraphics);
+		for (auto* pLine : mTriangulationLines)
+			pLine->draw(*pGraphics);
+	}
+
+	//Selection box
 	if (pSelectedPoint)
 	{
 		if (pSelectedOutline)
@@ -167,7 +96,7 @@ void App::onDraw()
 
 void App::clear()
 {
-	for (auto& drawables : mDrawables)
+	for (auto& drawables : mPoints)
 	{
 		for (int i = 0; i < drawables.second.size(); i ++)
 		{
@@ -182,66 +111,239 @@ void App::clear()
 			delete l;
 		mHullLines.clear();
 	}
+	if (!mPolygonLines.empty())
+	{
+		for (auto* l : mPolygonLines)
+			delete l;
+		mPolygonLines.clear();
+	}
+	if (!mTriangulationLines.empty())
+	{
+		for (auto l : mTriangulationLines)
+			delete l;
+		mTriangulationLines.clear();
+	}
+	mPolygon.clear();
 }
 
-void App::addDrawable(Drawable* pDrawable)
+void App::addPoint(Point* pPoint)
 {
-	if (mDrawables.find(pDrawable->getPos()) == mDrawables.end())
-		mDrawables[pDrawable->getPos()] = std::vector<Drawable*>();
-	mDrawables[pDrawable->getPos()].push_back(pDrawable);
+	if (mPoints.find(pPoint->getPos()) == mPoints.end())
+		mPoints[pPoint->getPos()] = std::vector<Point*>();
+	mPoints[pPoint->getPos()].push_back(pPoint);
 }
 
-Drawable* App::getDrawable(FLOAT2 pos)
+Point* App::getPoint(FLOAT2 pos)
 {
-	Drawable* d = nullptr;
-	for (auto* pDrawable : mDrawables[pos])
+	Point* p = nullptr;
+	for (auto* pDrawable : mPoints[pos])
 	{
 		FLOAT2 diff = pDrawable->getPos() - pos;
 		if (abs(diff.x) <= 20 && abs(diff.y) <= 20)
-			d = pDrawable;
+			p = pDrawable;
 	}
 	//If can't find it in current chunk, check the chunk's neighbors.
-	if (!d)
+	if (!p)
 	{
 		for (int i = -1; i <= 1; i++)
 		{
 			for (int j = -1; j <= 1; j++)
 			{
-				if ((j == 0 && i == 0) || mDrawables[pos] == mDrawables[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
+				if ((j == 0 && i == 0) || mPoints[pos] == mPoints[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
 					continue;
-				for (auto* pDrawable : mDrawables[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
+				for (auto* pDrawable : mPoints[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
 				{
 					FLOAT2 diff = pDrawable->getPos() - pos;
 					if (abs(diff.x) <= 20 && abs(diff.y) <= 20)
-						d = pDrawable;
+						p = pDrawable;
 				}
 			}
 		}
 	}
-	return d;
+	return p;
 }
 
-bool App::removeDrawable(Drawable* pDrawable)
+bool App::removePoint(Point* pPoint)
 {
-	std::vector<Drawable*>::iterator it;
-	FLOAT2 pos = pDrawable->getPos();
-	if ((it = std::find(mDrawables[pos].begin(), mDrawables[pos].end(), pDrawable)) != mDrawables[pos].end())
+	std::vector<Point*>::iterator it;
+	FLOAT2 pos = pPoint->getPos();
+	if ((it = std::find(mPoints[pos].begin(), mPoints[pos].end(), pPoint)) != mPoints[pos].end())
 	{
-		mDrawables[pos].erase(it);
+		mPoints[pos].erase(it);
 		return true;
 	}
 	return false;
 }
 
-bool App::deleteDrawable(Drawable* pDrawable)
+bool App::deletePoint(Point* pPoint)
 {
-	std::vector<Drawable*>::iterator it;
-	FLOAT2 pos = pDrawable->getPos();
-	if ((it = std::find(mDrawables[pos].begin(), mDrawables[pos].end(), pDrawable)) != mDrawables[pos].end())
+	std::vector<Point*>::iterator it;
+	FLOAT2 pos = pPoint->getPos();
+	if ((it = std::find(mPoints[pos].begin(), mPoints[pos].end(), pPoint)) != mPoints[pos].end())
 	{ 
 		delete *it;
-		mDrawables[pos].erase(it);
+		mPoints[pos].erase(it);
 		return true;
 	}
 	return false;
+}
+
+void App::convexHullEventHandler(Event& e)
+{
+	if (Event::isMouse(e))
+	{
+		MouseEvent& mouse = (MouseEvent&)e;
+		FLOAT2 mousePos = { mouse.x, mouse.y };
+		Point* pHoveredPoint = getPoint(mousePos);
+		switch (mouse.mType)
+		{
+			case Event::EventType::PRESS:
+				switch (mouse.mKeycode)
+				{
+					case VK_LBUTTON:
+						if (pWindow->keyPressed(VK_SHIFT) || pWindow->keyPressed(VK_CONTROL))
+						{
+							if (!pHoveredPoint)
+							{
+								Point* pPoint = new Point(*pGraphics, mousePos);
+								if (mPoints.find(mousePos) == mPoints.end())
+									mPoints[mousePos] = std::vector<Point*>();
+								mPoints[mousePos].push_back(pPoint);
+								pSelectedPoint = nullptr;
+							}
+						}
+						else
+						{
+							if (pHoveredPoint)
+								pSelectedPoint = pHoveredPoint;
+							else
+								pSelectedPoint = nullptr;
+						}
+						break;
+					default:
+						break;
+				}
+				break;
+			case Event::EventType::RELEASE:
+				if (mDragging)
+					mDragging = false;
+				break;
+			case Event::EventType::MOVE:
+				if (pHoveredPoint && pSelectedPoint != nullptr && pWindow->lButtonPressed() && pSelectedPoint == pHoveredPoint)
+					mDragging = true;
+				if (mDragging)
+				{
+					if (removePoint(pSelectedPoint))
+					{
+						pSelectedPoint->setPos(mousePos);
+						addPoint(pSelectedPoint);
+					}
+				}
+				break;
+		}
+	}
+	if (Event::isKeyboard(e))
+	{
+		if (Event::isPress(e))
+		{
+			KeyEvent& key = (KeyEvent&)e;
+			switch (key.mKeycode)
+			{
+				case VK_DELETE:
+				case VK_BACK:
+					if (pSelectedPoint != nullptr)
+					{
+						deletePoint(pSelectedPoint);
+						pSelectedPoint = nullptr;
+					}
+					break;
+				case VK_RETURN:
+				{
+					if (!mHullLines.empty())
+					{
+						for (auto* l : mHullLines)
+							delete l;
+						mHullLines.clear();
+					}
+					std::vector<Vector2f> points = std::vector<Vector2f>();
+					for (auto& a : mPoints)
+					{
+						for (Drawable* d : a.second)
+							points.push_back(*reinterpret_cast<Vector2f*>(&d->getPos()));
+					}
+					std::vector<Vector2f> hull = convexHullGraham(points);
+					for (int i = 0; i < hull.size(); i++)
+					{
+						Line* l = new Line(*pGraphics, { hull[i].x, hull[i].y }, { hull[(i + 1) % hull.size()].x, hull[(i + 1) % hull.size()].y });
+						mHullLines.push_back(l);
+					}
+				}
+					break;
+				default:
+					break;
+			}
+		}
+	}
+}
+
+void App::triangulateEventHandler(Event& e)
+{
+	if (Event::isMouse(e))
+	{
+		MouseEvent& mouseEvent = (MouseEvent&)e;
+		FLOAT2 mousePos = { mouseEvent.x, mouseEvent.y };
+
+		switch (mouseEvent.mType)
+		{
+			case Event::EventType::PRESS:
+				switch (mouseEvent.mKeycode)
+				{
+					case VK_LBUTTON:
+					{
+						Point* p = nullptr;
+						if (!(p = getPoint(mousePos)))
+						{
+							p = new Point(*pGraphics, mousePos);
+							addPoint(p);
+							if (!mPolygon.empty())
+								mPolygonLines.push_back(new Line(*pGraphics, { mPolygon[mPolygon.size() - 1].x, mPolygon[mPolygon.size() - 1].y }, p->getPos()));
+							mPolygon.push_back(Vector2f{ p->getPos().x, p->getPos().y });
+						}
+						else if (!mPolygon.empty())
+						{
+							Line* l = new Line(*pGraphics, { mPolygon[mPolygon.size() - 1].x, mPolygon[mPolygon.size() - 1].y }, p->getPos());
+							mPolygonLines.push_back(l);
+						}
+					}
+						break;
+					default:
+						break;
+				}
+		}
+	}
+	if (Event::isKeyboard(e))
+	{
+		if (Event::isPress(e))
+		{
+			KeyEvent& key = (KeyEvent&)e;
+			switch (key.mKeycode)
+			{
+				case VK_RETURN:
+				{
+					if (!mTriangulationLines.empty())
+					{
+						for (auto l : mTriangulationLines)
+							delete l;
+						mTriangulationLines.clear();
+					}
+					std::vector<std::pair<Vector2f, Vector2f>> diagonals = triangulate(mPolygon);
+					for (auto& d : diagonals)
+						mTriangulationLines.push_back(new Line(*pGraphics, { d.first.x, d.first.y }, { d.second.x, d.second.y }));
+				}
+					break;
+				default:
+					break;
+			}
+		}
+	}
 }

@@ -26,7 +26,7 @@ class Graphics
 		//Draw a line from points p1 to p2, using pBrush.
 		void drawLine(FLOAT2 p1, FLOAT2 p2, ID2D1SolidColorBrush* pBrush, float strokeWidth = 1.0f);
 		//Draw a point on the specified coordinate, using pBrush.
-		void drawPoint(FLOAT2 p, ID2D1SolidColorBrush* pBrush, float radius = 10.0f);
+		void drawPoint(FLOAT2 p, ID2D1SolidColorBrush* pBrush, float radius = 5.0f);
 
 		//Draw a path geometry created back createPathGeometry()
 		void drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset = { 0, 0 });

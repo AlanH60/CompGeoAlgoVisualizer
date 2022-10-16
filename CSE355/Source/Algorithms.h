@@ -226,8 +226,8 @@ inline std::vector<Vector2f> quickHull(std::vector<Vector2f>& points)
 	return hull;
 }
 
-//Tests whether a diagonal is inside the polygon.  Only works with polygon diagonals, where a and b are vertices of the polygon.
-inline bool diagonalInPolygon(std::vector<Vector2f>& polygon, Vector2f a, Vector2f b)
+//Tests whether a diagonal crosses the polygon.  Only works with polygon diagonals, where a and b are vertices of the polygon.
+inline bool diagonalCrossPolygon(std::vector<Vector2f>& polygon, Vector2f a, Vector2f b)
 {
 	for (int i = 1; i < polygon.size(); i++)
 	{
@@ -242,7 +242,9 @@ inline bool diagonalInPolygon(std::vector<Vector2f>& polygon, Vector2f a, Vector
 //O(n)
 inline bool isEar(std::vector<Vector2f>& polygon, int idx, int prev, int next)
 {
-	return diagonalInPolygon(polygon, polygon[prev], polygon[next]);
+	if (!isConvex(polygon[prev], polygon[idx], polygon[next]))
+		return false;
+	return diagonalCrossPolygon(polygon, polygon[prev], polygon[next]);
 }
 
 //Contains the index of the previous vertex, next vertex, whether this vertex is an ear, and whether is has been clipped.

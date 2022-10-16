@@ -2,15 +2,23 @@
 #include "Direct2D/Application.h"
 #include "Direct2D/Types.h"
 
+struct Vector2f;
+class Event;
 class Point;
 class Line;
 class Polygon;
 class Drawable;
+
 class App : public Application
 {
 	public:
 		//Size of each partition of the grid space.
 		static const unsigned int CHUNK_SIZE = 100;
+		enum State
+		{
+			CONVEX_HULL = 0x00,
+			TRIANGULATE = 0x01
+		};
 	public:
 		//Compare class used in mChunks
 		class ChunkCompare
@@ -36,16 +44,27 @@ class App : public Application
 		void onDraw() override;
 		//Clear all drawables on the grid
 		void clear();
-		void addDrawable(Drawable* pDrawable);
-		bool removeDrawable(Drawable* pDrawable);
-		bool deleteDrawable(Drawable* pDrawable);
-		Drawable* getDrawable(FLOAT2 pos);
+		void addPoint(Point* pPoint);
+		bool removePoint(Point* pPoint);
+		bool deletePoint(Point* pPoint);
+		Point* getPoint(FLOAT2 pos);
+	private:
+		void convexHullEventHandler(Event& e);
+		void triangulateEventHandler(Event& e);
 	private:
 		bool mDragging = false;
 		Point* pSelectedPoint = nullptr;
 		Polygon* pSelectedOutline = nullptr;
 		std::vector<Line*> mGridLines;
+
+		//Convex Hull
 		std::vector<Line*> mHullLines;
+
+		//Triangulate
+		std::vector<Vector2f> mPolygon;
+		std::vector<Line*> mTriangulationLines;
+		std::vector<Line*> mPolygonLines;
 		//Map of chunks, or grid partitions, to make it faster to find points based on where the user clicks.
-		std::map<FLOAT2, std::vector<Drawable*>, ChunkCompare> mDrawables;
+		std::map<FLOAT2, std::vector<Point*>, ChunkCompare> mPoints;
+		State mState = CONVEX_HULL;
 };
