@@ -53,9 +53,7 @@ App::App()
 App::~App()
 {
 	clear();
-	for (auto* line : mGridLines)
-		delete line;
-	mGridLines.clear();
+	deleteAndClear(mGridLines);
 	if (pSelectedOutline)
 		delete pSelectedOutline;
 }
@@ -105,24 +103,9 @@ void App::clear()
 		}
 		drawables.second.clear();
 	}
-	if (!mHullLines.empty())
-	{
-		for (auto* l : mHullLines)
-			delete l;
-		mHullLines.clear();
-	}
-	if (!mPolygonLines.empty())
-	{
-		for (auto* l : mPolygonLines)
-			delete l;
-		mPolygonLines.clear();
-	}
-	if (!mTriangulationLines.empty())
-	{
-		for (auto l : mTriangulationLines)
-			delete l;
-		mTriangulationLines.clear();
-	}
+	deleteAndClear(mHullLines);
+	deleteAndClear(mPolygonLines);
+	deleteAndClear(mTriangulationLines);
 	mPolygon.clear();
 }
 
@@ -259,12 +242,7 @@ void App::convexHullEventHandler(Event& e)
 					break;
 				case VK_RETURN:
 				{
-					if (!mHullLines.empty())
-					{
-						for (auto* l : mHullLines)
-							delete l;
-						mHullLines.clear();
-					}
+					deleteAndClear(mHullLines);
 					std::vector<Vector2f> points = std::vector<Vector2f>();
 					for (auto& a : mPoints)
 					{
@@ -305,15 +283,14 @@ void App::triangulateEventHandler(Event& e)
 						{
 							p = new Point(*pGraphics, mousePos);
 							addPoint(p);
-							if (!mPolygon.empty())
-								mPolygonLines.push_back(new Line(*pGraphics, { mPolygon[mPolygon.size() - 1].x, mPolygon[mPolygon.size() - 1].y }, p->getPos()));
-							mPolygon.push_back(Vector2f{ p->getPos().x, p->getPos().y });
 						}
-						else if (!mPolygon.empty())
+						if (!mPolygon.empty())
 						{
 							Line* l = new Line(*pGraphics, { mPolygon[mPolygon.size() - 1].x, mPolygon[mPolygon.size() - 1].y }, p->getPos());
 							mPolygonLines.push_back(l);
 						}
+						mPolygon.push_back(Vector2f{ p->getPos().x, p->getPos().y });
+						updatePolygonValidity();
 					}
 						break;
 					default:
@@ -330,15 +307,15 @@ void App::triangulateEventHandler(Event& e)
 			{
 				case VK_RETURN:
 				{
-					if (!mTriangulationLines.empty())
+					deleteAndClear(mTriangulationLines);
+					if (isValidPolygon && mPolygon.size() >= 3 && mPolygon[0] == mPolygon[mPolygon.size() - 1])
 					{
-						for (auto l : mTriangulationLines)
-							delete l;
-						mTriangulationLines.clear();
+						mPolygon.erase(--mPolygon.end());
+						std::vector<std::pair<Vector2f, Vector2f>> diagonals = triangulate(mPolygon);
+						mPolygon.push_back(mPolygon[0]);
+						for (auto& d : diagonals)
+							mTriangulationLines.push_back(new Line(*pGraphics, { d.first.x, d.first.y }, { d.second.x, d.second.y }));
 					}
-					std::vector<std::pair<Vector2f, Vector2f>> diagonals = triangulate(mPolygon);
-					for (auto& d : diagonals)
-						mTriangulationLines.push_back(new Line(*pGraphics, { d.first.x, d.first.y }, { d.second.x, d.second.y }));
 				}
 					break;
 				default:
@@ -346,4 +323,18 @@ void App::triangulateEventHandler(Event& e)
 			}
 		}
 	}
+}
+
+void App::updatePolygonValidity()
+{
+	Vector2f lastVertex = mPolygon[mPolygon.size() - 1];
+	for (int i = 0; i < (int)mPolygon.size() - 3; i++)
+	{
+		if (intersectProp(mPolygon[i], mPolygon[i + 1], mPolygon[mPolygon.size() - 1], lastVertex))
+		{
+			isValidPolygon = false;
+			return;
+		}
+	}
+	isValidPolygon = true;
 }

@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <chrono>
+#include <thread>
 
 #include <string>
 #include <vector>

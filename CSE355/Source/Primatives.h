@@ -1,8 +1,14 @@
 #pragma once
 #include <math.h>
+#include "Direct2D/Types.h"
 struct Vector2f
 {
 	float x, y;
+
+	operator FLOAT2()
+	{
+		return FLOAT2{ x, y };
+	}
 };
 inline Vector2f operator+(const Vector2f& v1, const Vector2f& v2)
 {

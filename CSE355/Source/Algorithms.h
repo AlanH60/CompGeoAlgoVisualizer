@@ -1,6 +1,40 @@
 #pragma once
 #include "Primatives.h"
 
+class App;
+class AlgorithmVisualizer
+{
+	public:
+		enum ConvexHullAlgorithm
+		{
+			GRAHAM_SCAN,
+			GIFT_WRAPPING,
+			QUICK_HULL
+		};
+	public:
+		AlgorithmVisualizer(App* pApp);
+
+		std::vector<Vector2f> computeConvexHull(std::vector<Vector2f>& points, ConvexHullAlgorithm algorithm = QUICK_HULL);
+
+		bool isRunning();
+		bool getVisualization();
+		void setVisualization(bool visualize);
+		void setSpeed(float speed);
+	private:
+		std::vector<Vector2f> convexHullGW(std::vector<Vector2f>& points);
+	private:
+		//Pointer to the graphics object to access graphics API.
+		App* pApp;
+		//Flag that indicates whether or not to perform an algorithm step by step.
+		bool mVisualize = true;
+		//Flag that indicates whether or not an algorithm is running.
+		bool mRunning = false;
+		//Pointer to the thread that this algorithm will run on.
+		std::thread* mThread = nullptr;
+		//Speed of the algorithm.
+		float mSpeed = 1;
+};
+
 //O(nh) where n = num of points, h = num of outputs
 inline std::vector<Vector2f> convexHullGW(std::vector<Vector2f>& points)
 {

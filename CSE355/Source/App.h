@@ -48,9 +48,22 @@ class App : public Application
 		bool removePoint(Point* pPoint);
 		bool deletePoint(Point* pPoint);
 		Point* getPoint(FLOAT2 pos);
+
+		//Queue this from algorithm
+		void setPointColor(FLOAT2 pos, Color color);
+
 	private:
+		template<typename T>
+		void deleteAndClear(std::vector<T*>& v)
+		{
+			for (const T* ptr : v)
+				delete ptr;
+			v.clear();
+		}
 		void convexHullEventHandler(Event& e);
+
 		void triangulateEventHandler(Event& e);
+		void updatePolygonValidity();
 	private:
 		bool mDragging = false;
 		Point* pSelectedPoint = nullptr;
@@ -64,6 +77,8 @@ class App : public Application
 		std::vector<Vector2f> mPolygon;
 		std::vector<Line*> mTriangulationLines;
 		std::vector<Line*> mPolygonLines;
+		bool isValidPolygon = false;
+
 		//Map of chunks, or grid partitions, to make it faster to find points based on where the user clicks.
 		std::map<FLOAT2, std::vector<Point*>, ChunkCompare> mPoints;
 		State mState = CONVEX_HULL;
