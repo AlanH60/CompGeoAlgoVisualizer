@@ -9,19 +9,22 @@
 #include "Direct2D/Drawable/Polygon.h"
 App::App()
 {
+	pVisualizer = new AlgorithmVisualizer();
 	//**************** Grid Lines ****************//
 	for (int i = 1; i <= pWindow->getWidth() / CHUNK_SIZE; i++)
 	{
-		mGridLines.push_back(new Line(*pGraphics, FLOAT2{ (float)i * CHUNK_SIZE, 0 }, FLOAT2{ (float)i * CHUNK_SIZE, (float)pWindow->getHeight() }, Color{ 0.0f, 0.0f, 0.0f, 0.5f }));
+		mGridLines.push_back(new Line(FLOAT2{ (float)i * CHUNK_SIZE, 0 }, FLOAT2{ (float)i * CHUNK_SIZE, (float)pWindow->getHeight() }, Color{ 0.0f, 0.0f, 0.0f, 0.5f }));
 	}
 	for (int i = 1; i <= pWindow->getHeight() / CHUNK_SIZE; i++)
 	{
-		mGridLines.push_back(new Line(*pGraphics, FLOAT2{ 0, (float)i * CHUNK_SIZE }, FLOAT2{ (float)pWindow->getWidth(), (float)i * CHUNK_SIZE }, Color{ 0.0f, 0.0f, 0.0f, 0.5f }));
+		mGridLines.push_back(new Line(FLOAT2{ 0, (float)i * CHUNK_SIZE }, FLOAT2{ (float)pWindow->getWidth(), (float)i * CHUNK_SIZE }, Color{ 0.0f, 0.0f, 0.0f, 0.5f }));
 	}
 	//*******************************************//
 
 	pWindow->setOnEvent([this](Event& e)-> void
 	{
+		if (!pVisualizer->isIdle())
+			return;
 		if (Event::isKeyboard(e))
 		{
 			KeyEvent& keyEvent = (KeyEvent&)e;
@@ -56,26 +59,40 @@ App::~App()
 	deleteAndClear(mGridLines);
 	if (pSelectedOutline)
 		delete pSelectedOutline;
+	delete pVisualizer;
+}
+
+void App::onUpdate()
+{
+	if (pVisualizer->isFinished())
+	{
+		std::vector<std::pair<Vector2f, Vector2f>> result = pVisualizer->getResult();
+		for (auto& r : result)
+		{
+			Line* l = new Line(r.first, r.second);
+			mHullLines.push_back(l);
+		}
+	}
 }
 
 void App::onDraw()
 {
 	for (auto* pLine : mGridLines)
-		pLine->draw(*pGraphics);
+		pLine->draw();
 	for (auto& drawables : mPoints)
 	{
 		for (auto* drawable : drawables.second)
-			drawable->draw(*pGraphics);
+			drawable->draw();
 	}
 	if (mState == CONVEX_HULL)
 		for (auto* pLine : mHullLines)
-			pLine->draw(*pGraphics);
+			pLine->draw();
 	else if (mState == TRIANGULATE)
 	{
 		for (auto* pLine : mPolygonLines)
-			pLine->draw(*pGraphics);
+			pLine->draw();
 		for (auto* pLine : mTriangulationLines)
-			pLine->draw(*pGraphics);
+			pLine->draw();
 	}
 
 	//Selection box
@@ -87,9 +104,14 @@ void App::onDraw()
 						{pSelectedPoint->getPos().x + 15, pSelectedPoint->getPos().y - 15 },
 						{pSelectedPoint->getPos().x + 15, pSelectedPoint->getPos().y + 15 },
 						{pSelectedPoint->getPos().x - 15, pSelectedPoint->getPos().y + 15 } };
-		pSelectedOutline = new Polygon(*pGraphics, f, 4, false, { 0.0f, 0.5f, 1.0f, 0.8f });
-		pSelectedOutline->draw(*pGraphics);
+		pSelectedOutline = new Polygon(f, 4, false, { 0.0f, 0.5f, 1.0f, 0.8f });
+		pSelectedOutline->draw();
 	}
+
+	//Algorithm Visualizer
+	if (pVisualizer->isRunning() && pVisualizer->shouldVisualize())
+		for (Drawable* d : pVisualizer->getDrawables())
+			d->draw();
 }
 
 void App::clear()
@@ -188,7 +210,7 @@ void App::convexHullEventHandler(Event& e)
 						{
 							if (!pHoveredPoint)
 							{
-								Point* pPoint = new Point(*pGraphics, mousePos);
+								Point* pPoint = new Point(mousePos);
 								if (mPoints.find(mousePos) == mPoints.end())
 									mPoints[mousePos] = std::vector<Point*>();
 								mPoints[mousePos].push_back(pPoint);
@@ -249,12 +271,7 @@ void App::convexHullEventHandler(Event& e)
 						for (Drawable* d : a.second)
 							points.push_back(*reinterpret_cast<Vector2f*>(&d->getPos()));
 					}
-					std::vector<Vector2f> hull = convexHullGraham(points);
-					for (int i = 0; i < hull.size(); i++)
-					{
-						Line* l = new Line(*pGraphics, { hull[i].x, hull[i].y }, { hull[(i + 1) % hull.size()].x, hull[(i + 1) % hull.size()].y });
-						mHullLines.push_back(l);
-					}
+					pVisualizer->computeConvexHull(points, AlgorithmVisualizer::GIFT_WRAPPING);
 				}
 					break;
 				default:
@@ -281,12 +298,12 @@ void App::triangulateEventHandler(Event& e)
 						Point* p = nullptr;
 						if (!(p = getPoint(mousePos)))
 						{
-							p = new Point(*pGraphics, mousePos);
+							p = new Point(mousePos);
 							addPoint(p);
 						}
 						if (!mPolygon.empty())
 						{
-							Line* l = new Line(*pGraphics, { mPolygon[mPolygon.size() - 1].x, mPolygon[mPolygon.size() - 1].y }, p->getPos());
+							Line* l = new Line({ mPolygon[mPolygon.size() - 1].x, mPolygon[mPolygon.size() - 1].y }, p->getPos());
 							mPolygonLines.push_back(l);
 						}
 						mPolygon.push_back(Vector2f{ p->getPos().x, p->getPos().y });
@@ -314,7 +331,7 @@ void App::triangulateEventHandler(Event& e)
 						std::vector<std::pair<Vector2f, Vector2f>> diagonals = triangulate(mPolygon);
 						mPolygon.push_back(mPolygon[0]);
 						for (auto& d : diagonals)
-							mTriangulationLines.push_back(new Line(*pGraphics, { d.first.x, d.first.y }, { d.second.x, d.second.y }));
+							mTriangulationLines.push_back(new Line({ d.first.x, d.first.y }, { d.second.x, d.second.y }));
 					}
 				}
 					break;

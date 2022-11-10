@@ -22,6 +22,7 @@ int Application::run()
 	{
 		pWindow->pollEvents();
 		pGraphics->beginFrame();
+		onUpdate();
 		onDraw();
 		pGraphics->endFrame();
 	}

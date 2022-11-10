@@ -9,6 +9,7 @@ class Application
 		virtual ~Application();
 
 		int run();
+		virtual void onUpdate() {};
 		virtual void onDraw() {};
 	protected:
 		Window* pWindow;

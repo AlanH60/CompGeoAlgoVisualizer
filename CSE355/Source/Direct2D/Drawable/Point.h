@@ -5,7 +5,7 @@
 class Point : public Drawable
 {
 	public:
-		Point(Graphics& gfx, FLOAT2 pos, Color color = Color{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Point(FLOAT2 pos, Color color = Color{ 1.0f, 0.0f, 0.0f, 1.0f });
 		~Point() = default;
-		void draw(Graphics& gfx) override;
+		void draw() override;
 };

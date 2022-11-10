@@ -44,4 +44,6 @@ class Graphics
 		Microsoft::WRL::ComPtr<ID2D1DeviceContext> pContext2D;
 		//Factory used to create certain 2D interfaces like ID2D1Geometry and ID2D1DeviceContext
 		Microsoft::WRL::ComPtr<ID2D1Factory2> pFactory2D;
+		//Pointer to the window context
+		Window* pWindow;
 };

@@ -58,7 +58,7 @@ inline int compareX(const Vector2f& v1, const Vector2f& v2)
 }
 inline int compareY(const Vector2f& v1, const Vector2f& v2)
 {
-	return (v1.y < v2.y) ? -1 : (v1.x > v2.x) ? 1 : 0;
+	return (v1.y < v2.y) ? -1 : (v1.y > v2.y) ? 1 : 0;
 }
 
 inline bool collinear(const Vector2f& a, const Vector2f& b, const Vector2f c)

@@ -186,26 +186,27 @@ LRESULT Window::handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_KEYUP:
 			mEventQueue.emplace(new KeyEvent{ Event::EventType::RELEASE, (unsigned char)wParam });
 			break;
+		//mHeight - y to make positive y the up direction.
 		case WM_LBUTTONDOWN:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::PRESS, VK_LBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent{ Event::EventType::PRESS, VK_LBUTTON, LOWORD(lParam), mHeight - HIWORD(lParam) });
 			break;
 		case WM_RBUTTONDOWN:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::PRESS, VK_RBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent{ Event::EventType::PRESS, VK_RBUTTON, LOWORD(lParam), mHeight - HIWORD(lParam) });
 			break;
 		case WM_MBUTTONDOWN:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::PRESS, VK_MBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent{ Event::EventType::PRESS, VK_MBUTTON, LOWORD(lParam), mHeight - HIWORD(lParam) });
 			break;
 		case WM_LBUTTONUP:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::RELEASE, VK_LBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent{ Event::EventType::RELEASE, VK_LBUTTON, LOWORD(lParam), mHeight - HIWORD(lParam) });
 			break;
 		case WM_RBUTTONUP:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::RELEASE, VK_RBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent{ Event::EventType::RELEASE, VK_RBUTTON, LOWORD(lParam), mHeight - HIWORD(lParam) });
 			break;
 		case WM_MBUTTONUP:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::RELEASE, VK_MBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent{ Event::EventType::RELEASE, VK_MBUTTON, LOWORD(lParam), mHeight - HIWORD(lParam) });
 			break;
 		case WM_MOUSEMOVE:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::MOVE, VK_NONAME, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent{ Event::EventType::MOVE, VK_NONAME, LOWORD(lParam), mHeight - HIWORD(lParam) });
 			break;
 		case WM_SIZE:
 			if (pGraphics)

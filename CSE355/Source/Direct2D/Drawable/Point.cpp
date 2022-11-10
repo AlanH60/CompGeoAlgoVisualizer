@@ -2,12 +2,12 @@
 #include "Point.h"
 
 
-Point::Point(Graphics& gfx, FLOAT2 pos, Color color)
+Point::Point(FLOAT2 pos, Color color)
 	: 
-	Drawable(gfx, pos, color)
+	Drawable(pos, color)
 {}
 
-void Point::draw(Graphics& gfx)
+void Point::draw()
 {
-	gfx.drawPoint(mPos, pBrush->get());
+	pGraphics->drawPoint(mPos, pBrush->get());
 }

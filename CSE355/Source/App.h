@@ -8,7 +8,7 @@ class Point;
 class Line;
 class Polygon;
 class Drawable;
-
+class AlgorithmVisualizer;
 class App : public Application
 {
 	public:
@@ -41,6 +41,7 @@ class App : public Application
 	public:
 		App();
 		~App();
+		void onUpdate() override;
 		void onDraw() override;
 		//Clear all drawables on the grid
 		void clear();
@@ -48,9 +49,6 @@ class App : public Application
 		bool removePoint(Point* pPoint);
 		bool deletePoint(Point* pPoint);
 		Point* getPoint(FLOAT2 pos);
-
-		//Queue this from algorithm
-		void setPointColor(FLOAT2 pos, Color color);
 
 	private:
 		template<typename T>
@@ -65,6 +63,7 @@ class App : public Application
 		void triangulateEventHandler(Event& e);
 		void updatePolygonValidity();
 	private:
+		AlgorithmVisualizer* pVisualizer = nullptr;
 		bool mDragging = false;
 		Point* pSelectedPoint = nullptr;
 		Polygon* pSelectedOutline = nullptr;

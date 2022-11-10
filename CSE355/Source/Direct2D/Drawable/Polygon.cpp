@@ -1,15 +1,15 @@
 #include "PCH.h"
 #include "Polygon.h"
 
-Polygon::Polygon(Graphics& gfx, FLOAT2* vertices, unsigned int vertexCount, bool filled, Color color)
+Polygon::Polygon(FLOAT2* vertices, unsigned int vertexCount, bool filled, Color color)
 	:
-	Drawable(gfx, { 0,0 }, color),
+	Drawable({ 0,0 }, color),
 	mFilled(filled)
 {
-	pGeometry = std::unique_ptr<Geometry>(new Geometry(gfx, vertices, vertexCount, filled));
+	pGeometry = std::unique_ptr<Geometry>(new Geometry(*pGraphics, vertices, vertexCount, filled));
 }
 
-void Polygon::draw(Graphics& gfx)
+void Polygon::draw()
 {
-	gfx.drawGeometry(pGeometry->get(), pBrush->get(), mFilled, mPos);
+	pGraphics->drawGeometry(pGeometry->get(), pBrush->get(), mFilled, mPos);
 }

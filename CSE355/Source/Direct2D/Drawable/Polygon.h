@@ -5,10 +5,10 @@
 class Polygon : public Drawable
 {
 	public:
-		Polygon(Graphics& gfx, FLOAT2* vertices, unsigned int vertexCount, bool filled = true, Color color = Color{ 1.0f, 0.0f, 0.0f, 1.0f });
+		Polygon(FLOAT2* vertices, unsigned int vertexCount, bool filled = true, Color color = Color{ 1.0f, 0.0f, 0.0f, 1.0f });
 
 		~Polygon() = default;
-		void draw(Graphics& gfx) override;
+		void draw() override;
 	private:
 		std::unique_ptr<Geometry> pGeometry;
 		bool mFilled;

@@ -6,6 +6,8 @@
 
 using Microsoft::WRL::ComPtr;
 Graphics::Graphics(Window* pWindow)
+	:
+	pWindow(pWindow)
 {
 	//*********************** Create 3D Device, Context, and SwapChain ***********************//
 	UINT deviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
@@ -99,6 +101,7 @@ Graphics::Graphics(Window* pWindow)
 	pContext2D->SetTarget(pBitmap.Get());
 
 	pWindow->setGraphics(this);
+	Drawable::setGraphics(this);
 }
 
 void Graphics::beginFrame()
@@ -117,18 +120,19 @@ void Graphics::endFrame()
 
 void Graphics::drawLine(FLOAT2 p1, FLOAT2 p2, ID2D1SolidColorBrush* pBrush, float strokeWidth)
 {
-	pContext2D->DrawLine({ p1.x, p1.y }, { p2.x, p2.y }, pBrush, strokeWidth);
+	//Height - y to make positive y the down direction to align it with screen space.
+	pContext2D->DrawLine({ p1.x, pWindow->getHeight() - p1.y }, { p2.x, pWindow->getHeight() - p2.y }, pBrush, strokeWidth);
 }
 
 void Graphics::drawPoint(FLOAT2 p, ID2D1SolidColorBrush* pBrush, float radius)
 {
-	pContext2D->DrawEllipse(D2D1_ELLIPSE{ p.x, p.y, radius, radius}, pBrush);
-	pContext2D->FillEllipse(D2D1_ELLIPSE{ p.x, p.y, radius, radius}, pBrush);
+	pContext2D->DrawEllipse(D2D1_ELLIPSE{ p.x, pWindow->getHeight() - p.y, radius, radius}, pBrush);
+	pContext2D->FillEllipse(D2D1_ELLIPSE{ p.x, pWindow->getHeight() - p.y, radius, radius}, pBrush);
 }
 
 void Graphics::drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset) 
 {
-	pContext2D->SetTransform({ 1, 0, 0, 1, offset.x, offset.y });
+	pContext2D->SetTransform({ 1, 0, 0, 1, offset.x, -offset.y });
 	pContext2D->DrawGeometry(pGeometry, pBrush);
 	if (filled)
 		pContext2D->FillGeometry(pGeometry, pBrush);

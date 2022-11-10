@@ -3,13 +3,11 @@
 
 Graphics* Drawable::pGraphics = nullptr;
 
-Drawable::Drawable(Graphics& gfx, FLOAT2 pos, Color color)
+Drawable::Drawable(FLOAT2 pos, Color color)
 	:
 	mPos(pos)
 {
-	if (!pGraphics)
-		pGraphics = &gfx;
-	pBrush = std::unique_ptr<Brush>(new Brush(gfx, color));
+	pBrush = std::unique_ptr<Brush>(new Brush(*pGraphics, color));
 }
 
 void Drawable::setPos(FLOAT2 pos)
@@ -20,6 +18,11 @@ void Drawable::setPos(FLOAT2 pos)
 void Drawable::setColor(Color color)
 {
 	pBrush = std::unique_ptr<Brush>(new Brush(*pGraphics, color));
+}
+
+void Drawable::setGraphics(Graphics* gfx)
+{
+	pGraphics = gfx;
 }
 
 FLOAT2 Drawable::getPos()
