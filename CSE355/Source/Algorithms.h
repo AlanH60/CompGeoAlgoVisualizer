@@ -42,6 +42,11 @@ class AlgorithmVisualizer
 		//Pauses the thread for a specific time depending on the speed.
 		void wait();
 		static void convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points);
+		static void convexHullGraham(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points);
+		static void quickSort(std::vector<Vector2f>& points, std::vector<float>& dots, size_t start, size_t end);
+		static size_t partition(std::vector<Vector2f>& points, std::vector<float>& dots, size_t start, size_t end);
+		static void convexHullQuickHull(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points);
+		static std::vector<Vector2f> quickHullHelper(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points, Vector2f left, Vector2f right);
 
 	private:
 		//Flag that indicates whether or not to perform an algorithm step by step.
@@ -51,9 +56,10 @@ class AlgorithmVisualizer
 		//Pointer to the thread that this algorithm will run on.
 		std::thread* mThread = nullptr;
 		//Speed of the algorithm.
-		float mSpeed = 10;
-		//Stores the lines and points that are generated from the algorithm visualizer.
+		float mSpeed = 5;
+		//Stores the lines that are generated from the algorithm visualizer.
 		std::vector<Line*> mLines;
+		//Stores the points that are generated from the algorithm visualizer.
 		std::vector<Point*> mPoints;
 		//Result of the algorithm
 		std::vector<std::pair<Vector2f, Vector2f>> mResult;
@@ -101,40 +107,33 @@ inline std::vector<Vector2f> convexHullGW(std::vector<Vector2f>& points)
 }
 
 
-inline size_t partition(std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t end)
+inline size_t partition(std::vector<Vector2f>& points, std::vector<float>& dots, size_t start, size_t end)
 {
-	size_t i = start + 1;
-	for (size_t j = start + 1; j < end; j++)
+	size_t i = start;
+	for (size_t j = start; j < end; j++)
 	{
-		if (dots[j] > dots[start])
+		if (dots[j] >= dots[end - 1])
 		{
-			int temp = indices[i];
-			indices[i] = indices[j];
-			indices[j] = temp;
+			Vector2f temp = points[i];
+			points[i] = points[j];
+			points[j] = temp;
 			float tempf = dots[i];
 			dots[i] = dots[j];
 			dots[j] = tempf;
 			i++;
 		}
 	}
-	i--;
-	int temp = indices[i];
-	indices[i] = indices[start];
-	indices[start] = temp;
-	float tempf = dots[i];
-	dots[i] = dots[start];
-	dots[start] = tempf;
-	return i;
+	return --i;
 }
 
-inline void quickSort(std::vector<int>& indices, std::vector<float>& dots, size_t start, size_t end)
+inline void quickSort(std::vector<Vector2f>& points, std::vector<float>& dots, size_t start, size_t end)
 {
 	if (end - start <= 1)
 		return;
 
-	size_t p = partition(indices, dots, start, end);
-	quickSort(indices, dots, start, p);
-	quickSort(indices, dots, p + 1, end);
+	size_t p = partition(points, dots, start, end);
+	quickSort(points, dots, start, p);
+	quickSort(points, dots, p + 1, end);
 }
 
 //Graham Scan- O(nlogn) - we choose an extreme point, pivot, that is guaranteed to be on the convex hull.
@@ -142,7 +141,6 @@ inline void quickSort(std::vector<int>& indices, std::vector<float>& dots, size_
 //We can then use left tests and "wrap" the points in sorted counter-clockwise order.
 inline std::vector<Vector2f> convexHullGraham(std::vector<Vector2f>& points)
 {
-	std::vector<int> indices = std::vector<int>(points.size());
 	//Find the pivot point(Point with lowest y value, higher x value is used to break ties).  Rightmost of the bottommost
 	int pivot = 0;
 	for (int i = 0; i < points.size(); i++)
@@ -151,48 +149,42 @@ inline std::vector<Vector2f> convexHullGraham(std::vector<Vector2f>& points)
 			pivot = i;
 		else if (points[i].y == points[pivot].y)
 			pivot = (points[i].x > points[pivot].x) ? i : pivot;
-		indices[i] = i;
 	}
 
 	//Get the dot products between the vector horizontal from pivot and the vector from pivot to any given point.
 	//This dot product will be used to sort the points (1 -> -1).  
-	std::vector<float> dots = std::vector<float>(points.size());
-	for (int i = 0; i < dots.size(); i++)
+	std::vector<float> dots = std::vector<float>();
+	for (int i = 0; i < points.size(); i++)
 	{
-		dots[i] = dot({ 1, 0 }, normalize(Vector2f{ points[i] - points[pivot] }));
+		if (i == pivot) //Exclude the pivot point
+			continue;
+		dots.push_back(dot({ 1, 0 }, normalize(Vector2f{ points[i] - points[pivot] })));
 	}
+	std::vector<Vector2f> sortedPoints = points;
+	sortedPoints.erase((pivot == 0) ? sortedPoints.begin() : std::next(sortedPoints.begin(), pivot));
 	//Quick sort to sort vertices by dot product. Note: Average: O(nlogn), Worse: O(n^2), so this graham scan has worse case O(n^2).
-	quickSort(indices, dots, 0, points.size());
+	quickSort(sortedPoints, dots, 0, sortedPoints.size());
 
 	//"Stack", but I use an array.
-	std::vector<int> hullI = std::vector<int>();
-	hullI.push_back(pivot);
-	//Keep a record of 
-	int start = 0;
-	//The pivot point may or may not be in the front of the points array.  We want to make sure that it isn't added again.
-	while (indices[start] == pivot)
-		start++;
-	hullI.push_back(indices[start]);
-	for (int i = start + 1; i < points.size(); i ++)
+	std::vector<Vector2f> hull = std::vector<Vector2f>();
+	hull.push_back(points[pivot]);
+	hull.push_back(sortedPoints[0]);
+
+	for (int i = 1; i < sortedPoints.size(); i ++)
 	{
-		if (indices[i] == pivot) //Ignore the pivot point
-			continue;
-		if (leftOf(points[hullI[hullI.size() - 2]], points[hullI[hullI.size() - 1]], points[indices[i]]))
-			hullI.push_back(indices[i]);
+		if (leftOf(hull[hull.size() - 2], hull[hull.size() - 1], sortedPoints[i]))
+			hull.push_back(sortedPoints[i]);
 		else
 		{
 			//Remove from the end of the hull "stack" until the point satisfies the left test.
 			do
 			{
-				hullI.erase(--hullI.end());
-			} while (hullI.size() >= 2 && !leftOf(points[hullI[hullI.size() - 2]], points[hullI[hullI.size() - 1]], points[indices[i]]));
-			hullI.push_back(indices[i]);
+				hull.erase(--hull.end());
+			} while (hull.size() > 2 && !leftOf(hull[hull.size() - 2], hull[hull.size() - 1], sortedPoints[i]));
+			hull.push_back(sortedPoints[i]);
 		}
 	}
-	std::vector<Vector2f> hullPoints = std::vector<Vector2f>();
-	for (int i : hullI)
-		hullPoints.push_back(points[i]);
-	return hullPoints;
+	return hull;
 }
 
 //Recursive function for quickHull

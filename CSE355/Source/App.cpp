@@ -271,7 +271,7 @@ void App::convexHullEventHandler(Event& e)
 						for (Drawable* d : a.second)
 							points.push_back(*reinterpret_cast<Vector2f*>(&d->getPos()));
 					}
-					pVisualizer->computeConvexHull(points, AlgorithmVisualizer::GIFT_WRAPPING);
+					pVisualizer->computeConvexHull(points, AlgorithmVisualizer::QUICK_HULL);
 				}
 					break;
 				default:

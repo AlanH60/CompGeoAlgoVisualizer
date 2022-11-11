@@ -1,7 +1,7 @@
 ﻿  Algorithms.cpp
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(326,173): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(339,89): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(340,89): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(318,173): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(331,89): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(332,89): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
 C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(31,35): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
 C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(31,35): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
 C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(31,59): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
