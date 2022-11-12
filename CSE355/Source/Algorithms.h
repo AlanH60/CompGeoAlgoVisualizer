@@ -22,6 +22,19 @@ class AlgorithmVisualizer
 			GIFT_WRAPPING,
 			QUICK_HULL
 		};
+		enum TriangulationAlgorithm
+		{
+			EAR_CLIPPING
+		};
+	public:
+		//EAR-CLIPPING: Contains the index of the previous vertex, next vertex, whether this vertex is an ear, and whether is has been clipped.
+		struct VertexStatus
+		{
+			size_t prev = 0;
+			size_t next = 0;
+			bool isEar = false;
+			bool isClipped = false;
+		};
 	public:
 		AlgorithmVisualizer();
 		~AlgorithmVisualizer();
@@ -29,11 +42,14 @@ class AlgorithmVisualizer
 		bool isRunning();
 		bool isFinished();
 		bool shouldVisualize();
+		float getSpeed();
 		void setVisualization(bool visualize);
 		void setSpeed(float speed);
+		void addSpeed(float modifier);
 		std::vector<Drawable*> getDrawables();
 
 		void computeConvexHull(std::vector<Vector2f>& points, ConvexHullAlgorithm algorithm = QUICK_HULL);
+		void computeTriangulation(std::vector<Vector2f>& polygon, std::vector<std::pair<size_t, size_t>>& edges, TriangulationAlgorithm algorithm = EAR_CLIPPING);
 
 		std::vector<std::pair<Vector2f, Vector2f>> getResult();
 	private:
@@ -41,12 +57,19 @@ class AlgorithmVisualizer
 		void clear();
 		//Pauses the thread for a specific time depending on the speed.
 		void wait();
+		void wait(float multiplier); //Waits for $multiplier times longer.
+		//Convex Hull Algorithms
 		static void convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points);
 		static void convexHullGraham(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points);
 		static void quickSort(std::vector<Vector2f>& points, std::vector<float>& dots, size_t start, size_t end);
 		static size_t partition(std::vector<Vector2f>& points, std::vector<float>& dots, size_t start, size_t end);
 		static void convexHullQuickHull(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points);
 		static std::vector<Vector2f> quickHullHelper(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points, Vector2f left, Vector2f right);
+		
+		//Triangulation Algorithms
+		static void triangulateEarClipping(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& polygon);
+		static bool diagonalCrossPolygon(std::vector<Vector2f>& polygon, Vector2f a, Vector2f b);
+		static bool isEar(std::vector<Vector2f>& polygon, int idx, int prev, int next);
 
 	private:
 		//Flag that indicates whether or not to perform an algorithm step by step.

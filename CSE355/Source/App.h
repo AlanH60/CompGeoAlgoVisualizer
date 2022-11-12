@@ -1,6 +1,7 @@
 #pragma once
 #include "Direct2D/Application.h"
 #include "Direct2D/Types.h"
+#include "Algorithms.h"
 
 struct Vector2f;
 class Event;
@@ -8,7 +9,6 @@ class Point;
 class Line;
 class Polygon;
 class Drawable;
-class AlgorithmVisualizer;
 class App : public Application
 {
 	public:
@@ -81,4 +81,7 @@ class App : public Application
 		//Map of chunks, or grid partitions, to make it faster to find points based on where the user clicks.
 		std::map<FLOAT2, std::vector<Point*>, ChunkCompare> mPoints;
 		State mState = CONVEX_HULL;
+
+		AlgorithmVisualizer::ConvexHullAlgorithm mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::QUICK_HULL;
+		AlgorithmVisualizer::TriangulationAlgorithm mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::EAR_CLIPPING;
 };

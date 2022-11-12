@@ -23,6 +23,18 @@ App::App()
 
 	pWindow->setOnEvent([this](Event& e)-> void
 	{
+		if (Event::isKeyboard(e))
+		{
+			switch (((KeyEvent&)e).mKeycode)
+			{
+				case VK_UP:
+					pVisualizer->addSpeed(0.1f);
+					break;
+				case VK_DOWN:
+					pVisualizer->addSpeed(-0.1f);
+					break;
+			}
+		}
 		if (!pVisualizer->isIdle())
 			return;
 		if (Event::isKeyboard(e))
@@ -67,11 +79,18 @@ void App::onUpdate()
 	if (pVisualizer->isFinished())
 	{
 		std::vector<std::pair<Vector2f, Vector2f>> result = pVisualizer->getResult();
-		for (auto& r : result)
-		{
-			Line* l = new Line(r.first, r.second);
-			mHullLines.push_back(l);
-		}
+		if (mState == CONVEX_HULL)
+			for (auto& r : result)
+			{
+				Line* l = new Line(r.first, r.second);
+				mHullLines.push_back(l);
+			}
+		else
+			for (auto& r : result)
+			{
+				Line* l = new Line(r.first, r.second);
+				mTriangulationLines.push_back(l);
+			}
 	}
 }
 
@@ -254,6 +273,15 @@ void App::convexHullEventHandler(Event& e)
 			KeyEvent& key = (KeyEvent&)e;
 			switch (key.mKeycode)
 			{
+				case '1':
+					mCHAlgorithm = AlgorithmVisualizer::GIFT_WRAPPING;
+					break;
+				case '2':
+					mCHAlgorithm = AlgorithmVisualizer::GRAHAM_SCAN;
+					break;
+				case '3':
+					mCHAlgorithm = AlgorithmVisualizer::QUICK_HULL;
+					break;
 				case VK_DELETE:
 				case VK_BACK:
 					if (pSelectedPoint != nullptr)
@@ -271,7 +299,7 @@ void App::convexHullEventHandler(Event& e)
 						for (Drawable* d : a.second)
 							points.push_back(*reinterpret_cast<Vector2f*>(&d->getPos()));
 					}
-					pVisualizer->computeConvexHull(points, AlgorithmVisualizer::QUICK_HULL);
+					pVisualizer->computeConvexHull(points, mCHAlgorithm);
 				}
 					break;
 				default:
@@ -322,16 +350,18 @@ void App::triangulateEventHandler(Event& e)
 			KeyEvent& key = (KeyEvent&)e;
 			switch (key.mKeycode)
 			{
+				case '1':
+					mTriAlgorithm = AlgorithmVisualizer::EAR_CLIPPING;
+					break;
 				case VK_RETURN:
 				{
 					deleteAndClear(mTriangulationLines);
 					if (isValidPolygon && mPolygon.size() >= 3 && mPolygon[0] == mPolygon[mPolygon.size() - 1])
 					{
 						mPolygon.erase(--mPolygon.end());
-						std::vector<std::pair<Vector2f, Vector2f>> diagonals = triangulate(mPolygon);
+						std::vector<std::pair<size_t, size_t>> a;
+						pVisualizer->computeTriangulation(mPolygon, a, mTriAlgorithm);
 						mPolygon.push_back(mPolygon[0]);
-						for (auto& d : diagonals)
-							mTriangulationLines.push_back(new Line({ d.first.x, d.first.y }, { d.second.x, d.second.y }));
 					}
 				}
 					break;

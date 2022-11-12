@@ -39,6 +39,11 @@ bool AlgorithmVisualizer::shouldVisualize()
 	return mVisualize;
 }
 
+float AlgorithmVisualizer::getSpeed()
+{
+	return mSpeed;
+}
+
 void AlgorithmVisualizer::setVisualization(bool visualize)
 {
 	mVisualize = visualize;
@@ -47,6 +52,15 @@ void AlgorithmVisualizer::setVisualization(bool visualize)
 void AlgorithmVisualizer::setSpeed(float speed)
 {
 	mSpeed = speed;
+}
+
+void AlgorithmVisualizer::addSpeed(float modifier)
+{
+	mSpeed += modifier;
+	if (mSpeed < 1)
+		mSpeed = 1;
+	if (mSpeed > 10)
+		mSpeed = 10;
 }
 
 std::vector<Drawable*> AlgorithmVisualizer::getDrawables()
@@ -80,6 +94,21 @@ void AlgorithmVisualizer::computeConvexHull(std::vector<Vector2f>& points, Conve
 	}
 }
 
+void AlgorithmVisualizer::computeTriangulation(std::vector<Vector2f>& polygon, std::vector<std::pair<size_t, size_t>>& edges, TriangulationAlgorithm algorithm)
+{
+	if (polygon.size() <= 3)
+		return;
+	clear();
+	if (mThread->joinable())
+		mThread->join();
+	switch (algorithm)
+	{
+		case EAR_CLIPPING:
+			mThread->swap(std::thread(triangulateEarClipping, this, polygon));
+			break;
+	}
+}
+
 std::vector<std::pair<Vector2f, Vector2f>> AlgorithmVisualizer::getResult()
 {
 	if (mState == FINISHED)
@@ -107,6 +136,11 @@ void AlgorithmVisualizer::wait()
 	std::this_thread::sleep_for(std::chrono::milliseconds((long)(1000 / mSpeed)));
 }
 
+void AlgorithmVisualizer::wait(float multiplier)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds((long)(multiplier * 1000 / mSpeed)));
+}
+
 void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
 {
 	pVisualizer->mState = RUNNING;
@@ -132,7 +166,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 	{
 		pCurrPoint->setPos(points[i]);
 		pCurrLine->setPoints({ -1, points[i].y }, { 10000, points[i].y });
-
+		
 		//Compare the y values,  if points[minY] is below points[i], compareResult = -1, otherwise if it is above, compareResult = 1.
 		//compareResult = 0 if they are equal.
 		int compareResult = compareY(points[minY], points[i]);
@@ -168,6 +202,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 				continue;
 			pCurrLine->setPoints(convexHull[i], points[j]);
 			pCurrPoint->setPos(points[j]);
+			pVisualizer->wait(0.5f);
 			//If we find a point that is to the right of our current right-most edge, 
 			//we set the edge from that point to the most recent convex hull vertex as the new right-most edge.
 			if (!leftOf(convexHull[i], points[nextPoint], points[j]))
@@ -338,6 +373,7 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 
 		pCurrLine->setPoints(projection + left, p);
 		pCurrPoint->setPos(p);
+		pVisualizer->wait();
 
 		//Maximize this y component to find the next vertex of the hull.
 		if (dist > maxDist)
@@ -458,4 +494,74 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 		pVisualizer->mResult.push_back({ hull[i], hull[i + 1] });
 
 	pVisualizer->mState = FINISHED;
+}
+
+//Ear-Clipping triangulation algorithm.  Cut off ears and update ear status of adjacent vertices.  Loop around the polygon until triangulation is done.
+void AlgorithmVisualizer::triangulateEarClipping(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& polygon)
+{
+	pVisualizer->mState = RUNNING;
+	//Vector of VertexStatus of each vertex of the polygon
+	std::vector<VertexStatus> vertexStatus = std::vector<VertexStatus>(polygon.size());
+	//Intialize the VertexStatus of each vertex - O(n^2)
+	for (int i = 0; i < polygon.size(); i++)
+		vertexStatus[i] = { (i == 0) ? (polygon.size() - 1) : i - 1, (i + 1) % polygon.size(), isEar(polygon, i, (i == 0) ? (polygon.size() - 1) : i - 1, (i + 1) % polygon.size()), false };
+
+	Point* pCurrPoint = new Point({ 0, 0 }, { 0, 0.5f, 0.5f, 1 });
+	Line* pCurrLine = new Line({ 0, 0 }, { 0, 0 }, { 0, 0.5f, 0.5f, 1 });
+
+	pVisualizer->mPoints.push_back(pCurrPoint);
+	pVisualizer->mLines.push_back(pCurrLine);
+
+	int i = 0;
+	while (pVisualizer->mResult.size() != (polygon.size() - 3)) //There are always n - 3 non-crossing diagonals.
+	{
+		i %= polygon.size();
+		//If the vertex is an ear and is not already clipped, clip it.  Then update its prev and next vertices' ear status and their next and prev vertex respectively.
+		if (!vertexStatus[i].isClipped)
+		{
+			pCurrPoint->setPos(polygon[i]);
+			pCurrLine->setPoints(polygon[vertexStatus[i].prev], polygon[vertexStatus[i].next]);
+			if (vertexStatus[i].isEar)
+			{
+				pCurrLine->setColor({ 0, 0.5f, 0.5f, 1 });
+				pVisualizer->wait(2);
+				VertexStatus& v = vertexStatus[i];
+				pVisualizer->mResult.push_back({ polygon[v.prev], polygon[v.next] });
+				pVisualizer->mLines.push_back(new Line(polygon[v.prev], polygon[v.next], { 0, 1, 0, 1 }));
+				pVisualizer->mPoints.push_back(new Point(polygon[i], { 0, 1, 0, 1 }));
+
+				vertexStatus[v.prev].next = v.next;
+				vertexStatus[v.next].prev = v.prev;
+				vertexStatus[v.prev].isEar = isEar(polygon, v.prev, vertexStatus[v.prev].prev, v.next);
+				vertexStatus[v.next].isEar = isEar(polygon, v.next, v.prev, vertexStatus[v.next].next);
+				vertexStatus[i].isClipped = true;
+			}
+			else
+				pCurrLine->setColor({ 1, 0, 0, 1 });
+
+			pVisualizer->wait(2);
+		}
+		i++;
+	}
+
+	pVisualizer->mState = FINISHED;
+}
+
+bool AlgorithmVisualizer::diagonalCrossPolygon(std::vector<Vector2f>& polygon, Vector2f a, Vector2f b)
+{
+	for (int i = 1; i < polygon.size(); i++)
+	{
+		if (intersectProp(a, b, polygon[i - 1], polygon[i]))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool AlgorithmVisualizer::isEar(std::vector<Vector2f>& polygon, int idx, int prev, int next)
+{
+	if (!isConvex(polygon[prev], polygon[idx], polygon[next]))
+		return false;
+	return diagonalCrossPolygon(polygon, polygon[prev], polygon[next]);
 }
