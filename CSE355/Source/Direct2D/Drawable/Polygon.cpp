@@ -1,6 +1,8 @@
 #include "PCH.h"
 #include "Polygon.h"
 
+using namespace D2D;
+
 Polygon::Polygon(FLOAT2* vertices, unsigned int vertexCount, bool filled, Color color)
 	:
 	Drawable({ 0,0 }, color),

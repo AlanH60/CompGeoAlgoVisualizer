@@ -34,6 +34,7 @@ struct Event
 
 	InputType mInputType;
 	EventType mType;
+	bool isConsumed = false;
 };
 
 struct MouseEvent : public Event

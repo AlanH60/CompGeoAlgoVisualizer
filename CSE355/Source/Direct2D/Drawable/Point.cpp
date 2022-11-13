@@ -1,6 +1,7 @@
 #include "PCH.h"
 #include "Point.h"
 
+using namespace D2D;
 
 Point::Point(FLOAT2 pos, Color color)
 	: 
@@ -9,5 +10,5 @@ Point::Point(FLOAT2 pos, Color color)
 
 void Point::draw()
 {
-	pGraphics->drawPoint(mPos, pBrush->get());
+	pGraphics->drawPoint(mPos + mOffset, pBrush->get());
 }

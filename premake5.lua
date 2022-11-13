@@ -13,7 +13,7 @@ project "CSE355"
     objdir ("bin-int/" .. outputDir .. "/%{prj.name}")
 
     pchheader "PCH.h"
-    pchsource "CSE355/PCH.cpp"
+    pchsource "CSE355/Source/PCH.cpp"
 
     files 
     { 
@@ -32,7 +32,8 @@ project "CSE355"
     {
         "d3d11.lib",
         "d2d1.lib",
-		"D3DCompiler.lib"
+		"D3DCompiler.lib",
+		"dwrite.lib"
     }
 
     filter { "configurations:Debug" }

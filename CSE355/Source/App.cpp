@@ -7,9 +7,22 @@
 #include "Direct2D/Drawable/Point.h"
 #include "Direct2D/Drawable/Line.h"
 #include "Direct2D/Drawable/Polygon.h"
+#include "Direct2D/Drawable/Text.h"
+#include "UI/IContainer.h"
+#include "UI/IButton.h"
+
+using D2D::Drawable;
+using D2D::Line;
+using D2D::Point;
+using D2D::Polygon;
+using D2D::Text;
+
 App::App()
 {
 	pVisualizer = new AlgorithmVisualizer();
+	pRoot = new IContainer();
+	IButton* button = new IButton(L"Testing", 100, 100);
+	pRoot->addChild(button);
 	//**************** Grid Lines ****************//
 	for (int i = 1; i <= pWindow->getWidth() / CHUNK_SIZE; i++)
 	{
@@ -23,6 +36,9 @@ App::App()
 
 	pWindow->setOnEvent([this](Event& e)-> void
 	{
+		pRoot->onEvent(e);
+		if (e.isConsumed)
+			return;
 		if (Event::isKeyboard(e))
 		{
 			switch (((KeyEvent&)e).mKeycode)
@@ -67,6 +83,7 @@ App::App()
 
 App::~App()
 {
+	delete pRoot;
 	clear();
 	deleteAndClear(mGridLines);
 	if (pSelectedOutline)
@@ -82,13 +99,13 @@ void App::onUpdate()
 		if (mState == CONVEX_HULL)
 			for (auto& r : result)
 			{
-				Line* l = new Line(r.first, r.second);
+				Line* l = new Line({ r.first.x, -r.first.y }, { r.second.x, -r.second.y });
 				mHullLines.push_back(l);
 			}
 		else
 			for (auto& r : result)
 			{
-				Line* l = new Line(r.first, r.second);
+				Line* l = new Line({ r.first.x, -r.first.y }, { r.second.x, -r.second.y });
 				mTriangulationLines.push_back(l);
 			}
 	}
@@ -123,14 +140,35 @@ void App::onDraw()
 						{pSelectedPoint->getPos().x + 15, pSelectedPoint->getPos().y - 15 },
 						{pSelectedPoint->getPos().x + 15, pSelectedPoint->getPos().y + 15 },
 						{pSelectedPoint->getPos().x - 15, pSelectedPoint->getPos().y + 15 } };
-		pSelectedOutline = new Polygon(f, 4, false, { 0.0f, 0.5f, 1.0f, 0.8f });
+		pSelectedOutline = new D2D::Polygon(f, 4, false, { 0.0f, 0.5f, 1.0f, 0.8f });
 		pSelectedOutline->draw();
 	}
 
+
+
 	//Algorithm Visualizer
-	if (pVisualizer->isRunning() && pVisualizer->shouldVisualize())
-		for (Drawable* d : pVisualizer->getDrawables())
-			d->draw();
+	if ((pVisualizer->isRunning() || pVisualizer->isSleeping()) && pVisualizer->shouldVisualize())
+	{
+		//Wait until the algorithm is sleeping to draw.
+		while (!pVisualizer->isSleeping()) {}
+		std::vector<Point*>& points = pVisualizer->getPoints();
+		std::vector<Line*>& lines = pVisualizer->getLines();
+		for (Line* l : lines)
+		{
+			l->setPoints({ l->getP1().x, -l->getP1().y }, { l->getP2().x, -l->getP2().y });
+			l->draw();
+			l->setPoints({ l->getP1().x, -l->getP1().y }, { l->getP2().x, -l->getP2().y });
+		}
+		for (Point* p : points)
+		{
+			p->setPos({ p->getPos().x, -p->getPos().y });
+			p->draw();
+			p->setPos({ p->getPos().x, -p->getPos().y });
+		}
+	}
+
+	//UI
+	pRoot->draw(0, 0);
 }
 
 void App::clear()
@@ -160,11 +198,11 @@ void App::addPoint(Point* pPoint)
 Point* App::getPoint(FLOAT2 pos)
 {
 	Point* p = nullptr;
-	for (auto* pDrawable : mPoints[pos])
+	for (Point* pPoint : mPoints[pos])
 	{
-		FLOAT2 diff = pDrawable->getPos() - pos;
+		FLOAT2 diff = pPoint->getPos() - pos;
 		if (abs(diff.x) <= 20 && abs(diff.y) <= 20)
-			p = pDrawable;
+			p = pPoint;
 	}
 	//If can't find it in current chunk, check the chunk's neighbors.
 	if (!p)
@@ -175,11 +213,11 @@ Point* App::getPoint(FLOAT2 pos)
 			{
 				if ((j == 0 && i == 0) || mPoints[pos] == mPoints[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
 					continue;
-				for (auto* pDrawable : mPoints[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
+				for (Point* pPoint : mPoints[pos + FLOAT2{ i * 20.0f, j * 20.0f }])
 				{
-					FLOAT2 diff = pDrawable->getPos() - pos;
+					FLOAT2 diff = pPoint->getPos() - pos;
 					if (abs(diff.x) <= 20 && abs(diff.y) <= 20)
-						p = pDrawable;
+						p = pPoint;
 				}
 			}
 		}
@@ -296,8 +334,9 @@ void App::convexHullEventHandler(Event& e)
 					std::vector<Vector2f> points = std::vector<Vector2f>();
 					for (auto& a : mPoints)
 					{
+						//Flip y for counter-clockwise
 						for (Drawable* d : a.second)
-							points.push_back(*reinterpret_cast<Vector2f*>(&d->getPos()));
+							points.push_back({ d->getPos().x, -d->getPos().y });
 					}
 					pVisualizer->computeConvexHull(points, mCHAlgorithm);
 				}
@@ -360,7 +399,10 @@ void App::triangulateEventHandler(Event& e)
 					{
 						mPolygon.erase(--mPolygon.end());
 						std::vector<std::pair<size_t, size_t>> a;
-						pVisualizer->computeTriangulation(mPolygon, a, mTriAlgorithm);
+						std::vector<Vector2f> flippedY;
+						for (int i = 0; i < mPolygon.size(); i++)
+							flippedY[i] = {mPolygon[i].x, -mPolygon[i].y};
+						pVisualizer->computeTriangulation(flippedY, a, mTriAlgorithm);
 						mPolygon.push_back(mPolygon[0]);
 					}
 				}

@@ -55,7 +55,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -66,7 +66,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d2d1.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d2d1.lib;D3DCompiler.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -86,7 +86,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>d3d11.lib;d2d1.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d2d1.lib;D3DCompiler.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -94,13 +94,15 @@
     <ClInclude Include="Source\App.h" />
     <ClInclude Include="Source\Direct2D\Application.h" />
     <ClInclude Include="Source\Direct2D\Color.h" />
+    <ClInclude Include="Source\Direct2D\DrawRes\Bitmap.h" />
+    <ClInclude Include="Source\Direct2D\DrawRes\Brush.h" />
+    <ClInclude Include="Source\Direct2D\DrawRes\Geometry.h" />
     <ClInclude Include="Source\Direct2D\Drawable\Drawable.h" />
     <ClInclude Include="Source\Direct2D\Drawable\Line.h" />
     <ClInclude Include="Source\Direct2D\Drawable\Point.h" />
     <ClInclude Include="Source\Direct2D\Drawable\Polygon.h" />
-    <ClInclude Include="Source\Direct2D\DrawRes\Bitmap.h" />
-    <ClInclude Include="Source\Direct2D\DrawRes\Brush.h" />
-    <ClInclude Include="Source\Direct2D\DrawRes\Geometry.h" />
+    <ClInclude Include="Source\Direct2D\Drawable\Rectangle.h" />
+    <ClInclude Include="Source\Direct2D\Drawable\Text.h" />
     <ClInclude Include="Source\Direct2D\Event.h" />
     <ClInclude Include="Source\Direct2D\Graphics.h" />
     <ClInclude Include="Source\Direct2D\Types.h" />
@@ -108,25 +110,35 @@
     <ClInclude Include="Source\Loader.h" />
     <ClInclude Include="Source\PCH.h" />
     <ClInclude Include="Source\Primatives.h" />
+    <ClInclude Include="Source\UI\IButton.h" />
+    <ClInclude Include="Source\UI\IComponent.h" />
+    <ClInclude Include="Source\UI\IContainer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
     <ClCompile Include="Source\App.cpp" />
     <ClCompile Include="Source\Direct2D\Application.cpp" />
     <ClCompile Include="Source\Direct2D\Color.cpp" />
+    <ClCompile Include="Source\Direct2D\DrawRes\Bitmap.cpp" />
+    <ClCompile Include="Source\Direct2D\DrawRes\Brush.cpp" />
+    <ClCompile Include="Source\Direct2D\DrawRes\Geometry.cpp" />
     <ClCompile Include="Source\Direct2D\Drawable\Drawable.cpp" />
     <ClCompile Include="Source\Direct2D\Drawable\Line.cpp" />
     <ClCompile Include="Source\Direct2D\Drawable\Point.cpp" />
     <ClCompile Include="Source\Direct2D\Drawable\Polygon.cpp" />
-    <ClCompile Include="Source\Direct2D\DrawRes\Bitmap.cpp" />
-    <ClCompile Include="Source\Direct2D\DrawRes\Brush.cpp" />
-    <ClCompile Include="Source\Direct2D\DrawRes\Geometry.cpp" />
+    <ClCompile Include="Source\Direct2D\Drawable\Rectangle.cpp" />
+    <ClCompile Include="Source\Direct2D\Drawable\Text.cpp" />
     <ClCompile Include="Source\Direct2D\Event.cpp" />
     <ClCompile Include="Source\Direct2D\Graphics.cpp" />
     <ClCompile Include="Source\Direct2D\Types.cpp" />
     <ClCompile Include="Source\Direct2D\Window.cpp" />
     <ClCompile Include="Source\Loader.cpp" />
-    <ClCompile Include="Source\PCH.cpp" />
+    <ClCompile Include="Source\PCH.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\UI\IButton.cpp" />
+    <ClCompile Include="Source\UI\IComponent.cpp" />
+    <ClCompile Include="Source\UI\IContainer.cpp" />
     <ClCompile Include="Source\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

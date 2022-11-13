@@ -2,10 +2,13 @@
 #include "../Types.h"
 #include "Drawable.h"
 
-class Point : public Drawable
+namespace D2D
 {
-	public:
-		Point(FLOAT2 pos, Color color = Color{ 1.0f, 0.0f, 0.0f, 1.0f });
-		~Point() = default;
-		void draw() override;
-};
+	class Point : public Drawable
+	{
+		public:
+			Point(FLOAT2 pos, Color color = Color{ 1.0f, 0.0f, 0.0f, 1.0f });
+			~Point() = default;
+			void draw() override;
+	};
+}

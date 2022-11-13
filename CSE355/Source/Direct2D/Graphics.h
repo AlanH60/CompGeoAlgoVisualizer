@@ -11,22 +11,26 @@
 	#define ASSERT_IF_FAILED(hr, message)
 #endif
 
-
 class Window;
 struct Color;
 class Graphics
 {
 	public:
 		Graphics(Window* pWindow);
+		~Graphics();
 		//Sets up a new frame for draw calls.
 		void beginFrame();
 		//Displays the new frame.
 		void endFrame();
 
+		//Draw a rectangle
+		void drawRect(FLOAT2 pos, float width, float height, bool filled, ID2D1SolidColorBrush* pBrush, float cornerRadius = 0.0f, float borderWidth = 1.0f);
 		//Draw a line from points p1 to p2, using pBrush.
 		void drawLine(FLOAT2 p1, FLOAT2 p2, ID2D1SolidColorBrush* pBrush, float strokeWidth = 1.0f);
 		//Draw a point on the specified coordinate, using pBrush.
 		void drawPoint(FLOAT2 p, ID2D1SolidColorBrush* pBrush, float radius = 5.0f);
+		//Draw text
+		void drawText(FLOAT2 pos, IDWriteTextLayout* pTextLayout, ID2D1SolidColorBrush* pBrush);
 
 		//Draw a path geometry created back createPathGeometry()
 		void drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset = { 0, 0 });
@@ -34,7 +38,10 @@ class Graphics
 		void createSolidColorBrush(Color color, Microsoft::WRL::ComPtr<ID2D1SolidColorBrush>& pBrush);
 		//Create a path geometry, or shape, using a set of vertices.
 		void createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bool filled, Microsoft::WRL::ComPtr<ID2D1PathGeometry>& pGeometry);
-		
+		//Create a text layout. For style, 0 - normal, 1 - oblique, 2 - italics
+		void createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, 
+			float width, float height, IDWriteTextLayout** ppTextLayout);
+
 		//Operation to handle the resize of the window.  This includes resizing the back buffers of pSwapChain.
 		void onResize(int width, int height);
 	private:
@@ -44,6 +51,6 @@ class Graphics
 		Microsoft::WRL::ComPtr<ID2D1DeviceContext> pContext2D;
 		//Factory used to create certain 2D interfaces like ID2D1Geometry and ID2D1DeviceContext
 		Microsoft::WRL::ComPtr<ID2D1Factory2> pFactory2D;
-		//Pointer to the window context
-		Window* pWindow;
+		//Factory used to create text
+		IDWriteFactory* pWriteFactory;
 };

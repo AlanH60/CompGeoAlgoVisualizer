@@ -1,9 +1,12 @@
 #include "PCH.h"
 #include "Algorithms.h"
-#include "App.h"
 #include "Direct2D/Color.h"
 #include "Direct2D/Drawable/Point.h"
 #include "Direct2D/Drawable/Line.h"
+
+using D2D::Drawable;
+using D2D::Point;
+using D2D::Line;
 
 AlgorithmVisualizer::AlgorithmVisualizer()
 {
@@ -32,6 +35,11 @@ bool AlgorithmVisualizer::isRunning()
 bool AlgorithmVisualizer::isFinished()
 {
 	return mState == FINISHED;
+}
+
+bool AlgorithmVisualizer::isSleeping()
+{
+	return mState == SLEEPING;
 }
 
 bool AlgorithmVisualizer::shouldVisualize()
@@ -63,15 +71,16 @@ void AlgorithmVisualizer::addSpeed(float modifier)
 		mSpeed = 10;
 }
 
-std::vector<Drawable*> AlgorithmVisualizer::getDrawables()
+std::vector<D2D::Line*>& AlgorithmVisualizer::getLines()
 {
-	std::vector<Drawable*> drawables;
-	for (Line* l : mLines)
-		drawables.push_back(l);
-	for (Point* p : mPoints)
-		drawables.push_back(p);
-	return drawables;
+	return mLines;
 }
+
+std::vector<D2D::Point*>& AlgorithmVisualizer::getPoints()
+{
+	return mPoints;
+}
+
 
 void AlgorithmVisualizer::computeConvexHull(std::vector<Vector2f>& points, ConvexHullAlgorithm algorithm)
 {
@@ -133,12 +142,16 @@ void AlgorithmVisualizer::clear()
 
 void AlgorithmVisualizer::wait()
 {
+	mState = SLEEPING;
 	std::this_thread::sleep_for(std::chrono::milliseconds((long)(1000 / mSpeed)));
+	mState = RUNNING;
 }
 
 void AlgorithmVisualizer::wait(float multiplier)
 {
+	mState = SLEEPING;
 	std::this_thread::sleep_for(std::chrono::milliseconds((long)(multiplier * 1000 / mSpeed)));
+	mState = RUNNING;
 }
 
 void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
@@ -165,7 +178,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 	for (int i = 0; i < points.size(); i++)
 	{
 		pCurrPoint->setPos(points[i]);
-		pCurrLine->setPoints({ -1, points[i].y }, { 10000, points[i].y });
+		pCurrLine->setPoints({ 0, points[i].y }, { 10000, points[i].y });
 		
 		//Compare the y values,  if points[minY] is below points[i], compareResult = -1, otherwise if it is above, compareResult = 1.
 		//compareResult = 0 if they are equal.
@@ -177,7 +190,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 
 		//Update the lowest point and line.
 		pLowestPoint->setPos(points[minY]);
-		pLowestLine->setPoints({ -1, points[minY].y }, { 10000, points[minY].y });
+		pLowestLine->setPoints({ 0, points[minY].y }, { 10000, points[minY].y });
 		pVisualizer->wait();
 	}
 	//Lowest line no longer needed.
@@ -247,7 +260,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 	for (int i = 0; i < points.size(); i++)
 	{
 		pCurrPoint->setPos(points[i]);
-		pCurrLine->setPoints({ -1, points[i].y }, { 10000, points[i].y });
+		pCurrLine->setPoints({ 0, points[i].y }, { 10000, points[i].y });
 
 		if (points[i].y < points[pivot].y)
 			pivot = i;
@@ -256,7 +269,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 
 		//Update the lowest point and line.
 		pLowestPoint->setPos(points[pivot]);
-		pLowestLine->setPoints({ -1, points[pivot].y }, { 10000, points[pivot].y });
+		pLowestLine->setPoints({ 0, points[pivot].y }, { 10000, points[pivot].y });
 		pVisualizer->wait();
 	}
 	//Lowest line no longer needed.
@@ -443,7 +456,7 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 	for (Vector2f& p : points)
 	{
 		pCurrPoint->setPos(p);
-		pCurrLine->setPoints({ p.x, -1 }, { p.x, 10000 });
+		pCurrLine->setPoints({ p.x, 0 }, { p.x, -10000 });
 
 		if (p.x < left.x)
 			left = p;
@@ -456,8 +469,8 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 
 		pLeftPoint->setPos(left);
 		pRightPoint->setPos(right);
-		pLeftLine->setPoints({ left.x, -1 }, { left.x, 10000 });
-		pRightLine->setPoints({ right.x, -1 }, { right.x, 10000 });
+		pLeftLine->setPoints({ left.x, 0 }, { left.x, -10000 });
+		pRightLine->setPoints({ right.x, 0 }, { right.x, -10000 });
 
 		pVisualizer->wait();
 	}

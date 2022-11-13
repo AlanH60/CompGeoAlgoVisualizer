@@ -3,11 +3,10 @@
 #include "Window.h"
 #include "Color.h"
 #include "Drawable/Drawable.h"
+#include <dwrite.h>
 
 using Microsoft::WRL::ComPtr;
 Graphics::Graphics(Window* pWindow)
-	:
-	pWindow(pWindow)
 {
 	//*********************** Create 3D Device, Context, and SwapChain ***********************//
 	UINT deviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
@@ -100,8 +99,17 @@ Graphics::Graphics(Window* pWindow)
 
 	pContext2D->SetTarget(pBitmap.Get());
 
+	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED,	__uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&pWriteFactory));
+
+	ASSERT_IF_FAILED(hr, "Failed to create text factory!");
+
 	pWindow->setGraphics(this);
-	Drawable::setGraphics(this);
+	D2D::Drawable::setGraphics(this);
+}
+
+Graphics::~Graphics()
+{
+	pWriteFactory->Release();
 }
 
 void Graphics::beginFrame()
@@ -117,17 +125,39 @@ void Graphics::endFrame()
 	ASSERT_IF_FAILED(hr, "Swap Chain present error!");
 }
 
+void Graphics::drawRect(FLOAT2 pos, float width, float height, bool filled, ID2D1SolidColorBrush* pBrush, float cornerRadius, float borderWidth)
+{
+	D2D1_RECT_F rect = { pos.x, pos.y + height, pos.x + width, pos.y };
+	if (cornerRadius != 0)
+	{
+		pContext2D->DrawRoundedRectangle({ rect, cornerRadius, cornerRadius }, pBrush, borderWidth);
+		if (filled)
+			pContext2D->FillRoundedRectangle({ rect, cornerRadius, cornerRadius }, pBrush);
+	}
+	else
+	{
+		pContext2D->DrawRectangle(rect, pBrush, borderWidth);
+		if (filled)
+			pContext2D->FillRectangle(rect, pBrush);
+	}
+}
+
 
 void Graphics::drawLine(FLOAT2 p1, FLOAT2 p2, ID2D1SolidColorBrush* pBrush, float strokeWidth)
 {
 	//Height - y to make positive y the down direction to align it with screen space.
-	pContext2D->DrawLine({ p1.x, pWindow->getHeight() - p1.y }, { p2.x, pWindow->getHeight() - p2.y }, pBrush, strokeWidth);
+	pContext2D->DrawLine({ p1.x, p1.y }, { p2.x, p2.y }, pBrush, strokeWidth);
 }
 
 void Graphics::drawPoint(FLOAT2 p, ID2D1SolidColorBrush* pBrush, float radius)
 {
-	pContext2D->DrawEllipse(D2D1_ELLIPSE{ p.x, pWindow->getHeight() - p.y, radius, radius}, pBrush);
-	pContext2D->FillEllipse(D2D1_ELLIPSE{ p.x, pWindow->getHeight() - p.y, radius, radius}, pBrush);
+	pContext2D->DrawEllipse(D2D1_ELLIPSE{ p.x, p.y, radius, radius}, pBrush);
+	pContext2D->FillEllipse(D2D1_ELLIPSE{ p.x, p.y, radius, radius}, pBrush);
+}
+
+void Graphics::drawText(FLOAT2 pos, IDWriteTextLayout* pTextLayout, ID2D1SolidColorBrush* pBrush)
+{
+	pContext2D->DrawTextLayout({ pos.x, pos.y }, pTextLayout, pBrush);
 }
 
 void Graphics::drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset) 
@@ -159,6 +189,17 @@ void Graphics::createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bo
 
 	hr = pSink->Close();
 	ASSERT_IF_FAILED(hr, "Failed to close geometry sink!");
+}
+
+void Graphics::createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, float width, float height, IDWriteTextLayout** ppTextLayout)
+{
+	HRESULT hr;
+	ComPtr<IDWriteTextFormat> pTextFormat;
+	hr = pWriteFactory->CreateTextFormat(fontFamily.c_str(), NULL, (bold) ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
+		(DWRITE_FONT_STYLE)style, DWRITE_FONT_STRETCH_NORMAL, size, L"en-us", &pTextFormat);
+	ASSERT_IF_FAILED(hr, "Failed to createt text format!");
+	hr = pWriteFactory->CreateTextLayout(wstr.c_str(), wstr.length(), pTextFormat.Get(), width, height, ppTextLayout);
+	ASSERT_IF_FAILED(hr, "Failed to create text layout!");
 }
 
 void Graphics::onResize(int width, int height)

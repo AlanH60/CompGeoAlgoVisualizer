@@ -14,5 +14,4 @@
 #include <set>
 #include <map>
 
-#define NOGDI
 #include <Windows.h>

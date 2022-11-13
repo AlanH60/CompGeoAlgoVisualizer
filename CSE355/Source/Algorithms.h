@@ -1,10 +1,13 @@
 #pragma once
 #include "Primatives.h"
 
-class App;
-class Drawable;
-class Line;
-class Point;
+namespace D2D
+{
+	class Drawable;
+	class Line;
+	class Point;
+}
+
 class AlgorithmVisualizer
 {
 	public:
@@ -12,9 +15,10 @@ class AlgorithmVisualizer
 		//Results of an algorithm can be obtained when it is in a finished state.
 		enum State
 		{
-			IDLE,
-			RUNNING,
-			FINISHED
+			IDLE, //The no algorithm is running
+			RUNNING, //Algorithm is running
+			SLEEPING, //Algorithm is running, but the thread is currently sleeping
+			FINISHED //Algorithm is done and result is ready to be queried by App.
 		};
 		enum ConvexHullAlgorithm
 		{
@@ -41,12 +45,14 @@ class AlgorithmVisualizer
 		bool isIdle();
 		bool isRunning();
 		bool isFinished();
+		bool isSleeping();
 		bool shouldVisualize();
 		float getSpeed();
 		void setVisualization(bool visualize);
 		void setSpeed(float speed);
 		void addSpeed(float modifier);
-		std::vector<Drawable*> getDrawables();
+		std::vector<D2D::Line*>& getLines();
+		std::vector<D2D::Point*>& getPoints();
 
 		void computeConvexHull(std::vector<Vector2f>& points, ConvexHullAlgorithm algorithm = QUICK_HULL);
 		void computeTriangulation(std::vector<Vector2f>& polygon, std::vector<std::pair<size_t, size_t>>& edges, TriangulationAlgorithm algorithm = EAR_CLIPPING);
@@ -81,9 +87,9 @@ class AlgorithmVisualizer
 		//Speed of the algorithm.
 		float mSpeed = 5;
 		//Stores the lines that are generated from the algorithm visualizer.
-		std::vector<Line*> mLines;
+		std::vector<D2D::Line*> mLines;
 		//Stores the points that are generated from the algorithm visualizer.
-		std::vector<Point*> mPoints;
+		std::vector<D2D::Point*> mPoints;
 		//Result of the algorithm
 		std::vector<std::pair<Vector2f, Vector2f>> mResult;
 };

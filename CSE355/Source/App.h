@@ -3,12 +3,18 @@
 #include "Direct2D/Types.h"
 #include "Algorithms.h"
 
+namespace D2D
+{
+	class Drawable;
+	class Point;
+	class Line;
+	class Polygon;
+}
+
 struct Vector2f;
 class Event;
-class Point;
-class Line;
-class Polygon;
-class Drawable;
+
+class IContainer;
 class App : public Application
 {
 	public:
@@ -45,10 +51,10 @@ class App : public Application
 		void onDraw() override;
 		//Clear all drawables on the grid
 		void clear();
-		void addPoint(Point* pPoint);
-		bool removePoint(Point* pPoint);
-		bool deletePoint(Point* pPoint);
-		Point* getPoint(FLOAT2 pos);
+		void addPoint(D2D::Point* pPoint);
+		bool removePoint(D2D::Point* pPoint);
+		bool deletePoint(D2D::Point* pPoint);
+		D2D::Point* getPoint(FLOAT2 pos);
 
 	private:
 		template<typename T>
@@ -65,23 +71,26 @@ class App : public Application
 	private:
 		AlgorithmVisualizer* pVisualizer = nullptr;
 		bool mDragging = false;
-		Point* pSelectedPoint = nullptr;
-		Polygon* pSelectedOutline = nullptr;
-		std::vector<Line*> mGridLines;
+		D2D::Point* pSelectedPoint = nullptr;
+		D2D::Polygon* pSelectedOutline = nullptr;
+		std::vector<D2D::Line*> mGridLines;
 
 		//Convex Hull
-		std::vector<Line*> mHullLines;
+		std::vector<D2D::Line*> mHullLines;
 
 		//Triangulate
 		std::vector<Vector2f> mPolygon;
-		std::vector<Line*> mTriangulationLines;
-		std::vector<Line*> mPolygonLines;
+		std::vector<D2D::Line*> mTriangulationLines;
+		std::vector<D2D::Line*> mPolygonLines;
 		bool isValidPolygon = false;
 
 		//Map of chunks, or grid partitions, to make it faster to find points based on where the user clicks.
-		std::map<FLOAT2, std::vector<Point*>, ChunkCompare> mPoints;
+		std::map<FLOAT2, std::vector<D2D::Point*>, ChunkCompare> mPoints;
 		State mState = CONVEX_HULL;
 
 		AlgorithmVisualizer::ConvexHullAlgorithm mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::QUICK_HULL;
 		AlgorithmVisualizer::TriangulationAlgorithm mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::EAR_CLIPPING;
+
+		//*******************UI********************//
+		IContainer* pRoot;
 };

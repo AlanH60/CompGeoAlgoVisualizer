@@ -1,6 +1,8 @@
 #include "PCH.h"
 #include "Drawable.h"
 
+using namespace D2D;
+
 Graphics* Drawable::pGraphics = nullptr;
 
 Drawable::Drawable(FLOAT2 pos, Color color)
@@ -28,6 +30,11 @@ void Drawable::setGraphics(Graphics* gfx)
 FLOAT2 Drawable::getPos()
 {
 	return mPos;
+}
+
+void Drawable::setOffset(FLOAT2 offset)
+{
+	mOffset = offset;
 }
 
 
