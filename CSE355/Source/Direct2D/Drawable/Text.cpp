@@ -3,16 +3,16 @@
 
 using namespace D2D;
 
-Text::Text(std::wstring string, FontFormat& fontFormat, float width, float height)
+Text::Text(std::wstring string, TextFormat& textFormat, float width, float height)
 	:
 	Drawable({ 0, 0 }, { 0, 0, 0, 1 }),
 	mString(string),
-	mFontFormat(fontFormat),
+	mTextFormat(textFormat),
 	mWidth(width),
 	mHeight(height)
 {
-	pGraphics->createTextLayout(mString, fontFormat.fontFamily, fontFormat.size, fontFormat.bold, (unsigned char)fontFormat.style, 
-		mWidth, mHeight, &pTextLayout);
+	pGraphics->createTextLayout(mString, textFormat.fontFamily, textFormat.size, textFormat.bold, (unsigned char)textFormat.style,
+		(unsigned char)textFormat.alignment, mWidth, mHeight, &pTextLayout);
 }
 
 D2D::Text::~Text()

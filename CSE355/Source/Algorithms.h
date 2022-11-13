@@ -48,6 +48,7 @@ class AlgorithmVisualizer
 		bool isSleeping();
 		bool shouldVisualize();
 		float getSpeed();
+		float* getSpeedPointer();
 		void setVisualization(bool visualize);
 		void setSpeed(float speed);
 		void addSpeed(float modifier);

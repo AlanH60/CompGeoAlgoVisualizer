@@ -52,6 +52,11 @@ float AlgorithmVisualizer::getSpeed()
 	return mSpeed;
 }
 
+float* AlgorithmVisualizer::getSpeedPointer()
+{
+	return &mSpeed;
+}
+
 void AlgorithmVisualizer::setVisualization(bool visualize)
 {
 	mVisualize = visualize;

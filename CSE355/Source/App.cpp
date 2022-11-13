@@ -10,6 +10,7 @@
 #include "Direct2D/Drawable/Text.h"
 #include "UI/IContainer.h"
 #include "UI/IButton.h"
+#include "UI/ISlider.h"
 
 using D2D::Drawable;
 using D2D::Line;
@@ -20,8 +21,15 @@ using D2D::Text;
 App::App()
 {
 	pVisualizer = new AlgorithmVisualizer();
-	pRoot = new IContainer();
-	IButton* button = new IButton(L"Testing", 100, 100);
+	pRoot = new IContainer(0, 0, pWindow->getWidth(), pWindow->getHeight());
+	IButton* button = new IButton(L"Testing", 100, 30);
+	button->setPos(150, 150);
+	button->setOnClick([]()-> void {
+		std::cout << "Clicked :D" << std::endl;
+		});
+	ISlider* slider = new ISlider(pVisualizer->getSpeedPointer(), 1, 10, 700, 50);
+	slider->setPos(100, 500);
+	pRoot->addChild(slider);
 	pRoot->addChild(button);
 	//**************** Grid Lines ****************//
 	for (int i = 1; i <= pWindow->getWidth() / CHUNK_SIZE; i++)

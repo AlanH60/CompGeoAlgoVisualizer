@@ -3,6 +3,14 @@
 
 using D2D::Drawable;
 
+IComponent::IComponent(int x, int y, int width, int height)
+    :
+    mPosX(x),
+    mPosY(y),
+    mWidth(width),
+    mHeight(height)
+{}
+
 IComponent::~IComponent()
 {
     for (Drawable* d : mDrawables)

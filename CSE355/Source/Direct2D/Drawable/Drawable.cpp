@@ -32,6 +32,11 @@ FLOAT2 Drawable::getPos()
 	return mPos;
 }
 
+FLOAT2 D2D::Drawable::getOffset()
+{
+	return mOffset;
+}
+
 void Drawable::setOffset(FLOAT2 offset)
 {
 	mOffset = offset;

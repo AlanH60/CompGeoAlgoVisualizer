@@ -74,6 +74,9 @@
     <ClInclude Include="Source\UI\IButton.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\ISlider.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
@@ -133,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\UI\IButton.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\ISlider.cpp">
       <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>

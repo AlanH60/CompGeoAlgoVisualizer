@@ -14,4 +14,5 @@
 #include <set>
 #include <map>
 
+#define NOMINMAX
 #include <Windows.h>

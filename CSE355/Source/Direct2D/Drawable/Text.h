@@ -8,27 +8,34 @@ namespace D2D
 	class Text : public Drawable
 	{
 	public:
-		enum Style
+		enum class Style : unsigned char
 		{
 			NORMAL = 0,
 			OBLIQUE,
 			ITALIC
 		};
-		struct FontFormat
+		enum class Alignment : unsigned char
+		{
+			LEFT = 0,
+			RIGHT = 1,
+			CENTER = 2
+		};
+		struct TextFormat
 		{
 			std::wstring fontFamily;
 			float size;
 			Style style;
+			Alignment alignment;
 			bool bold;
 		};
 	public:
-		Text(std::wstring string, FontFormat& fontFormat, float width, float height);
+		Text(std::wstring string, TextFormat& fontFormat, float width, float height);
 		~Text();
 		void draw() override;
 	private:
 		float mWidth, mHeight;
 		std::wstring mString;
-		FontFormat mFontFormat;
+		TextFormat mTextFormat;
 		IDWriteTextLayout* pTextLayout;
 		
 	};

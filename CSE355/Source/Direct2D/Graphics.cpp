@@ -58,7 +58,7 @@ Graphics::Graphics(Window* pWindow)
 	ComPtr<IDXGIDevice> pIDXGIDevice;
 	hr = pDevice->QueryInterface(__uuidof(IDXGIDevice), &pIDXGIDevice);
 	ASSERT_IF_FAILED(hr, "Failed to query IDXGIDevice for creating 2D Device!");
-
+	
 	//Create 2D Factory
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory2), &pFactory2D);
 	ASSERT_IF_FAILED(hr, "Failed to create 2D Factory!");
@@ -72,11 +72,12 @@ Graphics::Graphics(Window* pWindow)
 #endif
 	cProps.options = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
 
+
 	ComPtr<ID2D1Device> pDevice2D;
 	hr = pFactory2D->CreateDevice(pIDXGIDevice.Get(), &pDevice2D);
 	ASSERT_IF_FAILED(hr, "Failed to create 2D Device!");
 
-	//Create a IDXGISurface for the 2D context to draw on
+	//Query for the DXGISurface/backbuffer of the swap chain.
 	ComPtr<IDXGISurface> pSurface;
 	hr = pSwapChain->GetBuffer(0, _uuidof(IDXGISurface), &pSurface);
 	ASSERT_IF_FAILED(hr, "Failed to obtain IDXGISurface from Swap Chain!");
@@ -85,7 +86,7 @@ Graphics::Graphics(Window* pWindow)
 	hr = pDevice2D->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &pContext2D);
 	ASSERT_IF_FAILED(hr, "Failed to create 2D Device Context!");
 
-	//Create a bitmap target of swapchain's buffer for 2D Context to draw on.
+	//Create a bitmap target pointing at the back buffer of the swap chain.
 	ComPtr<ID2D1Bitmap1> pBitmap;
 	D2D1_BITMAP_PROPERTIES1 bmpProps;
 	bmpProps.dpiX = 0;
@@ -99,7 +100,7 @@ Graphics::Graphics(Window* pWindow)
 
 	pContext2D->SetTarget(pBitmap.Get());
 
-	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED,	__uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&pWriteFactory));
+	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&pWriteFactory));
 
 	ASSERT_IF_FAILED(hr, "Failed to create text factory!");
 
@@ -191,13 +192,15 @@ void Graphics::createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bo
 	ASSERT_IF_FAILED(hr, "Failed to close geometry sink!");
 }
 
-void Graphics::createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, float width, float height, IDWriteTextLayout** ppTextLayout)
+void Graphics::createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, unsigned char alignment, float width, float height, IDWriteTextLayout** ppTextLayout)
 {
 	HRESULT hr;
 	ComPtr<IDWriteTextFormat> pTextFormat;
 	hr = pWriteFactory->CreateTextFormat(fontFamily.c_str(), NULL, (bold) ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
 		(DWRITE_FONT_STYLE)style, DWRITE_FONT_STRETCH_NORMAL, size, L"en-us", &pTextFormat);
 	ASSERT_IF_FAILED(hr, "Failed to createt text format!");
+	pTextFormat->SetTextAlignment((DWRITE_TEXT_ALIGNMENT)alignment);
+	pTextFormat->SetParagraphAlignment((DWRITE_PARAGRAPH_ALIGNMENT)alignment);
 	hr = pWriteFactory->CreateTextLayout(wstr.c_str(), wstr.length(), pTextFormat.Get(), width, height, ppTextLayout);
 	ASSERT_IF_FAILED(hr, "Failed to create text layout!");
 }

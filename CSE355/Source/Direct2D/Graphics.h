@@ -38,9 +38,9 @@ class Graphics
 		void createSolidColorBrush(Color color, Microsoft::WRL::ComPtr<ID2D1SolidColorBrush>& pBrush);
 		//Create a path geometry, or shape, using a set of vertices.
 		void createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bool filled, Microsoft::WRL::ComPtr<ID2D1PathGeometry>& pGeometry);
-		//Create a text layout. For style, 0 - normal, 1 - oblique, 2 - italics
+		//Create a text layout. For style, 0 - normal, 1 - oblique, 2 - italics.  For alignment, 0 - left, 1 - right, 2 - center.
 		void createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, 
-			float width, float height, IDWriteTextLayout** ppTextLayout);
+			unsigned char alignment, float width, float height, IDWriteTextLayout** ppTextLayout);
 
 		//Operation to handle the resize of the window.  This includes resizing the back buffers of pSwapChain.
 		void onResize(int width, int height);

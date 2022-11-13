@@ -16,6 +16,7 @@ namespace D2D
 
 
 		FLOAT2 getPos();
+		FLOAT2 getOffset();
 		virtual ~Drawable() = default;
 		virtual void draw() = 0;
 	private:

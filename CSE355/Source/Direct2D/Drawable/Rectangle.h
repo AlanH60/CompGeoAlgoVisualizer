@@ -19,6 +19,7 @@ namespace D2D
 		void setWidth(float width);
 		void setHeight(float height);
 		void setCornerRadius(float cornerRadius);
+
 	private:
 		float mWidth, mHeight;
 		float mCornerRadius;

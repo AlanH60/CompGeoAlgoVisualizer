@@ -1,6 +1,12 @@
 #include "PCH.h"
 #include "IContainer.h"
 
+
+IContainer::IContainer(int x, int y, int width, int height)
+	:
+	IComponent(x, y, width, height)
+{
+}
 IContainer::~IContainer()
 {
 	ILink* pCurrChild = pFrontChild;
