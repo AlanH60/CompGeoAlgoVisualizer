@@ -162,17 +162,9 @@ void App::onDraw()
 		std::vector<Point*>& points = pVisualizer->getPoints();
 		std::vector<Line*>& lines = pVisualizer->getLines();
 		for (Line* l : lines)
-		{
-			l->setPoints({ l->getP1().x, -l->getP1().y }, { l->getP2().x, -l->getP2().y });
 			l->draw();
-			l->setPoints({ l->getP1().x, -l->getP1().y }, { l->getP2().x, -l->getP2().y });
-		}
 		for (Point* p : points)
-		{
-			p->setPos({ p->getPos().x, -p->getPos().y });
 			p->draw();
-			p->setPos({ p->getPos().x, -p->getPos().y });
-		}
 	}
 
 	//UI
@@ -409,7 +401,7 @@ void App::triangulateEventHandler(Event& e)
 						std::vector<std::pair<size_t, size_t>> a;
 						std::vector<Vector2f> flippedY;
 						for (int i = 0; i < mPolygon.size(); i++)
-							flippedY[i] = {mPolygon[i].x, -mPolygon[i].y};
+							flippedY.push_back({ mPolygon[i].x, -mPolygon[i].y });
 						pVisualizer->computeTriangulation(flippedY, a, mTriAlgorithm);
 						mPolygon.push_back(mPolygon[0]);
 					}

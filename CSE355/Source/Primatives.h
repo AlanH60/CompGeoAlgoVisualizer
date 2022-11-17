@@ -5,6 +5,11 @@ struct Vector2f
 {
 	float x, y;
 
+	Vector2f invertY()
+	{
+		return { x, -y };
+	}
+
 	operator FLOAT2()
 	{
 		return FLOAT2{ x, y };

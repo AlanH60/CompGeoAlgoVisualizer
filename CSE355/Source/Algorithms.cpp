@@ -182,8 +182,8 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 	//Find point with smallest y value - O(n)
 	for (int i = 0; i < points.size(); i++)
 	{
-		pCurrPoint->setPos(points[i]);
-		pCurrLine->setPoints({ 0, points[i].y }, { 10000, points[i].y });
+		pCurrPoint->setPos(points[i].invertY());
+		pCurrLine->setPoints({ 0, -points[i].y }, { 10000, -points[i].y });
 		
 		//Compare the y values,  if points[minY] is below points[i], compareResult = -1, otherwise if it is above, compareResult = 1.
 		//compareResult = 0 if they are equal.
@@ -194,8 +194,8 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 			minY = (points[minY].x > points[i].x) ? i : minY;
 
 		//Update the lowest point and line.
-		pLowestPoint->setPos(points[minY]);
-		pLowestLine->setPoints({ 0, points[minY].y }, { 10000, points[minY].y });
+		pLowestPoint->setPos(points[minY].invertY());
+		pLowestLine->setPoints({ 0, -points[minY].y }, { 10000, -points[minY].y });
 		pVisualizer->wait();
 	}
 	//Lowest line no longer needed.
@@ -218,16 +218,16 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 		{
 			if (usedPoints[j] || (i == 0 && j == minY))
 				continue;
-			pCurrLine->setPoints(convexHull[i], points[j]);
-			pCurrPoint->setPos(points[j]);
+			pCurrLine->setPoints(convexHull[i].invertY(), points[j].invertY());
+			pCurrPoint->setPos(points[j].invertY());
 			pVisualizer->wait(0.5f);
 			//If we find a point that is to the right of our current right-most edge, 
 			//we set the edge from that point to the most recent convex hull vertex as the new right-most edge.
 			if (!leftOf(convexHull[i], points[nextPoint], points[j]))
 			{
 				nextPoint = j;
-				pNextPoint->setPos(points[j]);
-				pNextLine->setPoints(convexHull[i], points[j]);
+				pNextPoint->setPos(points[j].invertY());
+				pNextLine->setPoints(convexHull[i].invertY(), points[j].invertY());
 			}
 			pVisualizer->wait();
 		}
@@ -238,7 +238,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 			break;
 	}
 	for (int i = 0; i < convexHull.size() - 1; i++)
-		pVisualizer->mResult.push_back({ convexHull[i], convexHull[i + 1] });
+		pVisualizer->mResult.push_back({ convexHull[i].invertY(), convexHull[i + 1].invertY() });
 	pVisualizer->mState = FINISHED;
 }
 
@@ -264,8 +264,8 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 	int pivot = 0;
 	for (int i = 0; i < points.size(); i++)
 	{
-		pCurrPoint->setPos(points[i]);
-		pCurrLine->setPoints({ 0, points[i].y }, { 10000, points[i].y });
+		pCurrPoint->setPos(points[i].invertY());
+		pCurrLine->setPoints({ 0, -points[i].y }, { 10000, -points[i].y });
 
 		if (points[i].y < points[pivot].y)
 			pivot = i;
@@ -273,8 +273,8 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 			pivot = (points[i].x > points[pivot].x) ? i : pivot;
 
 		//Update the lowest point and line.
-		pLowestPoint->setPos(points[pivot]);
-		pLowestLine->setPoints({ 0, points[pivot].y }, { 10000, points[pivot].y });
+		pLowestPoint->setPos(points[pivot].invertY());
+		pLowestLine->setPoints({ 0, -points[pivot].y }, { 10000, -points[pivot].y });
 		pVisualizer->wait();
 	}
 	//Lowest line no longer needed.
@@ -298,14 +298,14 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 	std::vector<Vector2f> hull = std::vector<Vector2f>();
 	hull.push_back(points[pivot]);
 	hull.push_back(sortedPoints[0]);
-	pVisualizer->mLines.push_back(new Line(points[pivot], sortedPoints[0], Color{ 0, 1, 0, 1 }));
-	pVisualizer->mPoints.push_back(new Point(points[pivot], Color{ 0, 1, 0, 1 }));
-	pVisualizer->mPoints.push_back(new Point(sortedPoints[0], Color{ 0, 1, 0, 1 }));
+	pVisualizer->mLines.push_back(new Line(points[pivot].invertY(), sortedPoints[0].invertY(), Color{ 0, 1, 0, 1 }));
+	pVisualizer->mPoints.push_back(new Point(points[pivot].invertY(), Color{ 0, 1, 0, 1 }));
+	pVisualizer->mPoints.push_back(new Point(sortedPoints[0].invertY(), Color{ 0, 1, 0, 1 }));
 
 	for (int i = 1; i < sortedPoints.size(); i++)
 	{
-		pCurrPoint->setPos(sortedPoints[i]);
-		pCurrLine->setPoints(hull[hull.size() - 1], sortedPoints[i]);
+		pCurrPoint->setPos(sortedPoints[i].invertY());
+		pCurrLine->setPoints(hull[hull.size() - 1].invertY(), sortedPoints[i].invertY());
 		pVisualizer->wait();
 		if (!leftOf(hull[hull.size() - 2], hull[hull.size() - 1], sortedPoints[i]))
 		{
@@ -313,7 +313,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 			do
 			{
 				hull.erase(--hull.end());
-				pCurrLine->setPoints(hull[hull.size() - 1], sortedPoints[i]);
+				pCurrLine->setPoints(hull[hull.size() - 1].invertY(), sortedPoints[i]);
 				Point* p = *--pVisualizer->mPoints.end();
 				Line* l = *--pVisualizer->mLines.end();
 				pVisualizer->mLines.erase(--pVisualizer->mLines.end());
@@ -323,13 +323,13 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 				delete l;
 			} while (hull.size() > 2 && !leftOf(hull[hull.size() - 2], hull[hull.size() - 1], sortedPoints[i]));
 		}		
-		pVisualizer->mLines.push_back(new Line(hull[hull.size() - 1], sortedPoints[i], Color{ 0, 1, 0, 1 }));
-		pVisualizer->mPoints.push_back(new Point(sortedPoints[i], Color{ 0, 1, 0, 1 }));
+		pVisualizer->mLines.push_back(new Line(hull[hull.size() - 1].invertY(), sortedPoints[i].invertY(), Color{ 0, 1, 0, 1 }));
+		pVisualizer->mPoints.push_back(new Point(sortedPoints[i].invertY(), Color{ 0, 1, 0, 1 }));
 		hull.push_back(sortedPoints[i]);
 	}
 	hull.push_back(points[pivot]);
 	for (int i = 0; i < hull.size() - 1; i++)
-		pVisualizer->mResult.push_back({ hull[i], hull[i + 1] });
+		pVisualizer->mResult.push_back({ hull[i].invertY(), hull[i + 1].invertY() });
 	pVisualizer->mState = FINISHED;
 }
 
@@ -389,8 +389,8 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 		//From this projection, we take the y component from the vector from projection to point.
 		float dist = abs((leftToP - projection).y);
 
-		pCurrLine->setPoints(projection + left, p);
-		pCurrPoint->setPos(p);
+		pCurrLine->setPoints(Vector2f(projection + left).invertY(), p.invertY());
+		pCurrPoint->setPos(p.invertY());
 		pVisualizer->wait();
 
 		//Maximize this y component to find the next vertex of the hull.
@@ -398,15 +398,15 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 		{
 			maxDist = dist;
 			top = p;
-			pTopLine->setPoints(projection + left, p);
-			pTopPoint->setPos(p);
+			pTopLine->setPoints(Vector2f(projection + left).invertY(), p.invertY());
+			pTopPoint->setPos(p.invertY());
 		}
 		pVisualizer->wait();
 	}
 	pCurrPoint->setColor({ 0, 0, 0, 0 });
 	pCurrLine->setColor({ 0, 1, 0, 1 });
-	pTopLine->setPoints(left, top);
-	pCurrLine->setPoints(top, right);
+	pTopLine->setPoints(left.invertY(), top.invertY());
+	pCurrLine->setPoints(top.invertY(), right.invertY());
 	//Once found we find the next vertex of the hull, top, we divide the points that are left of vector(left->c) and vector(c->right).
 	std::vector<Vector2f> leftPoints;
 	std::vector<Vector2f> rightPoints;
@@ -422,9 +422,9 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 	std::vector<Vector2f> rightHull = quickHullHelper(pVisualizer, rightPoints, top, right);
 
 	if (leftHull.empty())
-		pVisualizer->mLines.push_back(new Line(top, left, Color{ 0, 1, 0, 1 }));
+		pVisualizer->mLines.push_back(new Line(top.invertY(), left.invertY(), Color{ 0, 1, 0, 1 }));
 	if (rightHull.empty())
-		pVisualizer->mLines.push_back(new Line(top, right, Color{ 0, 1, 0, 1 }));
+		pVisualizer->mLines.push_back(new Line(top.invertY(), right.invertY(), Color{ 0, 1, 0, 1 }));
 
 	//Once we find the left and right hulls.  We combine them accordingly.
 	std::vector<Vector2f> topHull;
@@ -460,8 +460,8 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 	//Find the top-leftmost point and the top-rightmost point.
 	for (Vector2f& p : points)
 	{
-		pCurrPoint->setPos(p);
-		pCurrLine->setPoints({ p.x, 0 }, { p.x, -10000 });
+		pCurrPoint->setPos(p.invertY());
+		pCurrLine->setPoints({ p.x, 0 }, { p.x, 10000 });
 
 		if (p.x < left.x)
 			left = p;
@@ -472,17 +472,17 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 		else if (p.x == right.x)
 			right = (p.y > right.y) ? p : right;
 
-		pLeftPoint->setPos(left);
-		pRightPoint->setPos(right);
-		pLeftLine->setPoints({ left.x, 0 }, { left.x, -10000 });
-		pRightLine->setPoints({ right.x, 0 }, { right.x, -10000 });
+		pLeftPoint->setPos(left.invertY());
+		pRightPoint->setPos(right.invertY());
+		pLeftLine->setPoints({ left.x, 0 }, { left.x, 10000 });
+		pRightLine->setPoints({ right.x, 0 }, { right.x, 10000 });
 
 		pVisualizer->wait();
 	}
 	pCurrPoint->setColor({ 0, 0, 0, 0 });
 	pLeftLine->setColor({ 0, 0, 0, 0 });
 	pCurrLine->setColor({ 0, 0, 0, 0 });
-	pRightLine->setPoints(left, right);
+	pRightLine->setPoints(left.invertY(), right.invertY());
 
 	//Divide the points into a set of points above and below the line from the left to right points.
 	std::vector<Vector2f> topPoints;
@@ -537,16 +537,16 @@ void AlgorithmVisualizer::triangulateEarClipping(AlgorithmVisualizer* pVisualize
 		//If the vertex is an ear and is not already clipped, clip it.  Then update its prev and next vertices' ear status and their next and prev vertex respectively.
 		if (!vertexStatus[i].isClipped)
 		{
-			pCurrPoint->setPos(polygon[i]);
-			pCurrLine->setPoints(polygon[vertexStatus[i].prev], polygon[vertexStatus[i].next]);
+			pCurrPoint->setPos(polygon[i].invertY());
+			pCurrLine->setPoints(polygon[vertexStatus[i].prev].invertY(), polygon[vertexStatus[i].next].invertY());
 			if (vertexStatus[i].isEar)
 			{
 				pCurrLine->setColor({ 0, 0.5f, 0.5f, 1 });
 				pVisualizer->wait(2);
 				VertexStatus& v = vertexStatus[i];
 				pVisualizer->mResult.push_back({ polygon[v.prev], polygon[v.next] });
-				pVisualizer->mLines.push_back(new Line(polygon[v.prev], polygon[v.next], { 0, 1, 0, 1 }));
-				pVisualizer->mPoints.push_back(new Point(polygon[i], { 0, 1, 0, 1 }));
+				pVisualizer->mLines.push_back(new Line(polygon[v.prev].invertY(), polygon[v.next].invertY(), {0, 1, 0, 1}));
+				pVisualizer->mPoints.push_back(new Point(polygon[i].invertY(), {0, 1, 0, 1}));
 
 				vertexStatus[v.prev].next = v.next;
 				vertexStatus[v.next].prev = v.prev;
