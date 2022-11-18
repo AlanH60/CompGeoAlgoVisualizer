@@ -94,6 +94,8 @@
     <ClInclude Include="Source\App.h" />
     <ClInclude Include="Source\Direct2D\Application.h" />
     <ClInclude Include="Source\Direct2D\Color.h" />
+    <ClInclude Include="Source\Direct2D\Drawable\DynamicText.h" />
+    <ClInclude Include="Source\Direct2D\Drawable\TextFormat.h" />
     <ClInclude Include="Source\Direct2D\DrawRes\Bitmap.h" />
     <ClInclude Include="Source\Direct2D\DrawRes\Brush.h" />
     <ClInclude Include="Source\Direct2D\DrawRes\Geometry.h" />
@@ -113,6 +115,8 @@
     <ClInclude Include="Source\UI\IButton.h" />
     <ClInclude Include="Source\UI\IComponent.h" />
     <ClInclude Include="Source\UI\IContainer.h" />
+    <ClInclude Include="Source\UI\IInput.h" />
+    <ClInclude Include="Source\UI\ILabel.h" />
     <ClInclude Include="Source\UI\ISlider.h" />
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +124,8 @@
     <ClCompile Include="Source\App.cpp" />
     <ClCompile Include="Source\Direct2D\Application.cpp" />
     <ClCompile Include="Source\Direct2D\Color.cpp" />
+    <ClCompile Include="Source\Direct2D\Drawable\DynamicText.cpp" />
+    <ClCompile Include="Source\Direct2D\Drawable\TextFormat.cpp" />
     <ClCompile Include="Source\Direct2D\DrawRes\Bitmap.cpp" />
     <ClCompile Include="Source\Direct2D\DrawRes\Brush.cpp" />
     <ClCompile Include="Source\Direct2D\DrawRes\Geometry.cpp" />
@@ -141,6 +147,8 @@
     <ClCompile Include="Source\UI\IComponent.cpp" />
     <ClCompile Include="Source\UI\IContainer.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\UI\ILabel.cpp" />
+    <ClCompile Include="Source\UI\IInput.cpp" />
     <ClCompile Include="Source\UI\ISlider.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

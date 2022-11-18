@@ -31,16 +31,16 @@ class IContainer : public IComponent
 				switch (mouseEvent.mType)
 				{
 					case Event::EventType::PRESS:
-						onPress(mouseEvent.x, mouseEvent.y);
+						onPress(mouseEvent.x, mouseEvent.y, mouseEvent);
 						break;
 					case Event::EventType::MOVE:
-						onHover(mouseEvent.x, mouseEvent.y);
-						onMove(mouseEvent.x, mouseEvent.y);
-						onDrag(mouseEvent.x, mouseEvent.y);
+						onHover(mouseEvent.x, mouseEvent.y, mouseEvent);
+						onMove(mouseEvent.x, mouseEvent.y, mouseEvent);
+						onDrag(mouseEvent.x, mouseEvent.y, mouseEvent);
 						break;
 					case Event::EventType::RELEASE:
-						onClick(mouseEvent.x, mouseEvent.y);
-						onDragRelease(mouseEvent.x, mouseEvent.y);
+						onClick(mouseEvent.x, mouseEvent.y, mouseEvent);
+						onDragRelease(mouseEvent.x, mouseEvent.y, mouseEvent);
 						break;
 				}
 			}
@@ -52,8 +52,10 @@ class IContainer : public IComponent
 			}
 		}
 		//Probagates press to a child - this function should be called by any function overriding this, unless it has its own method of probagation.
-		virtual void onPress(int x, int y) override
+		virtual void onPress(int x, int y, MouseEvent& mouseEvent) override
 		{
+			if (mouseEvent.isConsumed)
+				return;
 			int relativeX = x - mPosX;
 			int relativeY = y - mPosY;
 			ILink* pCurrChild = pFrontChild;
@@ -62,15 +64,17 @@ class IContainer : public IComponent
 				if (pCurrChild->component->inComponent(relativeX, relativeY))
 				{
 					pPressed = pCurrChild->component;
-					pCurrChild->component->onPress(relativeX, relativeY);
+					pCurrChild->component->onPress(relativeX, relativeY, mouseEvent);
 					break;
 				}
 				pCurrChild = pCurrChild->next;
 			}
 		}
 		//Probagates hover to a child - this function should be called in any function overriding this, unless it has its own method of probagation
-		virtual void onHover(int x, int y) override
+		virtual void onHover(int x, int y, MouseEvent& mouseEvent) override
 		{
+			if (mouseEvent.isConsumed)
+				return;
 			int relativeX = x - mPosX;
 			int relativeY = y - mPosY;
 			ILink* pCurrChild = pFrontChild;
@@ -81,9 +85,9 @@ class IContainer : public IComponent
 					if (pHovered != pCurrChild->component)
 					{
 						if (pHovered)
-							pHovered->onExit();
+							pHovered->onExit(mouseEvent);
 						pHovered = pCurrChild->component;
-						pHovered->onHover(relativeX, relativeY);
+						pHovered->onHover(relativeX, relativeY, mouseEvent);
 					}
 					break;
 				}
@@ -92,51 +96,61 @@ class IContainer : public IComponent
 			//None of its children are hovered.
 			if (pCurrChild == nullptr && pHovered != nullptr)
 			{
-				pHovered->onExit();
+				pHovered->onExit(mouseEvent);
 				pHovered = nullptr;
 			}
 
 		}
 		//Default on exit - this function should be called in any function overriding this, unless it has its own method of probagation
-		virtual void onExit() override
+		virtual void onExit(MouseEvent& mouseEvent) override
 		{
+			if (mouseEvent.isConsumed)
+				return;
 			if (pHovered)
 			{
-				pHovered->onExit();
+				pHovered->onExit(mouseEvent);
 				pHovered = nullptr;
 			}
 		}
 
-		virtual void onMove(int x, int y) override
+		virtual void onMove(int x, int y, MouseEvent& mouseEvent) override
 		{
+			if (mouseEvent.isConsumed)
+				return;
 			if (pHovered)
-				pHovered->onMove(x - mPosX, y - mPosY);
+				pHovered->onMove(x - mPosX, y - mPosY, mouseEvent);
 			if (!pDragged && pPressed)
 				pDragged = pPressed;
 		}
 
-		virtual void onDrag(int x, int y) override
+		virtual void onDrag(int x, int y, MouseEvent& mouseEvent) override
 		{
+			if (mouseEvent.isConsumed)
+				return;
 			if (pDragged)
-				pDragged->onDrag(x - mPosX, y - mPosY);
+				pDragged->onDrag(x - mPosX, y - mPosY, mouseEvent);
 		}
 
-		virtual void onDragRelease(int x, int y) override
+		virtual void onDragRelease(int x, int y, MouseEvent& mouseEvent) override
 		{
+			if (mouseEvent.isConsumed)
+				return;
 			if (pDragged)
-				pDragged->onDragRelease(x - mPosX, y - mPosY);
+				pDragged->onDragRelease(x - mPosX, y - mPosY, mouseEvent);
 			pDragged = nullptr;
 		}
 
 		//If the pressed component is the same as the released component, then a click has occurred. - this function should be called in any function overriding this.
-		virtual void onClick(int x, int y) override
+		virtual void onClick(int x, int y, MouseEvent& mouseEvent) override
 		{
+			if (mouseEvent.isConsumed)
+				return;
 			if (pPressed)
 			{
 				int relativeX = x - mPosX;
 				int relativeY = y - mPosY;
 				if (pPressed->inComponent(relativeX, relativeY))
-					pPressed->onClick(relativeX, relativeY);
+					pPressed->onClick(relativeX, relativeY, mouseEvent);
 				pPressed = nullptr;
 			}
 		}

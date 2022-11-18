@@ -63,7 +63,3 @@ void IComponent::setHeight(int height)
     mHeight = height;
 }
 
-void IComponent::setEventHandler(std::function<void(Event&)> handler)
-{
-    mEventHandler = handler;
-}

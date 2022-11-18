@@ -126,20 +126,22 @@ void Graphics::endFrame()
 	ASSERT_IF_FAILED(hr, "Swap Chain present error!");
 }
 
-void Graphics::drawRect(FLOAT2 pos, float width, float height, bool filled, ID2D1SolidColorBrush* pBrush, float cornerRadius, float borderWidth)
+void Graphics::drawRect(FLOAT2 pos, float width, float height, bool filled, ID2D1SolidColorBrush* pBrush, ID2D1SolidColorBrush* pBorderBrush,
+	float cornerRadius, float borderWidth)
 {
 	D2D1_RECT_F rect = { pos.x, pos.y + height, pos.x + width, pos.y };
 	if (cornerRadius != 0)
 	{
-		pContext2D->DrawRoundedRectangle({ rect, cornerRadius, cornerRadius }, pBrush, borderWidth);
 		if (filled)
 			pContext2D->FillRoundedRectangle({ rect, cornerRadius, cornerRadius }, pBrush);
+		pContext2D->DrawRoundedRectangle({ rect, cornerRadius, cornerRadius }, pBorderBrush, borderWidth);
+		
 	}
 	else
 	{
-		pContext2D->DrawRectangle(rect, pBrush, borderWidth);
 		if (filled)
 			pContext2D->FillRectangle(rect, pBrush);
+		pContext2D->DrawRectangle(rect, pBorderBrush, borderWidth);
 	}
 }
 
@@ -160,6 +162,13 @@ void Graphics::drawText(FLOAT2 pos, IDWriteTextLayout* pTextLayout, ID2D1SolidCo
 {
 	pContext2D->DrawTextLayout({ pos.x, pos.y }, pTextLayout, pBrush);
 }
+
+void Graphics::drawText(std::wstring& text, FLOAT2 pos, IDWriteTextLayout* pTextLayout, ID2D1SolidColorBrush* pBrush)
+{
+	pContext2D->DrawTextW(text.c_str(), text.length(), pTextLayout, { pos.x, pos.y, pos.x + pTextLayout->GetMaxWidth(), pos.y + pTextLayout->GetMaxHeight()}, pBrush);
+}
+
+
 
 void Graphics::drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset) 
 {

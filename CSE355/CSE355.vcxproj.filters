@@ -77,6 +77,18 @@
     <ClInclude Include="Source\UI\ISlider.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\ILabel.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\IInput.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\DynamicText.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\TextFormat.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
@@ -140,6 +152,18 @@
     </ClCompile>
     <ClCompile Include="Source\UI\ISlider.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\IInput.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\ILabel.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\DynamicText.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\TextFormat.cpp">
+      <Filter>Direct2D\Drawable</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

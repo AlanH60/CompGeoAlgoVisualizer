@@ -15,14 +15,13 @@ public:
 	void setPos(int x, int y);
 	void setWidth(int width);
 	void setHeight(int height);
-	void setEventHandler(std::function<void(Event&)> handler);
-	virtual void onPress(int x, int y) {}
-	virtual void onHover(int x, int y) {}
-	virtual void onExit() {}
-	virtual void onMove(int x, int y) {}
-	virtual void onClick(int x, int y) {}
-	virtual void onDrag(int x, int y) {}
-	virtual void onDragRelease(int x, int y) {}
+	virtual void onPress(int x, int y, MouseEvent& mouseEvent) {}
+	virtual void onHover(int x, int y, MouseEvent& mouseEvent) {}
+	virtual void onExit(MouseEvent& mouseEvent) {}
+	virtual void onMove(int x, int y, MouseEvent& mouseEvent) {}
+	virtual void onClick(int x, int y, MouseEvent& mouseEvent) {}
+	virtual void onDrag(int x, int y, MouseEvent& mouseEvent) {}
+	virtual void onDragRelease(int x, int y, MouseEvent& mouseEvent) {}
 	virtual void onEvent(Event& e)
 	{
 		if (e.isConsumed)
@@ -50,6 +49,4 @@ public:
 		int mWidth, mHeight;
 		//Drawables associated with component
 		std::vector<D2D::Drawable*> mDrawables;
-		//Function pointer to event handler
-		std::function<void(Event&)> mEventHandler;
 };

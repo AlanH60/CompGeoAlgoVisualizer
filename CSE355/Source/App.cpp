@@ -11,6 +11,8 @@
 #include "UI/IContainer.h"
 #include "UI/IButton.h"
 #include "UI/ISlider.h"
+#include "UI/ILabel.h"
+#include "UI/IInput.h"
 
 using D2D::Drawable;
 using D2D::Line;
@@ -27,8 +29,16 @@ App::App()
 	button->setOnClick([]()-> void {
 		std::cout << "Clicked :D" << std::endl;
 		});
-	ISlider* slider = new ISlider(pVisualizer->getSpeedPointer(), 1, 10, 700, 50);
+	ISlider* slider = new ISlider(pVisualizer->getSpeedPointer(), 1, 10, 150, 30);
 	slider->setPos(100, 500);
+	
+	ILabel* label = new ILabel(L"Label", D2D::TextFormat(L"Arial", 16, true), 200, 200);
+	label->setPos(500, 0);
+
+	IInput* input = new IInput(L"Input", D2D::TextFormat(L"Arial", 16, true), 100, 30);
+	input->setPos(500, 500);
+	pRoot->addChild(input);
+	pRoot->addChild(label);
 	pRoot->addChild(slider);
 	pRoot->addChild(button);
 	//**************** Grid Lines ****************//

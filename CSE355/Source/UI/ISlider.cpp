@@ -20,22 +20,29 @@ ISlider::ISlider(float* pValue, float min, float max, float width, float height)
 	mDrawables.push_back(pSliderBar);
 }
 
-void ISlider::onPress(int x, int y)
+void ISlider::onPress(int x, int y, MouseEvent& mouseEvent)
 {
+	if (mouseEvent.isConsumed)
+		return;
 	int relativeX = x - mPosX;
 	int relativeY = y - mPosY;
 	int sliderX = pSliderBar->getOffset().x;
 	int sliderY = pSliderBar->getOffset().y;
 	if (relativeX >= sliderX && relativeX <= sliderX + pSliderBar->getWidth() &&
 		relativeY >= sliderY && relativeY <= sliderY + pSliderBar->getHeight())
+	{
 		isPressed = true;
+		mouseEvent.isConsumed = true;
+	}
 	else
 		isPressed = false;
 }
 
 
-void ISlider::onMove(int x, int y)
+void ISlider::onMove(int x, int y, MouseEvent& mouseEvent)
 {
+	if (mouseEvent.isConsumed)
+		return;
 	int relativeX = x - mPosX;
 	int relativeY = y - mPosY;
 	int sliderX = pSliderBar->getOffset().x;
@@ -47,13 +54,17 @@ void ISlider::onMove(int x, int y)
 		pSliderBar->setColor({ 0.75f, 0.75f, 0.75f, 1 });
 }
 
-void ISlider::onExit()
+void ISlider::onExit(MouseEvent& mouseEvent)
 {
+	if (mouseEvent.isConsumed)
+		return;
 	pSliderBar->setColor({ 0.75f, 0.75f, 0.75f, 1 });
 }
 
-void ISlider::onDrag(int x, int y)
+void ISlider::onDrag(int x, int y, MouseEvent& mouseEvent)
 {
+	if (mouseEvent.isConsumed)
+		return;
 	if (isPressed)
 	{
 		float newX = (x - mPosX) - pSliderBar->getWidth() / 2;
@@ -66,13 +77,17 @@ void ISlider::onDrag(int x, int y)
 	}
 }
 
-void ISlider::onDragRelease(int x, int y)
+void ISlider::onDragRelease(int x, int y, MouseEvent& mouseEvent)
 {
+	if (mouseEvent.isConsumed)
+		return;
 	isPressed = false;
 }
 
-void ISlider::onClick(int x, int y)
+void ISlider::onClick(int x, int y, MouseEvent& mouseEvent)
 {
+	if (mouseEvent.isConsumed)
+		return;
 	isPressed = false;
 }
 

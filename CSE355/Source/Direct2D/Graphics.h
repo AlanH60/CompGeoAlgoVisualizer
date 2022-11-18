@@ -24,13 +24,15 @@ class Graphics
 		void endFrame();
 
 		//Draw a rectangle
-		void drawRect(FLOAT2 pos, float width, float height, bool filled, ID2D1SolidColorBrush* pBrush, float cornerRadius = 0.0f, float borderWidth = 1.0f);
+		void drawRect(FLOAT2 pos, float width, float height, bool filled, ID2D1SolidColorBrush* pBrush, ID2D1SolidColorBrush* pBorderBrush, float cornerRadius = 0.0f, float borderWidth = 1.0f);
 		//Draw a line from points p1 to p2, using pBrush.
 		void drawLine(FLOAT2 p1, FLOAT2 p2, ID2D1SolidColorBrush* pBrush, float strokeWidth = 1.0f);
 		//Draw a point on the specified coordinate, using pBrush.
 		void drawPoint(FLOAT2 p, ID2D1SolidColorBrush* pBrush, float radius = 5.0f);
 		//Draw text
 		void drawText(FLOAT2 pos, IDWriteTextLayout* pTextLayout, ID2D1SolidColorBrush* pBrush);
+		//Draw dynamic text
+		void drawText(std::wstring& text, FLOAT2 pos, IDWriteTextLayout* pTextLayout, ID2D1SolidColorBrush* pBrush);
 
 		//Draw a path geometry created back createPathGeometry()
 		void drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset = { 0, 0 });
