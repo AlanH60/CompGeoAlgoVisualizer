@@ -162,6 +162,7 @@ void AlgorithmVisualizer::wait(float multiplier)
 void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
 {
 	pVisualizer->mState = RUNNING;
+
 	int minY = 0;
 	std::vector<Vector2f> convexHull = std::vector<Vector2f>();
 	std::vector<bool> usedPoints = std::vector<bool>(points.size()); //True if point is used in convex hull(Wanted to use bitset, but size of points is unknown at compile time)
@@ -170,7 +171,6 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 	//Current lines and points that the algorithm is evaluating
 	Line* pCurrLine = new Line({ 0, 0 }, { 0, 0 }, Color{ 0, 0.5f, 0.5f, 1 });
 	Point* pCurrPoint = new Point({ 0, 0 }, Color{ 0, 0.5f, 0.5f, 1 });
-
 	//Lowest point and line.  Line is a horizontal line that all other points should be above.
 	Line* pLowestLine = new Line({ 0, 0 }, { 0, 0 }, Color{ 0, 1, 0, 1 });
 	Point* pLowestPoint = new Point({ 0, 0 }, Color{0, 1, 0, 1});
@@ -199,7 +199,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 		pVisualizer->wait();
 	}
 	//Lowest line no longer needed.
-	pLowestLine->setColor({ 1, 1, 1, 0 });
+	pLowestLine->setVisibility(false);
 
 	convexHull.push_back(points[minY]);
 	int nextPoint = 0;
@@ -278,7 +278,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 		pVisualizer->wait();
 	}
 	//Lowest line no longer needed.
-	pLowestLine->setColor({ 1, 1, 1, 0 });
+	pLowestLine->setVisibility(false);
 
 	//Get the dot products between the vector horizontal from pivot and the vector from pivot to any given point.
 	//This dot product will be used to sort the points (1 -> -1).  
@@ -313,7 +313,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 			do
 			{
 				hull.erase(--hull.end());
-				pCurrLine->setPoints(hull[hull.size() - 1].invertY(), sortedPoints[i]);
+				pCurrLine->setPoints(hull[hull.size() - 1].invertY(), sortedPoints[i].invertY());
 				Point* p = *--pVisualizer->mPoints.end();
 				Line* l = *--pVisualizer->mLines.end();
 				pVisualizer->mLines.erase(--pVisualizer->mLines.end());
@@ -403,7 +403,7 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 		}
 		pVisualizer->wait();
 	}
-	pCurrPoint->setColor({ 0, 0, 0, 0 });
+	pCurrPoint->setVisibility(false);
 	pCurrLine->setColor({ 0, 1, 0, 1 });
 	pTopLine->setPoints(left.invertY(), top.invertY());
 	pCurrLine->setPoints(top.invertY(), right.invertY());
@@ -479,9 +479,9 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 
 		pVisualizer->wait();
 	}
-	pCurrPoint->setColor({ 0, 0, 0, 0 });
-	pLeftLine->setColor({ 0, 0, 0, 0 });
-	pCurrLine->setColor({ 0, 0, 0, 0 });
+	pCurrPoint->setVisibility(false);
+	pLeftLine->setVisibility(false);
+	pCurrLine->setVisibility(false);
 	pRightLine->setPoints(left.invertY(), right.invertY());
 
 	//Divide the points into a set of points above and below the line from the left to right points.
@@ -509,7 +509,7 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 	hull.push_back(right);
 
 	for (int i = 0; i < hull.size() - 1; i++)
-		pVisualizer->mResult.push_back({ hull[i], hull[i + 1] });
+		pVisualizer->mResult.push_back({ hull[i].invertY(), hull[i + 1].invertY() });
 
 	pVisualizer->mState = FINISHED;
 }
@@ -544,7 +544,7 @@ void AlgorithmVisualizer::triangulateEarClipping(AlgorithmVisualizer* pVisualize
 				pCurrLine->setColor({ 0, 0.5f, 0.5f, 1 });
 				pVisualizer->wait(2);
 				VertexStatus& v = vertexStatus[i];
-				pVisualizer->mResult.push_back({ polygon[v.prev], polygon[v.next] });
+				pVisualizer->mResult.push_back({ polygon[v.prev].invertY(), polygon[v.next].invertY() });
 				pVisualizer->mLines.push_back(new Line(polygon[v.prev].invertY(), polygon[v.next].invertY(), {0, 1, 0, 1}));
 				pVisualizer->mPoints.push_back(new Point(polygon[i].invertY(), {0, 1, 0, 1}));
 

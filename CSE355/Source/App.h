@@ -18,7 +18,8 @@ class IContainer;
 class App : public Application
 {
 	public:
-		//Size of each partition of the grid space.
+		static const unsigned int GRID_SIZE = 20;
+		//Size of each partition of the grid square.
 		static const unsigned int CHUNK_SIZE = 100;
 		enum State
 		{

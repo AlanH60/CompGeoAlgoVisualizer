@@ -42,8 +42,13 @@ class Graphics
 		void createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bool filled, Microsoft::WRL::ComPtr<ID2D1PathGeometry>& pGeometry);
 		//Create a text layout. For style, 0 - normal, 1 - oblique, 2 - italics.  For alignment, 0 - left, 1 - right, 2 - center.
 		void createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, 
-			unsigned char alignment, float width, float height, IDWriteTextLayout** ppTextLayout);
+			unsigned char textAlignment, unsigned char paragraphAlignment, float width, float height, IDWriteTextLayout** ppTextLayout);
 
+		//Push layer such that all subsequent draw calls are drawn on this layer.
+		void pushLayer(D2D1_RECT_F rect, ID2D1PathGeometry* pGeometry, D2D1_MATRIX_3X2_F& transform);
+		//Pop a layer that was previously pushed.
+		void popLayer();
+		
 		//Operation to handle the resize of the window.  This includes resizing the back buffers of pSwapChain.
 		void onResize(int width, int height);
 	private:
@@ -55,4 +60,6 @@ class Graphics
 		Microsoft::WRL::ComPtr<ID2D1Factory2> pFactory2D;
 		//Factory used to create text
 		IDWriteFactory* pWriteFactory;
+		//Layer used to region clipping.
+		Microsoft::WRL::ComPtr <ID2D1Layer> pLayer;
 };

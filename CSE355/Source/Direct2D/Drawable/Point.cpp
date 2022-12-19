@@ -10,5 +10,6 @@ Point::Point(FLOAT2 pos, Color color)
 
 void Point::draw()
 {
-	pGraphics->drawPoint(mPos + mOffset, pBrush->get());
+	if (isVisible)
+		pGraphics->drawPoint(mPos + mOffset, pBrush->get());
 }

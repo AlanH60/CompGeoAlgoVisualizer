@@ -13,6 +13,7 @@ namespace D2D
 		void setPos(FLOAT2 pos);
 		void setOffset(FLOAT2 offset);
 		void setColor(Color color);
+		void setVisibility(bool visibility);
 
 
 		FLOAT2 getPos();
@@ -28,5 +29,7 @@ namespace D2D
 		FLOAT2 mPos = { 0, 0 };
 		//Used to maintain structure when drawables are in a group, where all drawables within the group have the same position.
 		FLOAT2 mOffset = { 0, 0 };
+		//Flag indicating whether to draw this drawable or not.
+		bool isVisible;
 	};
 }

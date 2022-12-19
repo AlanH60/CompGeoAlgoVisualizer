@@ -5,7 +5,7 @@ class Window
 {
 	public:
 		//Maximum events stored the event queue.
-		const unsigned int MAX_EVENTS = 64u;
+		static const unsigned int MAX_EVENTS = 64u;
 		//The bit of each mouse button in the bitset mMouseState.
 		enum MouseButton
 		{

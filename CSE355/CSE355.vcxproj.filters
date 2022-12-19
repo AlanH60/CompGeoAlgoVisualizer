@@ -89,6 +89,12 @@
     <ClInclude Include="Source\Direct2D\Drawable\TextFormat.h">
       <Filter>Direct2D\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\IPanel.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\ITabbedPanel.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
@@ -164,6 +170,12 @@
     </ClCompile>
     <ClCompile Include="Source\Direct2D\Drawable\TextFormat.cpp">
       <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\IPanel.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\ITabbedPanel.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

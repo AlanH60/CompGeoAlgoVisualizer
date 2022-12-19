@@ -42,7 +42,8 @@ Rectangle::Rectangle(FLOAT2 pos, float width, float height, float cornerRadius, 
 
 void Rectangle::draw()
 {
-	pGraphics->drawRect(mPos + mOffset, mWidth, mHeight, mFilled, pBrush->get(), pBorderBrush->get(), mCornerRadius, mBorderWidth);
+	if (isVisible)
+		pGraphics->drawRect(mPos + mOffset, mWidth, mHeight, mFilled, pBrush->get(), pBorderBrush->get(), mCornerRadius, mBorderWidth);
 }
 
 float Rectangle::getWidth()

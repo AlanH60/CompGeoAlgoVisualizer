@@ -29,6 +29,7 @@ void IButton::onHover(int x, int y, MouseEvent& mouseEvent)
 	if (mouseEvent.isConsumed)
 		return;
 	pRectangle->setColor({ 0.95f, 0.95f, 0.95f, 1 });
+	pRectangle->setBorderColor({ 0.95f, 0.95f, 0.95f, 1 });
 	pText->setColor({ 1, 0.3f, 0.3f, 1 });
 }
 
@@ -37,6 +38,7 @@ void IButton::onExit(MouseEvent& mouseEvent)
 	if (mouseEvent.isConsumed)
 		return;
 	pRectangle->setColor({ 1, 0.3f, 0.3f, 1 });
+	pRectangle->setBorderColor({ 1, 0.3f, 0.3f, 1 });
 	pText->setColor({ 0.95f, 0.95f, 0.95f, 1 });
 }
 

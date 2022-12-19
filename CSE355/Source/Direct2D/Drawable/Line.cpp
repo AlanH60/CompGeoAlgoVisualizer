@@ -13,7 +13,8 @@ Line::Line(FLOAT2 p1, FLOAT2 p2, Color color)
 
 void Line::draw()
 {
-	pGraphics->drawLine(mPos + mP1 + mOffset, mPos + mP2 + mOffset, pBrush->get());
+	if (isVisible)
+		pGraphics->drawLine(mPos + mP1 + mOffset, mPos + mP2 + mOffset, pBrush->get());
 }
 
 FLOAT2 D2D::Line::getP1()

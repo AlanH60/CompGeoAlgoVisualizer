@@ -12,8 +12,7 @@ DynamicText::DynamicText(std::wstring text, TextFormat& textFormat, float width,
 	mHeight(height)
 {
 	pGraphics->createTextLayout(mText, textFormat.fontFamily, textFormat.size, textFormat.bold, (unsigned char)textFormat.style,
-		(unsigned char)textFormat.textAlignment, mWidth, mHeight, &pTextLayout);
-	ASSERT_IF_FAILED(pTextLayout->SetParagraphAlignment((DWRITE_PARAGRAPH_ALIGNMENT)mTextFormat.paraAlignment), "Failed to set paragraph alignment!");
+		(unsigned char)textFormat.textAlignment, (unsigned char)textFormat.paraAlignment, mWidth, mHeight, &pTextLayout);
 }
 
 DWRITE_HIT_TEST_METRICS DynamicText::getCaretMetrics(UINT32 textPosition)
@@ -23,6 +22,14 @@ DWRITE_HIT_TEST_METRICS DynamicText::getCaretMetrics(UINT32 textPosition)
 	ASSERT_IF_FAILED(pTextLayout->HitTestTextPosition(textPosition, 0, &(caretPosition.x), &(caretPosition.y), &metrics), "Failed to get caret position!");
 	return metrics;
 }
+
+DWRITE_HIT_TEST_METRICS DynamicText::getCoordinateMetrics(FLOAT2 pos, BOOL* isTrailing, BOOL* isInside)
+{
+	DWRITE_HIT_TEST_METRICS metrics = {};
+	ASSERT_IF_FAILED(pTextLayout->HitTestPoint(pos.x, pos.y, isTrailing, isInside, &metrics), "Failed to get caret position from point!");
+	return metrics;
+}
+
 
 DynamicText::~DynamicText()
 {
@@ -48,6 +55,7 @@ void DynamicText::setTextFormat(TextFormat& textFormat)
 
 void DynamicText::draw()
 {
-	pGraphics->drawText(mText, mPos + mOffset, pTextLayout, pBrush->get());
+	if (isVisible)
+		pGraphics->drawText(mText, mPos + mOffset, pTextLayout, pBrush->get());
 }
 

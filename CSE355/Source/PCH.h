@@ -1,6 +1,7 @@
 #pragma once
 #include <assert.h>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <functional>
 #include <memory>
@@ -13,6 +14,7 @@
 #include <bitset>
 #include <set>
 #include <map>
+#include <unordered_map>
 
 #define NOMINMAX
 #include <Windows.h>

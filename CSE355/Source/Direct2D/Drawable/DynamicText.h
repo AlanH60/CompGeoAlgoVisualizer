@@ -12,6 +12,7 @@ namespace D2D
 			DynamicText(std::wstring string, TextFormat& textFormat, float width, float height);
 			~DynamicText();
 			DWRITE_HIT_TEST_METRICS getCaretMetrics(UINT32 textPosition);
+			DWRITE_HIT_TEST_METRICS getCoordinateMetrics(FLOAT2 pos, BOOL* isTrailing, BOOL* isInside);
 
 			void setText(std::wstring& text);
 			void setTextFormat(TextFormat& textFormat);

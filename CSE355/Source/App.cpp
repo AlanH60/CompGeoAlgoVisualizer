@@ -13,6 +13,8 @@
 #include "UI/ISlider.h"
 #include "UI/ILabel.h"
 #include "UI/IInput.h"
+#include "UI/ITabbedPanel.h"
+#include "UI/IPanel.h"
 
 using D2D::Drawable;
 using D2D::Line;
@@ -37,18 +39,26 @@ App::App()
 
 	IInput* input = new IInput(L"Input", D2D::TextFormat(L"Arial", 16, true), 100, 30);
 	input->setPos(500, 500);
+
+	ITabbedPanel* tPanel = new ITabbedPanel(500, pWindow->getHeight());
+	IPanel* p1 = new IPanel(0, 0, { 1, 0, 0, 1 });
+	tPanel->addPanel(L"Red", p1);
+	IPanel* p2 = new IPanel(0, 0, { 0, 1, 0, 1 });
+	tPanel->addPanel(L"Green", p2);
+
 	pRoot->addChild(input);
 	pRoot->addChild(label);
 	pRoot->addChild(slider);
 	pRoot->addChild(button);
+	pRoot->addChild(tPanel);
 	//**************** Grid Lines ****************//
-	for (int i = 1; i <= pWindow->getWidth() / CHUNK_SIZE; i++)
+	for (int i = 1; i <= GRID_SIZE; i++)
 	{
-		mGridLines.push_back(new Line(FLOAT2{ (float)i * CHUNK_SIZE, 0 }, FLOAT2{ (float)i * CHUNK_SIZE, (float)pWindow->getHeight() }, Color{ 0.0f, 0.0f, 0.0f, 0.5f }));
+		mGridLines.push_back(new Line(FLOAT2{ (float)i * CHUNK_SIZE, 0 }, FLOAT2{ (float)i * CHUNK_SIZE, (float)GRID_SIZE * CHUNK_SIZE }, Color{ 0.0f, 0.0f, 0.0f, 0.5f }));
 	}
-	for (int i = 1; i <= pWindow->getHeight() / CHUNK_SIZE; i++)
+	for (int i = 1; i <= GRID_SIZE; i++)
 	{
-		mGridLines.push_back(new Line(FLOAT2{ 0, (float)i * CHUNK_SIZE }, FLOAT2{ (float)pWindow->getWidth(), (float)i * CHUNK_SIZE }, Color{ 0.0f, 0.0f, 0.0f, 0.5f }));
+		mGridLines.push_back(new Line(FLOAT2{ 0, (float)i * CHUNK_SIZE }, FLOAT2{ (float)GRID_SIZE * CHUNK_SIZE, (float)i * CHUNK_SIZE}, Color{0.0f, 0.0f, 0.0f, 0.5f}));
 	}
 	//*******************************************//
 
@@ -57,7 +67,7 @@ App::App()
 		pRoot->onEvent(e);
 		if (e.isConsumed)
 			return;
-		if (Event::isKeyboard(e))
+		if (e.isKeyboard())
 		{
 			switch (((KeyEvent&)e).mKeycode)
 			{
@@ -71,7 +81,7 @@ App::App()
 		}
 		if (!pVisualizer->isIdle())
 			return;
-		if (Event::isKeyboard(e))
+		if (e.isKeyboard())
 		{
 			KeyEvent& keyEvent = (KeyEvent&)e;
 			switch (keyEvent.mKeycode)
@@ -111,19 +121,20 @@ App::~App()
 
 void App::onUpdate()
 {
+	pRoot->onUpdate();
 	if (pVisualizer->isFinished())
 	{
 		std::vector<std::pair<Vector2f, Vector2f>> result = pVisualizer->getResult();
 		if (mState == CONVEX_HULL)
 			for (auto& r : result)
 			{
-				Line* l = new Line({ r.first.x, -r.first.y }, { r.second.x, -r.second.y });
+				Line* l = new Line(r.first, r.second);
 				mHullLines.push_back(l);
 			}
 		else
 			for (auto& r : result)
 			{
-				Line* l = new Line({ r.first.x, -r.first.y }, { r.second.x, -r.second.y });
+				Line* l = new Line(r.first, r.second);
 				mTriangulationLines.push_back(l);
 			}
 	}
@@ -262,7 +273,7 @@ bool App::deletePoint(Point* pPoint)
 
 void App::convexHullEventHandler(Event& e)
 {
-	if (Event::isMouse(e))
+	if (e.isMouse())
 	{
 		MouseEvent& mouse = (MouseEvent&)e;
 		FLOAT2 mousePos = { mouse.x, mouse.y };
@@ -314,9 +325,9 @@ void App::convexHullEventHandler(Event& e)
 				break;
 		}
 	}
-	if (Event::isKeyboard(e))
+	if (e.isKeyboard())
 	{
-		if (Event::isPress(e))
+		if (e.isPress())
 		{
 			KeyEvent& key = (KeyEvent&)e;
 			switch (key.mKeycode)
@@ -360,7 +371,7 @@ void App::convexHullEventHandler(Event& e)
 
 void App::triangulateEventHandler(Event& e)
 {
-	if (Event::isMouse(e))
+	if (e.isMouse())
 	{
 		MouseEvent& mouseEvent = (MouseEvent&)e;
 		FLOAT2 mousePos = { mouseEvent.x, mouseEvent.y };
@@ -392,9 +403,9 @@ void App::triangulateEventHandler(Event& e)
 				}
 		}
 	}
-	if (Event::isKeyboard(e))
+	if (e.isKeyboard())
 	{
-		if (Event::isPress(e))
+		if (e.isPress())
 		{
 			KeyEvent& key = (KeyEvent&)e;
 			switch (key.mKeycode)

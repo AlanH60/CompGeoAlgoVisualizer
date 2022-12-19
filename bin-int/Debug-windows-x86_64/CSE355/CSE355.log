@@ -1,11 +1,2 @@
-﻿  DynamicText.cpp
-  IInput.cpp
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\UI\IInput.cpp(13,42): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\UI\IInput.cpp(13,35): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\UI\IInput.cpp(14,75): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\UI\IInput.cpp(14,47): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\UI\IInput.cpp(14,40): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\UI\IInput.cpp(16,55): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\UI\IInput.cpp(16,48): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-  Generating Code...
+﻿  IContainer.cpp
   CSE355.vcxproj -> C:\Users\Hau\Documents\GitHub\CSE355\bin\Debug-windows-x86_64\CSE355\CSE355.exe

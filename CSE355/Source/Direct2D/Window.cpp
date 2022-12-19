@@ -31,11 +31,11 @@ Window::Window(std::string title, int width, int height)
 	windowRect.top = 100;
 	windowRect.bottom = height + windowRect.top;
 
-	if (!AdjustWindowRect(&windowRect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_SIZEBOX, false))
+	if (!AdjustWindowRect(&windowRect, WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_SIZEBOX, false))
 	{
 		assert(false && "Failed to create window rect!");
 	}
-	mHandle = CreateWindowExW(0, wndClass.lpszClassName, wndClass.lpszClassName, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_SIZEBOX,
+	mHandle = CreateWindowExW(0, wndClass.lpszClassName, wndClass.lpszClassName, WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_SIZEBOX,
 		CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, wndClass.hInstance, this);
 
 	if (mHandle == nullptr)
@@ -150,17 +150,17 @@ LRESULT CALLBACK Window::handleAdapter(HWND handle, UINT msg, WPARAM wParam, LPA
 
 void Window::initEventHandle(Event& e)
 {
-	if (Event::isPress(e) || Event::isRelease(e))
+	if (e.isPress() || e.isRelease())
 	{
-		if (Event::isMouse(e))
+		if (e.isMouse())
 		{
 			unsigned char keycode = ((MouseEvent&)e).mKeycode;
 			if (keycode > 2)
 				keycode = 2;
-			mMouseState[keycode] = (Event::isPress(e)) ? 1 : 0;
+			mMouseState[keycode] = (e.isPress()) ? 1 : 0;
 		}
-		if (Event::isKeyboard(e))
-			mKeyState[((KeyEvent&)e).mKeycode] = (Event::isPress(e)) ? 1 : 0;
+		if (e.isKeyboard())
+			mKeyState[((KeyEvent&)e).mKeycode] = (e.isPress()) ? 1 : 0;
 	}
 }
 
@@ -178,13 +178,25 @@ LRESULT Window::handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 			mShouldClose = true;
 			PostQuitMessage(0);
 			return 0;
+		case WM_CHAR:
+			mEventQueue.emplace(new CharEvent((wchar_t)wParam));
+			break;
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
-			mEventQueue.emplace(new KeyEvent{ Event::EventType::PRESS, (unsigned char)wParam });
+		{
+			unsigned char sysKeyState = 0;
+			if (mKeyState[VK_SHIFT])
+				sysKeyState |= (unsigned char)KeyEvent::SysKeyState::SHIFT;
+			if (mKeyState[VK_CONTROL])
+				sysKeyState |= (unsigned char)KeyEvent::SysKeyState::CTRL;
+			if (mKeyState[VK_MENU])
+				sysKeyState |= (unsigned char)KeyEvent::SysKeyState::ALT;
+			mEventQueue.emplace(new KeyEvent{ Event::EventType::PRESS, (unsigned char)wParam, sysKeyState });
 			break;
+		}
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			mEventQueue.emplace(new KeyEvent{ Event::EventType::RELEASE, (unsigned char)wParam });
+			mEventQueue.emplace(new KeyEvent{ Event::EventType::RELEASE, (unsigned char)wParam, 0});
 			break;
 		//mHeight - y to make positive y the up direction.
 		case WM_LBUTTONDOWN:

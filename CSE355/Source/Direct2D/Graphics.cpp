@@ -104,6 +104,8 @@ Graphics::Graphics(Window* pWindow)
 
 	ASSERT_IF_FAILED(hr, "Failed to create text factory!");
 
+	ASSERT_IF_FAILED(pContext2D->CreateLayer(NULL, &pLayer), "Failed to create layer!");
+
 	pWindow->setGraphics(this);
 	D2D::Drawable::setGraphics(this);
 }
@@ -148,7 +150,6 @@ void Graphics::drawRect(FLOAT2 pos, float width, float height, bool filled, ID2D
 
 void Graphics::drawLine(FLOAT2 p1, FLOAT2 p2, ID2D1SolidColorBrush* pBrush, float strokeWidth)
 {
-	//Height - y to make positive y the down direction to align it with screen space.
 	pContext2D->DrawLine({ p1.x, p1.y }, { p2.x, p2.y }, pBrush, strokeWidth);
 }
 
@@ -201,17 +202,30 @@ void Graphics::createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bo
 	ASSERT_IF_FAILED(hr, "Failed to close geometry sink!");
 }
 
-void Graphics::createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, unsigned char alignment, float width, float height, IDWriteTextLayout** ppTextLayout)
+void Graphics::createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, unsigned char textAlignment, unsigned char paragraphAlignment, float width, float height, IDWriteTextLayout** ppTextLayout)
 {
 	HRESULT hr;
 	ComPtr<IDWriteTextFormat> pTextFormat;
 	hr = pWriteFactory->CreateTextFormat(fontFamily.c_str(), NULL, (bold) ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
 		(DWRITE_FONT_STYLE)style, DWRITE_FONT_STRETCH_NORMAL, size, L"en-us", &pTextFormat);
-	ASSERT_IF_FAILED(hr, "Failed to createt text format!");
-	pTextFormat->SetTextAlignment((DWRITE_TEXT_ALIGNMENT)alignment);
-	pTextFormat->SetParagraphAlignment((DWRITE_PARAGRAPH_ALIGNMENT)alignment);
+	ASSERT_IF_FAILED(hr, "Failed to create text format!");
+	pTextFormat->SetTextAlignment((DWRITE_TEXT_ALIGNMENT)textAlignment);
+	pTextFormat->SetParagraphAlignment((DWRITE_PARAGRAPH_ALIGNMENT)paragraphAlignment);
 	hr = pWriteFactory->CreateTextLayout(wstr.c_str(), wstr.length(), pTextFormat.Get(), width, height, ppTextLayout);
 	ASSERT_IF_FAILED(hr, "Failed to create text layout!");
+	hr = (*ppTextLayout)->SetWordWrapping({ DWRITE_WORD_WRAPPING_NO_WRAP });
+	ASSERT_IF_FAILED(hr, "Failed to set word wrapping!");
+}
+
+void Graphics::pushLayer(D2D1_RECT_F rect, ID2D1PathGeometry* pGeometry, D2D1_MATRIX_3X2_F& transform)
+{
+	D2D1_LAYER_PARAMETERS layerParams = D2D1::LayerParameters(rect, pGeometry, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE, transform);
+	pContext2D->PushLayer(layerParams, pLayer.Get());
+}
+
+void Graphics::popLayer()
+{
+	pContext2D->PopLayer();
 }
 
 void Graphics::onResize(int width, int height)
@@ -221,6 +235,7 @@ void Graphics::onResize(int width, int height)
 	HRESULT hr = pSwapChain->GetBuffer(0, _uuidof(IDXGISurface), &pSurface);
 	ASSERT_IF_FAILED(hr, "Failed to obtain IDXGISurface from Swap Chain!");
 	pSurface.Reset(); //Buffer has to be released before resizing
+	pContext2D->SetTarget(NULL);
 
 	//Recreate the buffers with the same flags and format.
 	DXGI_SWAP_CHAIN_DESC desc;
