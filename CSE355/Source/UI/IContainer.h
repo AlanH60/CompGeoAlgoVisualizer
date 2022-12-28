@@ -20,7 +20,7 @@ class IContainer : public IComponent
 		virtual ~IContainer();
 		ILink* getFrontChild();
 		ILink* getBackChild();
-		void addChild(IComponent* child);
+		virtual void addChild(IComponent* child);
 		void removeChild(IComponent* child);
 		virtual void onEvent(Event& e) override;
 		//Probagates press to a child - this function should be called by any function overriding this, unless it has its own method of probagation.
@@ -28,7 +28,7 @@ class IContainer : public IComponent
 		//Probagates hover to a child - this function should be called in any function overriding this, unless it has its own method of probagation
 		virtual void onHover(int x, int y, MouseEvent& mouseEvent) override;
 		//Default on exit - this function should be called in any function overriding this, unless it has its own method of probagation
-		virtual void onExit(MouseEvent& mouseEvent) override;
+		virtual void onExit() override;
 		virtual void onMove(int x, int y, MouseEvent& mouseEvent) override;
 		virtual void onDrag(int x, int y, MouseEvent& mouseEvent) override;
 		virtual void onDragRelease(int x, int y, MouseEvent& mouseEvent) override;

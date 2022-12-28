@@ -17,12 +17,14 @@ namespace D2D
 		float getHeight();
 		float getCornerRadius();
 		float getBorderWidth();
+		bool inRect(FLOAT2 point);
 
 		void setWidth(float width);
 		void setHeight(float height);
 		void setCornerRadius(float cornerRadius);
 		void setBorderColor(Color color);
 		void setBorderWidth(float borderWidth);
+		
 
 	private:
 		std::unique_ptr<Brush> pBorderBrush;

@@ -17,7 +17,7 @@ class IComponent
 		virtual void setHeight(int height);
 		virtual void onPress(int x, int y, MouseEvent& mouseEvent) {}
 		virtual void onHover(int x, int y, MouseEvent& mouseEvent) {}
-		virtual void onExit(MouseEvent& mouseEvent) {}
+		virtual void onExit() {}
 		virtual void onMove(int x, int y, MouseEvent& mouseEvent) {}
 		virtual void onClick(int x, int y, MouseEvent& mouseEvent) {}
 		virtual void onDrag(int x, int y, MouseEvent& mouseEvent) {}
@@ -38,6 +38,7 @@ class IComponent
 			{
 				d->setPos(FLOAT2{ (float)originX + mPosX ,  (float)originY + mPosY });
 				d->draw();
+				d->setPos(FLOAT2{mPosX + 0.0f, mPosY + 0.0f});
 			}
 		}
 		//Returns true if the point (x,y) is within the bounds of the component

@@ -35,7 +35,7 @@ class Graphics
 		void drawText(std::wstring& text, FLOAT2 pos, IDWriteTextLayout* pTextLayout, ID2D1SolidColorBrush* pBrush);
 
 		//Draw a path geometry created back createPathGeometry()
-		void drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset = { 0, 0 });
+		void drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset = { 0, 0 }, float scale = 1);
 		//Create a brush of a specified color that is used for draw calls.
 		void createSolidColorBrush(Color color, Microsoft::WRL::ComPtr<ID2D1SolidColorBrush>& pBrush);
 		//Create a path geometry, or shape, using a set of vertices.

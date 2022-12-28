@@ -15,6 +15,7 @@
 #include "UI/IInput.h"
 #include "UI/ITabbedPanel.h"
 #include "UI/IPanel.h"
+#include "UI/IDropDown.h"
 
 using D2D::Drawable;
 using D2D::Line;
@@ -24,13 +25,14 @@ using D2D::Text;
 
 App::App()
 {
-	pVisualizer = new AlgorithmVisualizer();
+	pVisualizer = new AlgorithmVisualizer(this);
 	pRoot = new IContainer(0, 0, pWindow->getWidth(), pWindow->getHeight());
 	IButton* button = new IButton(L"Testing", 100, 30);
 	button->setPos(150, 150);
 	button->setOnClick([]()-> void {
 		std::cout << "Clicked :D" << std::endl;
 		});
+	button->setCornerRadius(15);
 	ISlider* slider = new ISlider(pVisualizer->getSpeedPointer(), 1, 10, 150, 30);
 	slider->setPos(100, 500);
 	
@@ -40,17 +42,32 @@ App::App()
 	IInput* input = new IInput(L"Input", D2D::TextFormat(L"Arial", 16, true), 100, 30);
 	input->setPos(500, 500);
 
+	IDropDown* dropDown = new IDropDown(L"Test", 100, 30);
+	dropDown->addOption(L"100");
+	dropDown->addOption(L"OMG");
+
 	ITabbedPanel* tPanel = new ITabbedPanel(500, pWindow->getHeight());
+	tPanel->setPos(900, 0);
 	IPanel* p1 = new IPanel(0, 0, { 1, 0, 0, 1 });
 	tPanel->addPanel(L"Red", p1);
 	IPanel* p2 = new IPanel(0, 0, { 0, 1, 0, 1 });
 	tPanel->addPanel(L"Green", p2);
 
+	IButton* panelButton = new IButton(L"Panel", 50, 50);
+	panelButton->setPos(100, 100);
+	//panelButton->setCornerRadius(25);
+	panelButton->setOnClick([]()-> void {
+		std::cout << "Clicked :D" << std::endl;
+		});
+	p1->addChild(panelButton);
+
+	pRoot->addChild(tPanel);
 	pRoot->addChild(input);
 	pRoot->addChild(label);
 	pRoot->addChild(slider);
 	pRoot->addChild(button);
-	pRoot->addChild(tPanel);
+	pRoot->addChild(dropDown);
+	
 	//**************** Grid Lines ****************//
 	for (int i = 1; i <= GRID_SIZE; i++)
 	{
@@ -178,6 +195,7 @@ void App::onDraw()
 	//Algorithm Visualizer
 	if ((pVisualizer->isRunning() || pVisualizer->isSleeping()) && pVisualizer->shouldVisualize())
 	{
+		isDrawingAlgo = true;
 		//Wait until the algorithm is sleeping to draw.
 		while (!pVisualizer->isSleeping()) {}
 		std::vector<Point*>& points = pVisualizer->getPoints();
@@ -186,6 +204,7 @@ void App::onDraw()
 			l->draw();
 		for (Point* p : points)
 			p->draw();
+		isDrawingAlgo = false;
 	}
 
 	//UI
@@ -269,6 +288,11 @@ bool App::deletePoint(Point* pPoint)
 		return true;
 	}
 	return false;
+}
+
+bool App::isDrawingAlgorithmVisualize()
+{
+	return isDrawingAlgo;
 }
 
 void App::convexHullEventHandler(Event& e)
@@ -355,9 +379,8 @@ void App::convexHullEventHandler(Event& e)
 					std::vector<Vector2f> points = std::vector<Vector2f>();
 					for (auto& a : mPoints)
 					{
-						//Flip y for counter-clockwise
 						for (Drawable* d : a.second)
-							points.push_back({ d->getPos().x, -d->getPos().y });
+							points.push_back({ d->getPos().x, d->getPos().y });
 					}
 					pVisualizer->computeConvexHull(points, mCHAlgorithm);
 				}
@@ -418,12 +441,13 @@ void App::triangulateEventHandler(Event& e)
 					deleteAndClear(mTriangulationLines);
 					if (isValidPolygon && mPolygon.size() >= 3 && mPolygon[0] == mPolygon[mPolygon.size() - 1])
 					{
+						if (!isCCW())
+						{
+							std::reverse(++mPolygon.begin(), --mPolygon.end());
+						}
 						mPolygon.erase(--mPolygon.end());
 						std::vector<std::pair<size_t, size_t>> a;
-						std::vector<Vector2f> flippedY;
-						for (int i = 0; i < mPolygon.size(); i++)
-							flippedY.push_back({ mPolygon[i].x, -mPolygon[i].y });
-						pVisualizer->computeTriangulation(flippedY, a, mTriAlgorithm);
+						pVisualizer->computeTriangulation(mPolygon, a, mTriAlgorithm);
 						mPolygon.push_back(mPolygon[0]);
 					}
 				}
@@ -447,4 +471,15 @@ void App::updatePolygonValidity()
 		}
 	}
 	isValidPolygon = true;
+}
+
+bool App::isCCW()
+{
+	int minY = 0;
+	for (int i = 0; i < mPolygon.size() - 1; i++)
+	{
+		if (mPolygon[i].y < mPolygon[minY].y)
+			minY = i;
+	}
+	return leftOf(mPolygon[minY], mPolygon[(minY + 1) % (mPolygon.size() - 1)], mPolygon[(minY + mPolygon.size() - 2) % (mPolygon.size() - 1)]);
 }

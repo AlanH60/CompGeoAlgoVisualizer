@@ -71,18 +71,18 @@ void IContainer::onEvent(Event& e)
 		MouseEvent& mouseEvent = (MouseEvent&)e;
 		switch (mouseEvent.mType)
 		{
-		case Event::EventType::PRESS:
-			onPress(mouseEvent.x, mouseEvent.y, mouseEvent);
-			break;
-		case Event::EventType::MOVE:
-			onHover(mouseEvent.x, mouseEvent.y, mouseEvent);
-			onMove(mouseEvent.x, mouseEvent.y, mouseEvent);
-			onDrag(mouseEvent.x, mouseEvent.y, mouseEvent);
-			break;
-		case Event::EventType::RELEASE:
-			onClick(mouseEvent.x, mouseEvent.y, mouseEvent);
-			onDragRelease(mouseEvent.x, mouseEvent.y, mouseEvent);
-			break;
+			case Event::EventType::PRESS:
+				onPress(mouseEvent.x, mouseEvent.y, mouseEvent);
+				break;
+			case Event::EventType::MOVE:
+				onDrag(mouseEvent.x, mouseEvent.y, mouseEvent);
+				onHover(mouseEvent.x, mouseEvent.y, mouseEvent);
+				onMove(mouseEvent.x, mouseEvent.y, mouseEvent);
+				break;
+			case Event::EventType::RELEASE:
+				onClick(mouseEvent.x, mouseEvent.y, mouseEvent);
+				onDragRelease(mouseEvent.x, mouseEvent.y, mouseEvent);
+				break;
 		}
 	}
 	if (e.isKeyboard())
@@ -90,10 +90,9 @@ void IContainer::onEvent(Event& e)
 		KeyEvent& keyEvent = (KeyEvent&)e;
 		switch (keyEvent.mType)
 		{
-		case Event::EventType::PRESS:
-			onKeyPress(keyEvent);
-			break;
-
+			case Event::EventType::PRESS:
+				onKeyPress(keyEvent);
+				break;
 		}
 	}
 	if (e.isChar())
@@ -155,10 +154,11 @@ void IContainer::onHover(int x, int y, MouseEvent& mouseEvent)
 	{
 		if (pCurrChild->component->inComponent(relativeX, relativeY))
 		{
-			if (pHovered != pCurrChild->component)
+			//If the child is already hovered there is no need to call onHover() again unless the child is a container.
+			if (pHovered != pCurrChild->component || dynamic_cast<IContainer*>(pCurrChild->component))
 			{
 				if (pHovered)
-					pHovered->onExit(mouseEvent);
+					pHovered->onExit();
 				pHovered = pCurrChild->component;
 				pHovered->onHover(relativeX, relativeY, mouseEvent);
 			}
@@ -169,18 +169,16 @@ void IContainer::onHover(int x, int y, MouseEvent& mouseEvent)
 	//None of its children are hovered.
 	if (pCurrChild == nullptr && pHovered != nullptr)
 	{
-		pHovered->onExit(mouseEvent);
+		pHovered->onExit();
 		pHovered = nullptr;
 	}
 }
 
-void IContainer::onExit(MouseEvent& mouseEvent)
+void IContainer::onExit()
 {
-	if (mouseEvent.isConsumed)
-		return;
 	if (pHovered)
 	{
-		pHovered->onExit(mouseEvent);
+		pHovered->onExit();
 		pHovered = nullptr;
 	}
 }
@@ -205,8 +203,6 @@ void IContainer::onDrag(int x, int y, MouseEvent& mouseEvent)
 
 void IContainer::onDragRelease(int x, int y, MouseEvent& mouseEvent)
 {
-	if (mouseEvent.isConsumed)
-		return;
 	if (pDragged)
 		pDragged->onDragRelease(x - mPosX, y - mPosY, mouseEvent);
 	pDragged = nullptr;

@@ -32,6 +32,7 @@ class ITabbedPanel : public IContainer
 		ITabbedPanel(int width, int height);
 		~ITabbedPanel();
 		void addPanel(std::wstring panelName, IPanel* pPanel);
+
 	private:
 		void setCurrTab(ITab* tab);
 	private:

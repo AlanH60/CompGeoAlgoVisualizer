@@ -11,6 +11,7 @@ namespace D2D
 	public:
 		Polygon(FLOAT2* vertices, unsigned int vertexCount, bool filled = true, Color color = Color{ 1.0f, 0.0f, 0.0f, 1.0f });
 		~Polygon() = default;
+		void setScale(float scale);
 
 		//Use this polygon's geometry as the mask for a clipping layer.
 		void pushLayer(D2D::Rectangle& rect, D2D1_MATRIX_3X2_F& transform);
@@ -19,6 +20,7 @@ namespace D2D
 		void draw() override;
 	private:
 		std::unique_ptr<Geometry> pGeometry;
+		float mScale;
 		bool mFilled;
 	};
 }

@@ -35,6 +35,9 @@
     <ClInclude Include="Source\Direct2D\Drawable\Drawable.h">
       <Filter>Direct2D\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\DynamicText.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Direct2D\Drawable\Line.h">
       <Filter>Direct2D\Drawable</Filter>
     </ClInclude>
@@ -48,6 +51,9 @@
       <Filter>Direct2D\Drawable</Filter>
     </ClInclude>
     <ClInclude Include="Source\Direct2D\Drawable\Text.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\TextFormat.h">
       <Filter>Direct2D\Drawable</Filter>
     </ClInclude>
     <ClInclude Include="Source\Direct2D\Event.h">
@@ -65,34 +71,31 @@
     <ClInclude Include="Source\Loader.h" />
     <ClInclude Include="Source\PCH.h" />
     <ClInclude Include="Source\Primatives.h" />
+    <ClInclude Include="Source\UI\IButton.h">
+      <Filter>UI</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\IComponent.h">
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\IContainer.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\IButton.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\ISlider.h">
+    <ClInclude Include="Source\UI\IInput.h">
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\ILabel.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\IInput.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Direct2D\Drawable\DynamicText.h">
-      <Filter>Direct2D\Drawable</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Direct2D\Drawable\TextFormat.h">
-      <Filter>Direct2D\Drawable</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\IPanel.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\ISlider.h">
+      <Filter>UI</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\ITabbedPanel.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\IDropDown.h">
       <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -117,6 +120,9 @@
     <ClCompile Include="Source\Direct2D\Drawable\Drawable.cpp">
       <Filter>Direct2D\Drawable</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\DynamicText.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Direct2D\Drawable\Line.cpp">
       <Filter>Direct2D\Drawable</Filter>
     </ClCompile>
@@ -130,6 +136,9 @@
       <Filter>Direct2D\Drawable</Filter>
     </ClCompile>
     <ClCompile Include="Source\Direct2D\Drawable\Text.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\TextFormat.cpp">
       <Filter>Direct2D\Drawable</Filter>
     </ClCompile>
     <ClCompile Include="Source\Direct2D\Event.cpp">
@@ -146,17 +155,13 @@
     </ClCompile>
     <ClCompile Include="Source\Loader.cpp" />
     <ClCompile Include="Source\PCH.cpp" />
+    <ClCompile Include="Source\UI\IButton.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\IComponent.cpp">
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\IContainer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\UI\IButton.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\ISlider.cpp">
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\IInput.cpp">
@@ -165,16 +170,17 @@
     <ClCompile Include="Source\UI\ILabel.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Direct2D\Drawable\DynamicText.cpp">
-      <Filter>Direct2D\Drawable</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Direct2D\Drawable\TextFormat.cpp">
-      <Filter>Direct2D\Drawable</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\IPanel.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\ISlider.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\ITabbedPanel.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\UI\IDropDown.cpp">
       <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>

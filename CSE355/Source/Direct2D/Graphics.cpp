@@ -171,9 +171,9 @@ void Graphics::drawText(std::wstring& text, FLOAT2 pos, IDWriteTextLayout* pText
 
 
 
-void Graphics::drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset) 
+void Graphics::drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset, float scale)
 {
-	pContext2D->SetTransform({ 1, 0, 0, 1, offset.x, -offset.y });
+	pContext2D->SetTransform(D2D1_MATRIX_3X2_F { scale, 0, 0, scale, offset.x, offset.y });
 	pContext2D->DrawGeometry(pGeometry, pBrush);
 	if (filled)
 		pContext2D->FillGeometry(pGeometry, pBrush);

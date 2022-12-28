@@ -1,6 +1,7 @@
 #pragma once
 #include "Primatives.h"
 
+class App;
 namespace D2D
 {
 	class Drawable;
@@ -40,7 +41,7 @@ class AlgorithmVisualizer
 			bool isClipped = false;
 		};
 	public:
-		AlgorithmVisualizer();
+		AlgorithmVisualizer(App* pApp);
 		~AlgorithmVisualizer();
 		bool isIdle();
 		bool isRunning();
@@ -79,6 +80,7 @@ class AlgorithmVisualizer
 		static bool isEar(std::vector<Vector2f>& polygon, int idx, int prev, int next);
 
 	private:
+		App* pApp = nullptr;
 		//Flag that indicates whether or not to perform an algorithm step by step.
 		bool mVisualize = true;
 		//State of the algorithm visualizer.

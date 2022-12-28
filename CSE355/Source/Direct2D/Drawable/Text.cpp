@@ -15,23 +15,28 @@ Text::Text(std::wstring& text, TextFormat& textFormat, float width, float height
 		(unsigned char)textFormat.textAlignment, (unsigned char)textFormat.paraAlignment, mWidth, mHeight, &pTextLayout);
 }
 
-D2D::Text::~Text()
+Text::~Text()
 {
 	if (pTextLayout)
 		pTextLayout->Release();
 }
 
-float D2D::Text::getWidth()
+float Text::getWidth()
 {
 	return mWidth;
 }
 
-float D2D::Text::getHeight()
+float Text::getHeight()
 {
 	return mHeight;
 }
 
-void D2D::Text::setWidth(float width)
+TextFormat Text::getTextFormat()
+{
+	return mTextFormat;
+}
+
+void Text::setWidth(float width)
 {
 	mWidth = width;
 	if (pTextLayout)
@@ -40,7 +45,7 @@ void D2D::Text::setWidth(float width)
 		(unsigned char)mTextFormat.textAlignment, (unsigned char)mTextFormat.paraAlignment, mWidth, mHeight, &pTextLayout);
 }
 
-void D2D::Text::setHeight(float height)
+void Text::setHeight(float height)
 {
 	mHeight = height;
 	if (pTextLayout)
@@ -50,7 +55,7 @@ void D2D::Text::setHeight(float height)
 
 }
 
-void D2D::Text::setDimensions(float width, float height)
+void Text::setDimensions(float width, float height)
 {
 	mWidth = width;
 	mHeight = height;
@@ -61,7 +66,7 @@ void D2D::Text::setDimensions(float width, float height)
 
 }
 
-void D2D::Text::setText(std::wstring& text)
+void Text::setText(std::wstring& text)
 {
 	pTextLayout->Release();
 	pTextLayout = nullptr;
@@ -96,7 +101,7 @@ DWRITE_HIT_TEST_METRICS Text::getCoordinateMetrics(FLOAT2 coords, BOOL* isTraili
 	return metrics;
 }
 
-DWRITE_OVERHANG_METRICS D2D::Text::getOverhangMetrics()
+DWRITE_OVERHANG_METRICS Text::getOverhangMetrics()
 {
 	DWRITE_OVERHANG_METRICS m = {};
 	pTextLayout->GetOverhangMetrics(&m);

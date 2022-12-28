@@ -13,6 +13,7 @@ namespace D2D
 			~Text();
 			float getWidth();
 			float getHeight();
+			TextFormat getTextFormat();
 
 
 			void setWidth(float width);

@@ -11,7 +11,7 @@
 int main(int argc, char** argv)
 {
 	std::vector<Vector2f> vertices;
-	if (!Loader::loadIPE(vertices, "C:/Users/Hau/Downloads/hw1-polygon-count-tri.ipe"))
+	/*if (!Loader::loadIPE(vertices, "C:/Users/Hau/Downloads/hw1-polygon-count-tri.ipe"))
 		return 1;
 	for (int i = 0; i < vertices.size(); i++)
 	{
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 	for (const auto& v : c)
 	{
 		std::cout << "(" << v.x << ", " << v.y << ")" << std::endl;
-	}
+	}*/
 	return WinMain(GetModuleHandle(nullptr), nullptr, GetCommandLineA(), SW_SHOW);
 }
 

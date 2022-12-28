@@ -55,6 +55,7 @@ class App : public Application
 		void addPoint(D2D::Point* pPoint);
 		bool removePoint(D2D::Point* pPoint);
 		bool deletePoint(D2D::Point* pPoint);
+		bool isDrawingAlgorithmVisualize();
 		D2D::Point* getPoint(FLOAT2 pos);
 
 	private:
@@ -69,6 +70,7 @@ class App : public Application
 
 		void triangulateEventHandler(Event& e);
 		void updatePolygonValidity();
+		bool isCCW();
 	private:
 		AlgorithmVisualizer* pVisualizer = nullptr;
 		bool mDragging = false;
@@ -91,6 +93,7 @@ class App : public Application
 
 		AlgorithmVisualizer::ConvexHullAlgorithm mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::QUICK_HULL;
 		AlgorithmVisualizer::TriangulationAlgorithm mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::EAR_CLIPPING;
+		bool isDrawingAlgo = false;
 
 		//*******************UI********************//
 		IContainer* pRoot;
