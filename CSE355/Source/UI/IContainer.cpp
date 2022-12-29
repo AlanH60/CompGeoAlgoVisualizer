@@ -38,6 +38,7 @@ void IContainer::addChild(IComponent* child)
 	else
 		pBackChild = newChild;
 	pFrontChild = newChild;
+	child->setDirtyFlag(true);
 }
 
 void IContainer::removeChild(IComponent* child)
@@ -71,15 +72,15 @@ void IContainer::onEvent(Event& e)
 		MouseEvent& mouseEvent = (MouseEvent&)e;
 		switch (mouseEvent.mType)
 		{
-			case Event::EventType::PRESS:
+			case MouseEvent::Type::PRESS:
 				onPress(mouseEvent.x, mouseEvent.y, mouseEvent);
 				break;
-			case Event::EventType::MOVE:
+			case MouseEvent::Type::MOVE:
 				onDrag(mouseEvent.x, mouseEvent.y, mouseEvent);
 				onHover(mouseEvent.x, mouseEvent.y, mouseEvent);
 				onMove(mouseEvent.x, mouseEvent.y, mouseEvent);
 				break;
-			case Event::EventType::RELEASE:
+			case MouseEvent::Type::RELEASE:
 				onClick(mouseEvent.x, mouseEvent.y, mouseEvent);
 				onDragRelease(mouseEvent.x, mouseEvent.y, mouseEvent);
 				break;
@@ -90,7 +91,7 @@ void IContainer::onEvent(Event& e)
 		KeyEvent& keyEvent = (KeyEvent&)e;
 		switch (keyEvent.mType)
 		{
-			case Event::EventType::PRESS:
+			case KeyEvent::Type::PRESS:
 				onKeyPress(keyEvent);
 				break;
 		}
@@ -245,12 +246,17 @@ void IContainer::onFocusLoss()
 		pFrontChild->component->onFocusLoss();
 }
 
-void IContainer::onUpdate()
+void IContainer::onUpdate(IComponent* parent)
 {
+	bool dirty = isDirty;
+	IComponent::onUpdate(parent);
+	if (!parent)
+		isDirty = false;
 	ILink* pCurrChild = pFrontChild;
 	while (pCurrChild != nullptr)
-	{
-		pCurrChild->component->onUpdate();
+	{ 
+		pCurrChild->component->setDirtyFlag(pCurrChild->component->getDirtyFlag() || dirty);
+		pCurrChild->component->onUpdate(this);
 		pCurrChild = pCurrChild->next;
 	}
 }

@@ -2,77 +2,76 @@
 
 struct Event
 {
-	enum class EventType
-	{
-		PRESS = 0x01,
-		RELEASE = 0x02,
-		MOVE = 0x03,
-		NONE = 0x04
-	};
-
 	virtual bool isMouse() { return false; }
 	virtual bool isKeyboard() { return false; }
 	virtual bool isChar() { return false; }
-
-	bool isPress()
-	{
-		return mType == EventType::PRESS;
-	}
-	bool isRelease()
-	{
-		return mType == EventType::RELEASE;
-	}
-
-	EventType mType = EventType::NONE;
+	virtual bool isWindow() { return false; }
 	bool isConsumed = false;
 };
 
 struct MouseEvent : public Event
 {
-	MouseEvent(EventType type, unsigned char keycode, int x, int y) : x(x), y(y), mKeycode(keycode)
-	{ 
-		mType = type; 
-	}
-	bool isMouse() override { return true; }
-	static bool isMove(Event& e)
+	enum class Type
 	{
-		return e.mType == EventType::MOVE;
-	}
+		PRESS = 0x01,
+		RELEASE,
+		MOVE
+	};
+	MouseEvent(Type type, unsigned char keycode, int x, int y) : x(x), y(y), mKeycode(keycode), mType(type) {}
+	bool isMouse() override { return true; }
+	bool isPress() { return mType == Type::PRESS; }
+	bool isRelease() { return mType == Type::RELEASE; }
+	bool isMove() { return mType == Type::MOVE; }
+
 	int x, y;
+	Type mType;
 	unsigned char mKeycode;
 };
 
 struct KeyEvent : public Event
 {
+	enum class Type
+	{
+		PRESS = 0x01,
+		RELEASE
+	};
 	enum class SysKeyState : unsigned char
 	{
 		CTRL = 0x01,
 		SHIFT = 0x02,
 		ALT = 0x04
 	};
-	KeyEvent(EventType type, unsigned char keycode, unsigned char keyState)
-		:
-		mKeycode(keycode),
-		mKeyState(keyState)
-	{ 
-		assert((int)type <= 0x02 && "Invalid key event type!");
-		mType = type;
-	}
+	KeyEvent(Type type, unsigned char keycode, unsigned char keyState) : mKeycode(keycode),	mKeyState(keyState), mType(type) {}
 	bool isKeyboard() override { return true; }
 	bool ctrlHeld() { return (mKeyState & (unsigned char)SysKeyState::CTRL) == (unsigned char)SysKeyState::CTRL; };
 	bool shiftHeld() { return (mKeyState & (unsigned char)SysKeyState::SHIFT) == (unsigned char)SysKeyState::SHIFT; };
 	bool altHeld() { return (mKeyState & (unsigned char)SysKeyState::ALT) == (unsigned char)SysKeyState::ALT; };
+	bool isPress() { return mType == Type::PRESS; }
+	bool isRelease() { return mType == Type::RELEASE; }
+
+	Type mType;
 	unsigned char mKeycode;
 	unsigned char mKeyState;
 };
 
 struct CharEvent : public Event
 {
-	CharEvent(wchar_t character)
-		:
-		mChar(character)
-	{}
+	CharEvent(wchar_t character) : mChar(character)	{}
 	bool isChar() override { return true; }
 
 	wchar_t mChar;
+};
+
+struct WindowEvent : public Event
+{
+	enum class Type
+	{
+		RESIZE = 0x01
+	};
+	WindowEvent(Type type, int windowWidth, int windowHeight) : mType(type), mWindowWidth(windowWidth), mWindowHeight(windowHeight) {}
+	bool isWindow() override { return true; }
+	bool isResize() { return mType == Type::RESIZE; }
+
+	Type mType;
+	int mWindowWidth, mWindowHeight;
 };

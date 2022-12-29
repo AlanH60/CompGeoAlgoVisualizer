@@ -61,11 +61,18 @@ ITabbedPanel::~ITabbedPanel()
 void ITabbedPanel::addPanel(std::wstring panelName, IPanel* pPanel)
 {
 	ITab* pTab = new ITab(panelName, TextFormat(L"Arial", 16, true, Style::NORMAL, TextAlignment::CENTER, ParagraphAlignment::CENTER), this, pPanel, mWidth, mHeight / 25);
-	if (pPanel->getWidth() > mWidth || pPanel->getWidth() == 0)
-		pPanel->setWidth(mWidth);
-	if (pPanel->getHeight() > mHeight - mHeight / 25 || pPanel->getHeight() == 0)
-		pPanel->setHeight(mHeight - mHeight / 25);
-	pPanel->setPos(0, mHeight / 25);
+	pTab->setXDimension(XDimension::RELATIVEX);
+	pTab->setYDimension(YDimension::RELATIVEY);
+	pTab->setRelativeHeight(0.04f);
+	pTab->setXOrientation(XOrientation::LEFT);
+	pTab->setYOrientation(YOrientation::TOP);
+	pPanel->setXDimension(XDimension::RELATIVEX);
+	pPanel->setYDimension(YDimension::RELATIVEY);
+	pPanel->setRelativeWidth(1.0f);
+	pPanel->setRelativeHeight(0.96f);
+	pPanel->setXOrientation(XOrientation::LEFT);
+	pPanel->setYOrientation(YOrientation::BOTTOM);
+
 	if (!pCurrTab)
 	{
 		pCurrTab = pTab;
@@ -75,9 +82,18 @@ void ITabbedPanel::addPanel(std::wstring panelName, IPanel* pPanel)
 	addChild(pTab);
 	for (int i = 0; i < mTabs.size(); i ++)
 	{
-		mTabs[i]->setWidth(mWidth / mTabs.size());
 		mTabs[i]->setPos(mWidth / mTabs.size() * i, 0);
+		mTabs[i]->setRelativeWidth(1.0f / mTabs.size());
 	}
+}
+
+void ITabbedPanel::onUpdate(IComponent* parent)
+{
+	bool isDirty = this->isDirty;
+	IContainer::onUpdate(parent);
+	if (isDirty)
+		for (int i = 0; i < mTabs.size(); i++)
+			mTabs[i]->setPos(mWidth / mTabs.size() * i, 0);
 }
 
 void ITabbedPanel::setCurrTab(ITab* tab)

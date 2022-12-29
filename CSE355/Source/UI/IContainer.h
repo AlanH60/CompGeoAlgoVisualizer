@@ -37,7 +37,7 @@ class IContainer : public IComponent
 		virtual void onKeyPress(KeyEvent& keyEvent) override;
 		virtual void onChar(CharEvent& charEvent) override;
 		virtual void onFocusLoss() override;
-		virtual void onUpdate() override;
+		virtual void onUpdate(IComponent* parent) override;
 		virtual void draw(int originX, int originY) override;
 	protected:
 		//Pointer to the front of the linked list

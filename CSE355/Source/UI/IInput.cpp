@@ -236,8 +236,9 @@ void IInput::onFocusLoss()
 	clearSelection();
 }
 
-void IInput::onUpdate()
+void IInput::onUpdate(IComponent* parent)
 {
+	IComponent::onUpdate(parent);
 	if (!isFocused || ++mCaretCounter >= 30)
 	{
 		pCaret->setVisibility(false);

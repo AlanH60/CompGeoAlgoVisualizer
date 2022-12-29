@@ -23,7 +23,7 @@ class IInput : public IComponent
 		void onChar(CharEvent& charEvent) override;
 		void onKeyPress(KeyEvent& keyEvent) override;
 		void onFocusLoss() override;
-		void onUpdate() override;
+		void onUpdate(IComponent* parent) override;
 		void draw(int originX, int originY) override;
 
 		void setInitialText(std::wstring& text);

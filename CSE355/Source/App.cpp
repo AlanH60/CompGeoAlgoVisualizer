@@ -42,15 +42,22 @@ App::App()
 	IInput* input = new IInput(L"Input", D2D::TextFormat(L"Arial", 16, true), 100, 30);
 	input->setPos(500, 500);
 
-	IDropDown* dropDown = new IDropDown(L"Test", 100, 30);
-	dropDown->addOption(L"100");
-	dropDown->addOption(L"OMG");
+	IDropDown* dropDown = new IDropDown(L"Convex Hull", 200, 30);
+	dropDown->setPos(10, 10);
+	dropDown->addOption(L"Triangulation");
+	dropDown->setXOrientation(IComponent::XOrientation::CENTER);
+	dropDown->setY(50);
 
 	ITabbedPanel* tPanel = new ITabbedPanel(500, pWindow->getHeight());
-	tPanel->setPos(900, 0);
+	tPanel->setXOrientation(IComponent::XOrientation::RIGHT);
+	tPanel->setYOrientation(IComponent::YOrientation::BOTTOM);
+	tPanel->setXDimension(IComponent::XDimension::RELATIVEX);
+	tPanel->setYDimension(IComponent::YDimension::RELATIVEY);
+	tPanel->setRelativeWidth(0.25f);
+	tPanel->setRelativeHeight(1.0f);
 	IPanel* p1 = new IPanel(0, 0, { 1, 0, 0, 1 });
 	tPanel->addPanel(L"Red", p1);
-	IPanel* p2 = new IPanel(0, 0, { 0, 1, 0, 1 });
+	IPanel* p2 = new IPanel(0, 0, { 0.95f, 0.95f, 0.95f, 1 });
 	tPanel->addPanel(L"Green", p2);
 
 	IButton* panelButton = new IButton(L"Panel", 50, 50);
@@ -60,13 +67,14 @@ App::App()
 		std::cout << "Clicked :D" << std::endl;
 		});
 	p1->addChild(panelButton);
+	p2->addChild(dropDown);
 
 	pRoot->addChild(tPanel);
 	pRoot->addChild(input);
 	pRoot->addChild(label);
 	pRoot->addChild(slider);
 	pRoot->addChild(button);
-	pRoot->addChild(dropDown);
+	
 	
 	//**************** Grid Lines ****************//
 	for (int i = 1; i <= GRID_SIZE; i++)
@@ -84,15 +92,29 @@ App::App()
 		pRoot->onEvent(e);
 		if (e.isConsumed)
 			return;
+		if (e.isWindow())
+		{
+			WindowEvent& windowEvent = (WindowEvent&)e;
+			switch (windowEvent.mType)
+			{
+				case WindowEvent::Type::RESIZE:
+					pRoot->setWidth(windowEvent.mWindowWidth);
+					pRoot->setHeight(windowEvent.mWindowHeight);
+					windowEvent.isConsumed = true;
+					break;
+			}
+		}
 		if (e.isKeyboard())
 		{
 			switch (((KeyEvent&)e).mKeycode)
 			{
 				case VK_UP:
 					pVisualizer->addSpeed(0.1f);
+					e.isConsumed = true;
 					break;
 				case VK_DOWN:
 					pVisualizer->addSpeed(-0.1f);
+					e.isConsumed = true;
 					break;
 			}
 		}
@@ -107,15 +129,18 @@ App::App()
 					if (mState != CONVEX_HULL)
 						clear();
 					mState = CONVEX_HULL;
+					e.isConsumed = true;
 					break;
 				case VK_F2:
 					if (mState != TRIANGULATE)
 						clear();
 					mState = TRIANGULATE;
+					e.isConsumed = true;
 					break;
 				case VK_SPACE:
 					clear();
 					pSelectedPoint = nullptr;
+					e.isConsumed = true;
 					break;
 			}
 		}
@@ -138,7 +163,7 @@ App::~App()
 
 void App::onUpdate()
 {
-	pRoot->onUpdate();
+	pRoot->onUpdate(nullptr);
 	if (pVisualizer->isFinished())
 	{
 		std::vector<std::pair<Vector2f, Vector2f>> result = pVisualizer->getResult();
@@ -304,7 +329,7 @@ void App::convexHullEventHandler(Event& e)
 		Point* pHoveredPoint = getPoint(mousePos);
 		switch (mouse.mType)
 		{
-			case Event::EventType::PRESS:
+			case MouseEvent::Type::PRESS:
 				switch (mouse.mKeycode)
 				{
 					case VK_LBUTTON:
@@ -331,11 +356,11 @@ void App::convexHullEventHandler(Event& e)
 						break;
 				}
 				break;
-			case Event::EventType::RELEASE:
+			case MouseEvent::Type::RELEASE:
 				if (mDragging)
 					mDragging = false;
 				break;
-			case Event::EventType::MOVE:
+			case MouseEvent::Type::MOVE:
 				if (pHoveredPoint && pSelectedPoint != nullptr && pWindow->lButtonPressed() && pSelectedPoint == pHoveredPoint)
 					mDragging = true;
 				if (mDragging)
@@ -351,19 +376,22 @@ void App::convexHullEventHandler(Event& e)
 	}
 	if (e.isKeyboard())
 	{
-		if (e.isPress())
+		KeyEvent& key = (KeyEvent&)e;
+		if (key.isPress())
 		{
-			KeyEvent& key = (KeyEvent&)e;
 			switch (key.mKeycode)
 			{
 				case '1':
 					mCHAlgorithm = AlgorithmVisualizer::GIFT_WRAPPING;
+					e.isConsumed = true;
 					break;
 				case '2':
 					mCHAlgorithm = AlgorithmVisualizer::GRAHAM_SCAN;
+					e.isConsumed = true;
 					break;
 				case '3':
 					mCHAlgorithm = AlgorithmVisualizer::QUICK_HULL;
+					e.isConsumed = true;
 					break;
 				case VK_DELETE:
 				case VK_BACK:
@@ -372,6 +400,7 @@ void App::convexHullEventHandler(Event& e)
 						deletePoint(pSelectedPoint);
 						pSelectedPoint = nullptr;
 					}
+					e.isConsumed = true;
 					break;
 				case VK_RETURN:
 				{
@@ -384,6 +413,7 @@ void App::convexHullEventHandler(Event& e)
 					}
 					pVisualizer->computeConvexHull(points, mCHAlgorithm);
 				}
+					e.isConsumed = true;
 					break;
 				default:
 					break;
@@ -401,7 +431,7 @@ void App::triangulateEventHandler(Event& e)
 
 		switch (mouseEvent.mType)
 		{
-			case Event::EventType::PRESS:
+			case MouseEvent::Type::PRESS:
 				switch (mouseEvent.mKeycode)
 				{
 					case VK_LBUTTON:
@@ -420,6 +450,7 @@ void App::triangulateEventHandler(Event& e)
 						mPolygon.push_back(Vector2f{ p->getPos().x, p->getPos().y });
 						updatePolygonValidity();
 					}
+						e.isConsumed = true;
 						break;
 					default:
 						break;
@@ -428,13 +459,14 @@ void App::triangulateEventHandler(Event& e)
 	}
 	if (e.isKeyboard())
 	{
-		if (e.isPress())
+		KeyEvent& key = (KeyEvent&)e;
+		if (key.isPress())
 		{
-			KeyEvent& key = (KeyEvent&)e;
 			switch (key.mKeycode)
 			{
 				case '1':
 					mTriAlgorithm = AlgorithmVisualizer::EAR_CLIPPING;
+					e.isConsumed = true;
 					break;
 				case VK_RETURN:
 				{
@@ -451,6 +483,7 @@ void App::triangulateEventHandler(Event& e)
 						mPolygon.push_back(mPolygon[0]);
 					}
 				}
+					e.isConsumed = true;
 					break;
 				default:
 					break;

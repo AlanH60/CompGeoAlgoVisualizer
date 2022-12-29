@@ -21,7 +21,7 @@ class ISlider : public IComponent
 		void onDrag(int x, int y, MouseEvent& mouseEvent) override;
 		void onDragRelease(int x, int y, MouseEvent& mouseEvent) override;
 		void onClick(int x, int y, MouseEvent& mouseEvent) override;
-		void onUpdate() override;
+		void onUpdate(IComponent* parent) override;
 		bool inComponent(int x, int y) override;
 	private:
 		float* pValue;

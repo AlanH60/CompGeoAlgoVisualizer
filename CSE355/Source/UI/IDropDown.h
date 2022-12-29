@@ -12,6 +12,7 @@ namespace D2D
 class IDropDown : public IContainer
 {
 	private:
+		const int PADDING = 5;
 		class IDropDownOption : public IComponent
 		{
 			friend IDropDown;
@@ -34,7 +35,9 @@ class IDropDown : public IContainer
 		void addOption(std::wstring text);
 		void addChild(IComponent* child) override;
 		void onPress(int x ,int y, MouseEvent& e) override;
+		void onUpdate(IComponent* parent) override;
 		void onFocusLoss() override;
+		void setDirtyFlag(bool dirty) override;
 	private:
 		void setOption(IDropDownOption* pOption);
 		void close();

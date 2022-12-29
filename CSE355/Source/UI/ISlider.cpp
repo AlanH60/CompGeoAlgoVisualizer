@@ -98,8 +98,9 @@ void ISlider::onClick(int x, int y, MouseEvent& mouseEvent)
 	mouseEvent.isConsumed = true;
 }
 
-void ISlider::onUpdate()
+void ISlider::onUpdate(IComponent* parent)
 {
+	IComponent::onUpdate(parent);
 	float prog = (*pValue - mMin) / (mMax - mMin);
 	pSliderBar->setOffset({ prog * mWidth - pSliderBar->getWidth() / 2, 0 });
 }

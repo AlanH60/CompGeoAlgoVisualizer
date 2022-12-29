@@ -150,18 +150,20 @@ LRESULT CALLBACK Window::handleAdapter(HWND handle, UINT msg, WPARAM wParam, LPA
 
 void Window::initEventHandle(Event& e)
 {
-	if (e.isPress() || e.isRelease())
+	if (e.isMouse())
 	{
-		if (e.isMouse())
+		MouseEvent& mouseEvent = (MouseEvent&)e;
+		if (mouseEvent.isPress() || mouseEvent.isRelease())
 		{
-			unsigned char keycode = ((MouseEvent&)e).mKeycode;
+			unsigned char keycode = mouseEvent.mKeycode;
 			if (keycode > 2)
 				keycode = 2;
-			mMouseState[keycode] = (e.isPress()) ? 1 : 0;
+			mMouseState[keycode] = (mouseEvent.isPress()) ? 1 : 0;
 		}
-		if (e.isKeyboard())
-			mKeyState[((KeyEvent&)e).mKeycode] = (e.isPress()) ? 1 : 0;
+			
 	}
+	else if (e.isKeyboard())
+		mKeyState[((KeyEvent&)e).mKeycode] = (((KeyEvent&)e).isPress()) ? 1 : 0;
 }
 
 void Window::trimQueues()
@@ -191,38 +193,39 @@ LRESULT Window::handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 				sysKeyState |= (unsigned char)KeyEvent::SysKeyState::CTRL;
 			if (mKeyState[VK_MENU])
 				sysKeyState |= (unsigned char)KeyEvent::SysKeyState::ALT;
-			mEventQueue.emplace(new KeyEvent{ Event::EventType::PRESS, (unsigned char)wParam, sysKeyState });
+			mEventQueue.emplace(new KeyEvent(KeyEvent::Type::PRESS, (unsigned char)wParam, sysKeyState));
 			break;
 		}
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			mEventQueue.emplace(new KeyEvent{ Event::EventType::RELEASE, (unsigned char)wParam, 0});
+			mEventQueue.emplace(new KeyEvent(KeyEvent::Type::RELEASE, (unsigned char)wParam, 0));
 			break;
 		//mHeight - y to make positive y the up direction.
 		case WM_LBUTTONDOWN:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::PRESS, VK_LBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent( MouseEvent::Type::PRESS, VK_LBUTTON, LOWORD(lParam), HIWORD(lParam)));
 			break;
 		case WM_RBUTTONDOWN:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::PRESS, VK_RBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent(MouseEvent::Type::PRESS, VK_RBUTTON, LOWORD(lParam), HIWORD(lParam)));
 			break;
 		case WM_MBUTTONDOWN:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::PRESS, VK_MBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent(MouseEvent::Type::PRESS, VK_MBUTTON, LOWORD(lParam), HIWORD(lParam)));
 			break;
 		case WM_LBUTTONUP:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::RELEASE, VK_LBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent(MouseEvent::Type::RELEASE, VK_LBUTTON, LOWORD(lParam), HIWORD(lParam)));
 			break;
 		case WM_RBUTTONUP:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::RELEASE, VK_RBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent(MouseEvent::Type::RELEASE, VK_RBUTTON, LOWORD(lParam), HIWORD(lParam)));
 			break;
 		case WM_MBUTTONUP:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::RELEASE, VK_MBUTTON, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent(MouseEvent::Type::RELEASE, VK_MBUTTON, LOWORD(lParam), HIWORD(lParam)));
 			break;
 		case WM_MOUSEMOVE:
-			mEventQueue.emplace(new MouseEvent{ Event::EventType::MOVE, VK_NONAME, LOWORD(lParam), HIWORD(lParam) });
+			mEventQueue.emplace(new MouseEvent(MouseEvent::Type::MOVE, VK_NONAME, LOWORD(lParam), HIWORD(lParam)));
 			break;
 		case WM_SIZE:
 			if (pGraphics)
 				pGraphics->onResize(LOWORD(lParam), HIWORD(lParam));
+			mEventQueue.emplace( new WindowEvent(WindowEvent::Type::RESIZE, LOWORD(lParam), HIWORD(lParam)));
 			break;
 		default:
 			break;

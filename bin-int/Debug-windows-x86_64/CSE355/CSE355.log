@@ -1,12 +1,4 @@
-﻿  IDropDown.cpp
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IDropDown.cpp(14,96): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IDropDown.cpp(14,77): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IDropDown.cpp(15,63): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IDropDown.cpp(15,44): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IDropDown.cpp(51,49): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IDropDown.cpp(51,42): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IDropDown.cpp(52,50): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IDropDown.cpp(52,43): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IDropDown.cpp(100,44): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IDropDown.cpp(123,44): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+﻿  IComponent.cpp
+C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IComponent.cpp(127,28): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IComponent.cpp(135,30): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   CSE355.vcxproj -> C:\Users\Home\Documents\GitHub\CSE355\bin\Debug-windows-x86_64\CSE355\CSE355.exe
