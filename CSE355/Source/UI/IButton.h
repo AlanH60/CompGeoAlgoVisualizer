@@ -13,6 +13,8 @@ class IButton : public IComponent
 	public:
 		IButton(std::wstring text, int width, int height);
 		IButton(std::wstring text, D2D::TextFormat& fontFormat, int width, int height);
+		void setWidth(int width) override;
+		void setHeight(int height) override;
 		void onHover(int x, int y, MouseEvent& mouseEvent) override;
 		void onExit() override;
 		void onPress(int x, int y, MouseEvent& mouseEvent) override;

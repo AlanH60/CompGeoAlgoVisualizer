@@ -12,7 +12,6 @@
 #include "UI/IButton.h"
 #include "UI/ISlider.h"
 #include "UI/ILabel.h"
-#include "UI/IInput.h"
 #include "UI/ITabbedPanel.h"
 #include "UI/IPanel.h"
 #include "UI/IDropDown.h"
@@ -26,55 +25,59 @@ using D2D::Text;
 App::App()
 {
 	pVisualizer = new AlgorithmVisualizer(this);
+
+	//********************************** UI *****************************************//
 	pRoot = new IContainer(0, 0, pWindow->getWidth(), pWindow->getHeight());
-	IButton* button = new IButton(L"Testing", 100, 30);
-	button->setPos(150, 150);
-	button->setOnClick([]()-> void {
+	std::cout << sizeof(IContainer);
+	IPanel* pMenuPanel = new IPanel(0, 0, { 0.95f, 0.95f, 0.95f, 1 });
+	pMenuPanel->setXOrientation(IComponent::XOrientation::RIGHT);
+	pMenuPanel->setYOrientation(IComponent::YOrientation::BOTTOM);
+	pMenuPanel->setXDimension(IComponent::XDimension::RELATIVEX);
+	pMenuPanel->setYDimension(IComponent::YDimension::RELATIVEY);
+	pMenuPanel->setRelativeHeight(1.0f);
+	pMenuPanel->setRelativeWidth(0.25f);
+
+	//Dropdown menu used to select a purpose for the algorithm
+	IDropDown* pAlgorithmDropDown = new IDropDown(L"Convex Hull", 200, 30);
+	pAlgorithmDropDown->addOption(L"Triangulation");
+	pAlgorithmDropDown->setXOrientation(IComponent::XOrientation::CENTER);
+	pAlgorithmDropDown->setYOrientation(IComponent::YOrientation::RELATIVE_HEIGHT);
+	pAlgorithmDropDown->setXDimension(IComponent::XDimension::RELATIVEX);
+	pAlgorithmDropDown->setYDimension(IComponent::YDimension::RELATIVEY);
+	pAlgorithmDropDown->setRelativeHeightOrientation(0.05f);
+	pAlgorithmDropDown->setRelativeWidth(0.8f);
+	pAlgorithmDropDown->setRelativeHeight(0.05f);
+
+	//Start button used to start the algorithm visualizer
+	IButton* pStartButton = new IButton(L"Start", 50, 50);
+	pStartButton->setXOrientation(IComponent::XOrientation::RIGHT);
+	pStartButton->setYOrientation(IComponent::YOrientation::BOTTOM);
+	pStartButton->setXDimension(IComponent::XDimension::RELATIVEX);
+	pStartButton->setYDimension(IComponent::YDimension::RELATIVEY);
+	pStartButton->setRelativeWidth(0.5f);
+	pStartButton->setRelativeHeight(0.1f);
+	pStartButton->setOnClick([]()-> void {
 		std::cout << "Clicked :D" << std::endl;
 		});
-	button->setCornerRadius(15);
-	ISlider* slider = new ISlider(pVisualizer->getSpeedPointer(), 1, 10, 150, 30);
-	slider->setPos(100, 500);
-	
-	ILabel* label = new ILabel(L"Label", D2D::TextFormat(L"Arial", 16, true), 200, 200);
-	label->setPos(500, 0);
 
-	IInput* input = new IInput(L"Input", D2D::TextFormat(L"Arial", 16, true), 100, 30);
-	input->setPos(500, 500);
+	//Slider used to modify the speed of the algorithm visualizer
+	ISlider* pSpeedSlider = new ISlider(pVisualizer->getSpeedPointer(), 1, 10, 0, 0);
+	pSpeedSlider->setXOrientation(IComponent::XOrientation::RELATIVE_WIDTH);
+	pSpeedSlider->setYOrientation(IComponent::YOrientation::RELATIVE_HEIGHT);
+	pSpeedSlider->setXDimension(IComponent::XDimension::RELATIVEX);
+	pSpeedSlider->setYDimension(IComponent::YDimension::RELATIVEY);
+	pSpeedSlider->setRelativeWidthOrientation(0.1f);
+	pSpeedSlider->setRelativeHeightOrientation(0.3f);
+	pSpeedSlider->setRelativeWidth(0.75f);
+	pSpeedSlider->setRelativeHeight(0.06f);
 
-	IDropDown* dropDown = new IDropDown(L"Convex Hull", 200, 30);
-	dropDown->setPos(10, 10);
-	dropDown->addOption(L"Triangulation");
-	dropDown->setXOrientation(IComponent::XOrientation::CENTER);
-	dropDown->setY(50);
 
-	ITabbedPanel* tPanel = new ITabbedPanel(500, pWindow->getHeight());
-	tPanel->setXOrientation(IComponent::XOrientation::RIGHT);
-	tPanel->setYOrientation(IComponent::YOrientation::BOTTOM);
-	tPanel->setXDimension(IComponent::XDimension::RELATIVEX);
-	tPanel->setYDimension(IComponent::YDimension::RELATIVEY);
-	tPanel->setRelativeWidth(0.25f);
-	tPanel->setRelativeHeight(1.0f);
-	IPanel* p1 = new IPanel(0, 0, { 1, 0, 0, 1 });
-	tPanel->addPanel(L"Red", p1);
-	IPanel* p2 = new IPanel(0, 0, { 0.95f, 0.95f, 0.95f, 1 });
-	tPanel->addPanel(L"Green", p2);
+	pMenuPanel->addChild(pStartButton);
+	pMenuPanel->addChild(pSpeedSlider);
+	pMenuPanel->addChild(pAlgorithmDropDown);
 
-	IButton* panelButton = new IButton(L"Panel", 50, 50);
-	panelButton->setPos(100, 100);
-	//panelButton->setCornerRadius(25);
-	panelButton->setOnClick([]()-> void {
-		std::cout << "Clicked :D" << std::endl;
-		});
-	p1->addChild(panelButton);
-	p2->addChild(dropDown);
-
-	pRoot->addChild(tPanel);
-	pRoot->addChild(input);
-	pRoot->addChild(label);
-	pRoot->addChild(slider);
-	pRoot->addChild(button);
-	
+	pRoot->addChild(pMenuPanel);
+	//*******************************************************************************//
 	
 	//**************** Grid Lines ****************//
 	for (int i = 1; i <= GRID_SIZE; i++)

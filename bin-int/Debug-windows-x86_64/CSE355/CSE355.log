@@ -1,4 +1,23 @@
-﻿  IComponent.cpp
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IComponent.cpp(127,28): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Home\Documents\GitHub\CSE355\CSE355\Source\UI\IComponent.cpp(135,30): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  CSE355.vcxproj -> C:\Users\Home\Documents\GitHub\CSE355\bin\Debug-windows-x86_64\CSE355\CSE355.exe
+﻿  App.cpp
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(350,173): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(363,89): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Algorithms.h(364,89): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(38,35): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(38,35): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(38,59): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(38,59): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(39,35): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(39,35): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(39,59): warning C4838: conversion from 'unsigned int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.h(39,59): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Direct2D\Event.h(4,1): warning C4099: 'Event': type name first seen using 'class' now seen using 'struct'
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\Direct2D\Event.h(3): message : see declaration of 'Event'
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(331,28): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(331,28): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(331,37): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(331,37): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(433,33): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(433,33): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(433,47): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CSE355\CSE355\Source\App.cpp(433,47): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+  CSE355.vcxproj -> C:\Users\Hau\Documents\GitHub\CSE355\bin\Debug-windows-x86_64\CSE355\CSE355.exe

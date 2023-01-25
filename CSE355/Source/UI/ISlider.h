@@ -15,6 +15,8 @@ class ISlider : public IComponent
 		const float SLIDER_WIDTH = 0.2f;
 	public:
 		ISlider(float* value, float min, float max, int width, int height);
+		void setWidth(int width) override;
+		void setHeight(int height) override;
 		void onPress(int x, int y, MouseEvent& mouseEvent) override;
 		void onMove(int x, int y, MouseEvent& mouseEvent) override;
 		void onExit() override;

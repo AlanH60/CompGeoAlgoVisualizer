@@ -64,6 +64,18 @@ void IComponent::setYOrientation(YOrientation yOrientation)
 	isDirty = true;
 }
 
+void IComponent::setRelativeWidthOrientation(float rWidthOrientation)
+{
+	mRWidthOrientation = rWidthOrientation;
+	isDirty = true;
+}
+
+void IComponent::setRelativeHeightOrientation(float rHeightOrientation)
+{
+	mRHeightOrientation = rHeightOrientation;
+	isDirty = true;
+}
+
 void IComponent::setXDimension(XDimension xDimension)
 {
 	mXDimension = xDimension;
@@ -148,6 +160,9 @@ void IComponent::onUpdate(IComponent* parent)
 		case XOrientation::RIGHT:
 			mPosX = (parent->mWidth - mWidth);
 			break;
+		case XOrientation::RELATIVE_WIDTH:
+			mPosX = mRWidthOrientation * parent->mWidth;
+			break;
 		default:
 			break;
 	}
@@ -161,6 +176,9 @@ void IComponent::onUpdate(IComponent* parent)
 			break;
 		case YOrientation::BOTTOM:
 			mPosY = (parent->mHeight - mHeight);
+			break;
+		case YOrientation::RELATIVE_HEIGHT:
+			mPosY = mRHeightOrientation * parent->mHeight;
 			break;
 		default:
 			break;

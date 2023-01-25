@@ -19,6 +19,20 @@ IDropDown::IDropDownOption::IDropDownOption(IDropDown* pDropDown, std::wstring& 
 	mDrawables.push_back(pText);
 }
 
+void IDropDown::IDropDownOption::setWidth(int width)
+{
+	IComponent::setWidth(width);
+	pRect->setWidth(width);
+	pText->setWidth(width);
+}
+
+void IDropDown::IDropDownOption::setHeight(int height)
+{
+	IComponent::setHeight(height);
+	pRect->setHeight(height);
+	pText->setHeight(height);
+}
+
 void IDropDown::IDropDownOption::onPress(int x, int y, MouseEvent& e)
 {
 	if (e.isConsumed)
@@ -70,6 +84,27 @@ IDropDown::~IDropDown()
 			delete pOption;
 }
 
+void IDropDown::setWidth(int width)
+{
+	IComponent::setWidth(width);
+	pSelectedText->setWidth(width);
+	pRectangle->setWidth(width);
+	pDownArrow->setOffset({ mWidth - mHeight / 2.0f , 2.5f * mHeight / 6.0f });
+}
+
+void IDropDown::setHeight(int height)
+{
+	IComponent::setHeight(height);
+	pSelectedText->setHeight(height);
+	pRectangle->setHeight(height);
+	FLOAT2 vertices[3] = { FLOAT2{ 0, 0 }, FLOAT2{ height / 3.0f, 0 }, FLOAT2{ height / 6.0f, height / 6.0f } };
+	mDrawables.erase(--mDrawables.end());
+	delete pDownArrow;
+	pDownArrow = new D2D::Polygon(vertices, 3, true, { 0, 0, 0, 1 });
+	pDownArrow->setOffset({ mWidth - mHeight / 2.0f , 2.5f * mHeight / 6.0f });
+	mDrawables.push_back(pDownArrow);
+}
+
 
 void IDropDown::addOption(std::wstring text)
 {
@@ -82,7 +117,6 @@ void IDropDown::addOption(std::wstring text)
 
 void IDropDown::addChild(IComponent* child)
 {
-	IDropDownOption* ptr = dynamic_cast<IDropDownOption*>(child);
 	if (dynamic_cast<IDropDownOption*>(child))
 		IContainer::addChild(child);
 }
@@ -118,13 +152,6 @@ void IDropDown::onUpdate(IComponent* parent)
 void IDropDown::onFocusLoss()
 {
 	close();
-}
-
-void IDropDown::setDirtyFlag(bool dirty)
-{
-	if (isExpanded)
-		int i = 0;
-	IContainer::setDirtyFlag(dirty);
 }
 
 void IDropDown::setOption(IDropDownOption* pOption)

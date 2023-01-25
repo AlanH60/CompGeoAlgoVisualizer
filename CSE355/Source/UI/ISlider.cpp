@@ -20,6 +20,23 @@ ISlider::ISlider(float* pValue, float min, float max, int width, int height)
 	mDrawables.push_back(pSliderBar);
 }
 
+void ISlider::setWidth(int width)
+{
+	IComponent::setWidth(width);
+	pHorizontalBar->setWidth(width);
+	float prog = (*pValue - mMin) / (mMax - mMin);
+	pSliderBar->setOffset({ prog * mWidth - pSliderBar->getWidth() / 2, 0 });
+}
+
+void ISlider::setHeight(int height)
+{
+	IComponent::setHeight(height);
+	pSliderBar->setHeight(height);
+	pSliderBar->setWidth(height * SLIDER_WIDTH);
+	pHorizontalBar->setHeight(height * HORIZONTAL_HEIGHT);
+	pHorizontalBar->setOffset({ 0, 3.0f * height / 8 });
+}
+
 void ISlider::onPress(int x, int y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)

@@ -9,14 +9,16 @@ class IComponent
 			RELATIVEX,
 			CENTER,
 			LEFT,
-			RIGHT
+			RIGHT,
+			RELATIVE_WIDTH
 		};
 		enum class YOrientation
 		{
 			RELATIVEY,
 			CENTER,
 			TOP,
-			BOTTOM
+			BOTTOM,
+			RELATIVE_HEIGHT
 		};
 		enum class XDimension
 		{
@@ -40,6 +42,8 @@ class IComponent
 		void setY(int y);
 		void setXOrientation(XOrientation xOrientation);
 		void setYOrientation(YOrientation yOrientation);
+		void setRelativeWidthOrientation(float rWidthOrientation);
+		void setRelativeHeightOrientation(float rHeightOrientation);
 		void setXDimension(XDimension xDimension);
 		void setYDimension(YDimension yDimension);
 		void setRelativeWidth(float rWidth);
@@ -74,6 +78,11 @@ class IComponent
 		//Orientation
 		XOrientation mXOrientation = XOrientation::RELATIVEX;
 		YOrientation mYOrientation = YOrientation::RELATIVEY;
+		//If RELATIVE_WIDTH or RELATIVE_HEIGHT orientations are chosen, 
+		//these values determine the factor of the parent's dimensions this component's position will be in.
+		//Ex: mRWidthOrientation = 0.5f ==> mPosX = 0.5f * pParent->getWidth()
+		float mRWidthOrientation = 0.0f;
+		float mRHeightOrientation = 0.0f;
 		//Dimensions relative to parent or absolute
 		XDimension mXDimension = XDimension::ABSOLUTEX;
 		YDimension mYDimension = YDimension::ABSOLUTEY;

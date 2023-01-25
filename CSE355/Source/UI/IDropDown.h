@@ -18,6 +18,8 @@ class IDropDown : public IContainer
 			friend IDropDown;
 			public:
 				IDropDownOption(IDropDown* pDropDown, std::wstring& string);
+				void setWidth(int width) override;
+				void setHeight(int height) override;
 				void onPress(int x, int y, MouseEvent& e) override;
 				void onHover(int x, int y, MouseEvent& e) override;
 				void onExit() override;
@@ -32,12 +34,13 @@ class IDropDown : public IContainer
 		IDropDown(std::wstring text, int width, int height);
 		IDropDown(std::wstring text, D2D::TextFormat& textFormat, int width, int height);
 		~IDropDown();
+		void setWidth(int width) override;
+		void setHeight(int height) override;
 		void addOption(std::wstring text);
 		void addChild(IComponent* child) override;
 		void onPress(int x ,int y, MouseEvent& e) override;
 		void onUpdate(IComponent* parent) override;
 		void onFocusLoss() override;
-		void setDirtyFlag(bool dirty) override;
 	private:
 		void setOption(IDropDownOption* pOption);
 		void close();

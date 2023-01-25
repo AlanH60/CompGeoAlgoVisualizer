@@ -20,8 +20,20 @@ IButton::IButton(std::wstring text, TextFormat& textFormat, int width, int heigh
 	pText->setColor({ 0.95f, 0.95f, 0.95f, 1 });
 	mDrawables.push_back(pRectangle);
 	mDrawables.push_back(pText);
-	
-	
+}
+
+void IButton::setWidth(int width)
+{
+	IComponent::setWidth(width);
+	pRectangle->setWidth(width);
+	pText->setWidth(width);
+}
+
+void IButton::setHeight(int height)
+{
+	IComponent::setHeight(height);
+	pRectangle->setHeight(height);
+	pText->setHeight(height);
 }
 
 void IButton::onHover(int x, int y, MouseEvent& mouseEvent)
