@@ -33,6 +33,8 @@ class IDropDown : public IContainer
 	public:
 		IDropDown(std::wstring text, int width, int height);
 		IDropDown(std::wstring text, D2D::TextFormat& textFormat, int width, int height);
+		IDropDown(int width, int height);
+		IDropDown(D2D::TextFormat& textFormat, int width, int height);
 		~IDropDown();
 		void setWidth(int width) override;
 		void setHeight(int height) override;

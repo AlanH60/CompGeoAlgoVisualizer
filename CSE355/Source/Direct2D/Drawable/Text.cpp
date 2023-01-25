@@ -3,7 +3,7 @@
 
 using namespace D2D;
 
-Text::Text(std::wstring& text, TextFormat& textFormat, float width, float height)
+Text::Text(const std::wstring& text, TextFormat& textFormat, float width, float height)
 	:
 	Drawable({ 0, 0 }, { 0, 0, 0, 1 }),
 	mText(text),

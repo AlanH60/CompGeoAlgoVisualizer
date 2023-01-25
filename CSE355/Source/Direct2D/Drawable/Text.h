@@ -9,7 +9,7 @@ namespace D2D
 	class Text : public Drawable
 	{
 		public:
-			Text(std::wstring& text, TextFormat& textFormat, float width, float height);
+			Text(const std::wstring& text, TextFormat& textFormat, float width, float height);
 			~Text();
 			float getWidth();
 			float getHeight();

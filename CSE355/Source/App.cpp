@@ -50,6 +50,7 @@ App::App()
 
 	//Start button used to start the algorithm visualizer
 	IButton* pStartButton = new IButton(L"Start", 50, 50);
+	
 	pStartButton->setXOrientation(IComponent::XOrientation::RIGHT);
 	pStartButton->setYOrientation(IComponent::YOrientation::BOTTOM);
 	pStartButton->setXDimension(IComponent::XDimension::RELATIVEX);

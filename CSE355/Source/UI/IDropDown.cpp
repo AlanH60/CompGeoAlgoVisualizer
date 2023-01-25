@@ -71,7 +71,34 @@ IDropDown::IDropDown(std::wstring text, D2D::TextFormat& textFormat, int width, 
 	FLOAT2 vertices[3] = { FLOAT2{ 0, 0 }, FLOAT2{ height / 3.0f, 0 }, FLOAT2{ height / 6.0f, height / 6.0f } };
 	pDownArrow = new D2D::Polygon(vertices, 3, true, {0, 0, 0, 1});
 	pDownArrow->setOffset({ width - height / 2.0f , 2.5f * height / 6.0f});
-	mOptions.push_back(new IDropDownOption(this, text));
+	IDropDownOption* pFirstOption = new IDropDownOption(this, text);
+	pFirstOption->setXDimension(IComponent::XDimension::RELATIVEX);
+	pFirstOption->setRelativeWidth(1.0f);
+	mOptions.push_back(pFirstOption);
+	
+	mDrawables.push_back(pRectangle);
+	mDrawables.push_back(pSelectedText);
+	mDrawables.push_back(pDownArrow);
+}
+
+IDropDown::IDropDown(int width, int height)
+	:
+	IDropDown(TextFormat(L"Arial", 14, true, Style::NORMAL, TextAlignment::LEFT, ParagraphAlignment::CENTER), width, height)
+{
+}
+
+IDropDown::IDropDown(D2D::TextFormat& textFormat, int width, int height)
+	:
+	IContainer(0, 0, width, height),
+	mSelectedString(L""),
+	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 0, width / 10, { 0.8f, 0.8f, 0.8f, 1.0f })),
+	pSelectedText(new Text(L"", textFormat, width - 2 * PADDING, height)),
+	isExpanded(false)
+{
+	pSelectedText->setOffset({ (float)PADDING, 0 });
+	FLOAT2 vertices[3] = { FLOAT2{ 0, 0 }, FLOAT2{ height / 3.0f, 0 }, FLOAT2{ height / 6.0f, height / 6.0f } };
+	pDownArrow = new D2D::Polygon(vertices, 3, true, { 0, 0, 0, 1 });
+	pDownArrow->setOffset({ width - height / 2.0f , 2.5f * height / 6.0f });
 	mDrawables.push_back(pRectangle);
 	mDrawables.push_back(pSelectedText);
 	mDrawables.push_back(pDownArrow);

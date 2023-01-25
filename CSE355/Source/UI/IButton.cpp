@@ -15,7 +15,7 @@ IButton::IButton(std::wstring text, TextFormat& textFormat, int width, int heigh
 	:
 	IComponent(0, 0, width, height),
 	pText(new Text(text, textFormat, width, height)),
-	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 5, true, Color{ 1, 0.3f, 0.3f, 1 }))
+	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 5, true, Color{ 0.3f, 0.3f, 0.3f, 1 }))
 {
 	pText->setColor({ 0.95f, 0.95f, 0.95f, 1 });
 	mDrawables.push_back(pRectangle);
