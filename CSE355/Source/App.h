@@ -15,6 +15,7 @@ struct Vector2f;
 class Event;
 
 class IContainer;
+class IDropDown;
 class App : public Application
 {
 	public:
@@ -71,6 +72,9 @@ class App : public Application
 		void triangulateEventHandler(Event& e);
 		void updatePolygonValidity();
 		bool isCCW();
+		
+		void startConvexHull();
+		void startTriangulation();
 	private:
 		AlgorithmVisualizer* pVisualizer = nullptr;
 		bool mDragging = false;
@@ -97,4 +101,5 @@ class App : public Application
 
 		//*******************UI********************//
 		IContainer* pRoot;
+		IDropDown* pAlgorithmDropDown;
 };

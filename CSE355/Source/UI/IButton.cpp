@@ -15,11 +15,25 @@ IButton::IButton(std::wstring text, TextFormat& textFormat, int width, int heigh
 	:
 	IComponent(0, 0, width, height),
 	pText(new Text(text, textFormat, width, height)),
-	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 5, true, Color{ 0.3f, 0.3f, 0.3f, 1 }))
+	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 5, true, Color{ 1, 0.3f, 0.3f, 1 }))
 {
-	pText->setColor({ 0.95f, 0.95f, 0.95f, 1 });
+	mTextColor = Color{ 0.95f, 0.95f, 0.95f, 1 };
+	pText->setColor(mTextColor);
 	mDrawables.push_back(pRectangle);
 	mDrawables.push_back(pText);
+}
+
+void IButton::setColor(const Color& color)
+{
+	IComponent::setColor(color);
+	pRectangle->setColor(color);
+	pRectangle->setBorderColor(color);
+}
+
+void IButton::setTextColor(const Color& color)
+{
+	mTextColor = color;
+	pText->setColor(color);
 }
 
 void IButton::setWidth(int width)
@@ -40,16 +54,17 @@ void IButton::onHover(int x, int y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
-	pRectangle->setColor({ 0.95f, 0.95f, 0.95f, 1 });
-	pRectangle->setBorderColor({ 0.95f, 0.95f, 0.95f, 1 });
-	pText->setColor({ 1, 0.3f, 0.3f, 1 });
+	Color hoveredColor = Color{ mColor.r + (1 - mColor.r) / 2, mColor.g + (1 - mColor.g) / 2, mColor.b + (1 - mColor.b) / 2, mColor.a };
+	pRectangle->setColor(hoveredColor);
+	pRectangle->setBorderColor(hoveredColor);
+	pText->setColor(mColor);
 }
 
 void IButton::onExit()
 {
-	pRectangle->setColor({ 1, 0.3f, 0.3f, 1 });
-	pRectangle->setBorderColor({ 1, 0.3f, 0.3f, 1 });
-	pText->setColor({ 0.95f, 0.95f, 0.95f, 1 });
+	pRectangle->setColor(mColor);
+	pRectangle->setBorderColor(mColor);
+	pText->setColor(mTextColor);
 }
 
 void IButton::onPress(int x, int y, MouseEvent& mouseEvent)

@@ -106,6 +106,11 @@ void IComponent::setPos(int x, int y)
     mPosY = y;
 }
 
+void IComponent::setColor(const Color& color)
+{
+	mColor = color;
+}
+
 void IComponent::setDirtyFlag(bool isDirty)
 {
 	this->isDirty = isDirty;

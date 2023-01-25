@@ -6,11 +6,12 @@
 
 using namespace D2D;
 
-IDropDown::IDropDownOption::IDropDownOption(IDropDown* pDropDown, std::wstring& string)
+IDropDown::IDropDownOption::IDropDownOption(IDropDown* pDropDown, std::wstring& string, int index)
 	:
 	IComponent(0, 0, pDropDown->mWidth, pDropDown->mHeight),
 	pDropDown(pDropDown),
 	mString(string),
+	mIndex(index),
 	pText(new Text(string, pDropDown->pSelectedText->getTextFormat(), pDropDown->mWidth - 2 * pDropDown->PADDING, pDropDown->mHeight)),
 	pRect(new D2D::Rectangle({0, 0}, pDropDown->mWidth, pDropDown->mHeight, 0, 0, true, { 1.0f ,1.0f, 1.0f, 1.0f }))
 {
@@ -62,16 +63,16 @@ IDropDown::IDropDown(std::wstring text, int width, int height)
 IDropDown::IDropDown(std::wstring text, D2D::TextFormat& textFormat, int width, int height)
 	:
 	IContainer(0, 0, width, height),
-	mSelectedString(text),
 	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 0, width / 10, { 0.8f, 0.8f, 0.8f, 1.0f })),
 	pSelectedText(new Text(text, textFormat, width - 2 * PADDING, height)),
+	mSelectedIndex(0),
 	isExpanded(false)
 {
 	pSelectedText->setOffset({ (float)PADDING, 0 });
 	FLOAT2 vertices[3] = { FLOAT2{ 0, 0 }, FLOAT2{ height / 3.0f, 0 }, FLOAT2{ height / 6.0f, height / 6.0f } };
 	pDownArrow = new D2D::Polygon(vertices, 3, true, {0, 0, 0, 1});
 	pDownArrow->setOffset({ width - height / 2.0f , 2.5f * height / 6.0f});
-	IDropDownOption* pFirstOption = new IDropDownOption(this, text);
+	IDropDownOption* pFirstOption = new IDropDownOption(this, text, 0);
 	pFirstOption->setXDimension(IComponent::XDimension::RELATIVEX);
 	pFirstOption->setRelativeWidth(1.0f);
 	mOptions.push_back(pFirstOption);
@@ -90,9 +91,9 @@ IDropDown::IDropDown(int width, int height)
 IDropDown::IDropDown(D2D::TextFormat& textFormat, int width, int height)
 	:
 	IContainer(0, 0, width, height),
-	mSelectedString(L""),
 	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 0, width / 10, { 0.8f, 0.8f, 0.8f, 1.0f })),
 	pSelectedText(new Text(L"", textFormat, width - 2 * PADDING, height)),
+	mSelectedIndex(-1),
 	isExpanded(false)
 {
 	pSelectedText->setOffset({ (float)PADDING, 0 });
@@ -109,6 +110,11 @@ IDropDown::~IDropDown()
 	if (!isExpanded)
 		for (IDropDownOption* pOption : mOptions)
 			delete pOption;
+}
+
+int IDropDown::getSelectedIndex()
+{
+	return mSelectedIndex;
 }
 
 void IDropDown::setWidth(int width)
@@ -136,7 +142,7 @@ void IDropDown::setHeight(int height)
 void IDropDown::addOption(std::wstring text)
 {
 	close();
-	IDropDownOption* pOption = new IDropDownOption(this, text);
+	IDropDownOption* pOption = new IDropDownOption(this, text, mOptions.size());
 	pOption->setXDimension(XDimension::RELATIVEX);
 	pOption->setRelativeWidth(1.0f);
 	mOptions.push_back(pOption);
@@ -183,10 +189,10 @@ void IDropDown::onFocusLoss()
 
 void IDropDown::setOption(IDropDownOption* pOption)
 {
-	if (pSelectedText != pOption->pText)
+	if (mSelectedIndex != pOption->mIndex)
 	{
-		mSelectedString = pOption->mString;
-		pSelectedText->setText(mSelectedString);
+		pSelectedText->setText(pOption->mString);
+		mSelectedIndex = pOption->mIndex;
 	}
 }
 

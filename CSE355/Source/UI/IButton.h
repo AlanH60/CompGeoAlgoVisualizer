@@ -13,6 +13,8 @@ class IButton : public IComponent
 	public:
 		IButton(std::wstring text, int width, int height);
 		IButton(std::wstring text, D2D::TextFormat& fontFormat, int width, int height);
+		void setColor(const Color& color);
+		void setTextColor(const Color& color);
 		void setWidth(int width) override;
 		void setHeight(int height) override;
 		void onHover(int x, int y, MouseEvent& mouseEvent) override;
@@ -26,5 +28,6 @@ class IButton : public IComponent
 		D2D::Text* pText;
 		D2D::Rectangle* pRectangle;
 		std::function<void()> mOnClickHandler;
+		Color mTextColor;
 };
 

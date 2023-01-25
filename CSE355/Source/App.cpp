@@ -28,7 +28,6 @@ App::App()
 
 	//********************************** UI *****************************************//
 	pRoot = new IContainer(0, 0, pWindow->getWidth(), pWindow->getHeight());
-	std::cout << sizeof(IContainer);
 	IPanel* pMenuPanel = new IPanel(0, 0, { 0.95f, 0.95f, 0.95f, 1 });
 	pMenuPanel->setXOrientation(IComponent::XOrientation::RIGHT);
 	pMenuPanel->setYOrientation(IComponent::YOrientation::BOTTOM);
@@ -38,7 +37,7 @@ App::App()
 	pMenuPanel->setRelativeWidth(0.25f);
 
 	//Dropdown menu used to select a purpose for the algorithm
-	IDropDown* pAlgorithmDropDown = new IDropDown(L"Convex Hull", 200, 30);
+	pAlgorithmDropDown = new IDropDown(L"Convex Hull", 200, 30);
 	pAlgorithmDropDown->addOption(L"Triangulation");
 	pAlgorithmDropDown->setXOrientation(IComponent::XOrientation::CENTER);
 	pAlgorithmDropDown->setYOrientation(IComponent::YOrientation::RELATIVE_HEIGHT);
@@ -50,16 +49,46 @@ App::App()
 
 	//Start button used to start the algorithm visualizer
 	IButton* pStartButton = new IButton(L"Start", 50, 50);
-	
+	pStartButton->setColor({ 0.7f, 0.7f, 0.7f, 1.0f });
+	pStartButton->setTextColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	pStartButton->setXOrientation(IComponent::XOrientation::RIGHT);
 	pStartButton->setYOrientation(IComponent::YOrientation::BOTTOM);
 	pStartButton->setXDimension(IComponent::XDimension::RELATIVEX);
 	pStartButton->setYDimension(IComponent::YDimension::RELATIVEY);
 	pStartButton->setRelativeWidth(0.5f);
 	pStartButton->setRelativeHeight(0.1f);
-	pStartButton->setOnClick([]()-> void {
-		std::cout << "Clicked :D" << std::endl;
-		});
+	pStartButton->setOnClick([this]()-> void {
+		if (pVisualizer->isIdle())
+		{
+			switch (mState)
+			{
+				case CONVEX_HULL:
+					startConvexHull();
+					break;
+				case TRIANGULATE:
+					startTriangulation();
+					break;
+			}
+		}
+	});
+	
+	//Clear button used to clear the grid of points and lines
+	IButton* pClearButton = new IButton(L"Clear", 0, 0);
+	pClearButton->setColor({ 0.7f, 0.7f, 0.7f, 1.0f });
+	pClearButton->setTextColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+	pClearButton->setXOrientation(IComponent::XOrientation::LEFT);
+	pClearButton->setYOrientation(IComponent::YOrientation::BOTTOM);
+	pClearButton->setXDimension(IComponent::XDimension::RELATIVEX);
+	pClearButton->setYDimension(IComponent::YDimension::RELATIVEY);
+	pClearButton->setRelativeWidth(0.5f);
+	pClearButton->setRelativeHeight(0.1f);
+	pClearButton->setOnClick([this]()-> void {
+		if (pVisualizer->isIdle())
+		{
+			clear();
+			pSelectedPoint = nullptr;
+		}
+	});
 
 	//Slider used to modify the speed of the algorithm visualizer
 	ISlider* pSpeedSlider = new ISlider(pVisualizer->getSpeedPointer(), 1, 10, 0, 0);
@@ -73,6 +102,7 @@ App::App()
 	pSpeedSlider->setRelativeHeight(0.06f);
 
 
+	pMenuPanel->addChild(pClearButton);
 	pMenuPanel->addChild(pStartButton);
 	pMenuPanel->addChild(pSpeedSlider);
 	pMenuPanel->addChild(pAlgorithmDropDown);
@@ -124,30 +154,6 @@ App::App()
 		}
 		if (!pVisualizer->isIdle())
 			return;
-		if (e.isKeyboard())
-		{
-			KeyEvent& keyEvent = (KeyEvent&)e;
-			switch (keyEvent.mKeycode)
-			{
-				case VK_F1:
-					if (mState != CONVEX_HULL)
-						clear();
-					mState = CONVEX_HULL;
-					e.isConsumed = true;
-					break;
-				case VK_F2:
-					if (mState != TRIANGULATE)
-						clear();
-					mState = TRIANGULATE;
-					e.isConsumed = true;
-					break;
-				case VK_SPACE:
-					clear();
-					pSelectedPoint = nullptr;
-					e.isConsumed = true;
-					break;
-			}
-		}
 		if (mState == CONVEX_HULL)
 			convexHullEventHandler(e);
 		else if (mState == TRIANGULATE)
@@ -183,6 +189,14 @@ void App::onUpdate()
 				Line* l = new Line(r.first, r.second);
 				mTriangulationLines.push_back(l);
 			}
+	}
+	if (!pVisualizer->isRunning())
+	{
+		if (mState != pAlgorithmDropDown->getSelectedIndex())
+		{
+			mState = (State)pAlgorithmDropDown->getSelectedIndex();
+			clear();
+		}
 	}
 }
 
@@ -406,19 +420,6 @@ void App::convexHullEventHandler(Event& e)
 					}
 					e.isConsumed = true;
 					break;
-				case VK_RETURN:
-				{
-					deleteAndClear(mHullLines);
-					std::vector<Vector2f> points = std::vector<Vector2f>();
-					for (auto& a : mPoints)
-					{
-						for (Drawable* d : a.second)
-							points.push_back({ d->getPos().x, d->getPos().y });
-					}
-					pVisualizer->computeConvexHull(points, mCHAlgorithm);
-				}
-					e.isConsumed = true;
-					break;
 				default:
 					break;
 			}
@@ -472,23 +473,6 @@ void App::triangulateEventHandler(Event& e)
 					mTriAlgorithm = AlgorithmVisualizer::EAR_CLIPPING;
 					e.isConsumed = true;
 					break;
-				case VK_RETURN:
-				{
-					deleteAndClear(mTriangulationLines);
-					if (isValidPolygon && mPolygon.size() >= 3 && mPolygon[0] == mPolygon[mPolygon.size() - 1])
-					{
-						if (!isCCW())
-						{
-							std::reverse(++mPolygon.begin(), --mPolygon.end());
-						}
-						mPolygon.erase(--mPolygon.end());
-						std::vector<std::pair<size_t, size_t>> a;
-						pVisualizer->computeTriangulation(mPolygon, a, mTriAlgorithm);
-						mPolygon.push_back(mPolygon[0]);
-					}
-				}
-					e.isConsumed = true;
-					break;
 				default:
 					break;
 			}
@@ -519,4 +503,32 @@ bool App::isCCW()
 			minY = i;
 	}
 	return leftOf(mPolygon[minY], mPolygon[(minY + 1) % (mPolygon.size() - 1)], mPolygon[(minY + mPolygon.size() - 2) % (mPolygon.size() - 1)]);
+}
+
+void App::startConvexHull()
+{
+	deleteAndClear(mHullLines);
+	std::vector<Vector2f> points = std::vector<Vector2f>();
+	for (auto& a : mPoints)
+	{
+		for (Drawable* d : a.second)
+			points.push_back({ d->getPos().x, d->getPos().y });
+	}
+	pVisualizer->computeConvexHull(points, mCHAlgorithm);
+}
+
+void App::startTriangulation()
+{
+	deleteAndClear(mTriangulationLines);
+	if (isValidPolygon && mPolygon.size() >= 3 && mPolygon[0] == mPolygon[mPolygon.size() - 1])
+	{
+		if (!isCCW())
+		{
+			std::reverse(++mPolygon.begin(), --mPolygon.end());
+		}
+		mPolygon.erase(--mPolygon.end());
+		std::vector<std::pair<size_t, size_t>> a;
+		pVisualizer->computeTriangulation(mPolygon, a, mTriAlgorithm);
+		mPolygon.push_back(mPolygon[0]);
+	}
 }

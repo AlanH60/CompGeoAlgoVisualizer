@@ -49,6 +49,7 @@ class IComponent
 		void setRelativeWidth(float rWidth);
 		void setRelativeHeight(float rHeight);
 		void setPos(int x, int y);
+		virtual void setColor(const Color& color);
 		virtual void setDirtyFlag(bool isDirty);
 		virtual void setWidth(int width);
 		virtual void setHeight(int height);
@@ -90,4 +91,6 @@ class IComponent
 		float mRelativeHeight = 1.0f;
 		//Drawables associated with component
 		std::vector<D2D::Drawable*> mDrawables;
+		//Color of the component
+		Color mColor = Color{ 0, 0, 0, 0 };
 };

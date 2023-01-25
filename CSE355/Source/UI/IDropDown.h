@@ -17,7 +17,7 @@ class IDropDown : public IContainer
 		{
 			friend IDropDown;
 			public:
-				IDropDownOption(IDropDown* pDropDown, std::wstring& string);
+				IDropDownOption(IDropDown* pDropDown, std::wstring& string, int index);
 				void setWidth(int width) override;
 				void setHeight(int height) override;
 				void onPress(int x, int y, MouseEvent& e) override;
@@ -28,6 +28,7 @@ class IDropDown : public IContainer
 				D2D::Rectangle* pRect;
 				D2D::Text* pText;
 				std::wstring mString;
+				int mIndex;
 		};
 	friend IDropDownOption;
 	public:
@@ -36,6 +37,7 @@ class IDropDown : public IContainer
 		IDropDown(int width, int height);
 		IDropDown(D2D::TextFormat& textFormat, int width, int height);
 		~IDropDown();
+		int getSelectedIndex();
 		void setWidth(int width) override;
 		void setHeight(int height) override;
 		void addOption(std::wstring text);
@@ -47,11 +49,11 @@ class IDropDown : public IContainer
 		void setOption(IDropDownOption* pOption);
 		void close();
 	private:
-		std::wstring mSelectedString;
 		D2D::Text* pSelectedText;
 		D2D::Rectangle* pRectangle;
 		D2D::Polygon* pDownArrow;
 		std::vector<IDropDownOption*> mOptions; 
+		int mSelectedIndex;
 		bool isExpanded;
 };
 
