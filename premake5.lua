@@ -1,11 +1,11 @@
-workspace "CSE355"
+workspace "CompGeoAlgoVisualizer"
     architecture "x64"
     configurations { "Debug", "Release" }
-	startproject "CSE355"
+	startproject "CompGeoAlgoVisualizer"
 
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-project "CSE355"
+project "CompGeoAlgoVisualizer"
     location "%{prj.name}"
     kind "ConsoleApp"
     language "C++"
@@ -13,7 +13,7 @@ project "CSE355"
     objdir ("bin-int/" .. outputDir .. "/%{prj.name}")
 
     pchheader "PCH.h"
-    pchsource "CSE355/Source/PCH.cpp"
+    pchsource "CompGeoAlgoVisualizer/Source/PCH.cpp"
 
     files 
     { 

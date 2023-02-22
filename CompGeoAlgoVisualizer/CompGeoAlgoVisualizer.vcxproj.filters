@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="DataStructs">
+      <UniqueIdentifier>{37AA6839-A35F-E12E-2C54-DB059808D832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direct2D">
+      <UniqueIdentifier>{36C11AE1-228E-75EC-4BA7-639437D3AA7A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direct2D\DrawRes">
+      <UniqueIdentifier>{BDDB23A2-A9D4-42F4-D206-2879BE5E2200}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direct2D\Drawable">
+      <UniqueIdentifier>{C77FA7E6-3396-A57C-7C0D-319EE8627604}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{83755900-6F01-880B-D8AF-880BC45A880B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Algorithms.h" />
+    <ClInclude Include="Source\App.h" />
+    <ClInclude Include="Source\DataStructs\AVLTree.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DataStructs\TriSweepLineStatus.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Application.h">
+      <Filter>Direct2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Color.h">
+      <Filter>Direct2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\DrawRes\Bitmap.h">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\DrawRes\Brush.h">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\DrawRes\Geometry.h">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\Drawable.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\Line.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\Point.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\Polygon.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\Rectangle.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\Text.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\TextFormat.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Event.h">
+      <Filter>Direct2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Graphics.h">
+      <Filter>Direct2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Types.h">
+      <Filter>Direct2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Window.h">
+      <Filter>Direct2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Loader.h" />
+    <ClInclude Include="Source\PCH.h" />
+    <ClInclude Include="Source\Primatives.h" />
+    <ClInclude Include="Source\UI\IButton.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\IComponent.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\IContainer.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\IDropDown.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\IInput.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\ILabel.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\IPanel.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\ISlider.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\ITabbedPanel.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Algorithms.cpp" />
+    <ClCompile Include="Source\App.cpp" />
+    <ClCompile Include="Source\DataStructs\AVLTree.cpp">
+      <Filter>DataStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DataStructs\TriSweepLineStatus.cpp">
+      <Filter>DataStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Application.cpp">
+      <Filter>Direct2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Color.cpp">
+      <Filter>Direct2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\DrawRes\Bitmap.cpp">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\DrawRes\Brush.cpp">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\DrawRes\Geometry.cpp">
+      <Filter>Direct2D\DrawRes</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\Drawable.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\Line.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\Point.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\Polygon.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\Rectangle.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\Text.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\TextFormat.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Event.cpp">
+      <Filter>Direct2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Graphics.cpp">
+      <Filter>Direct2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Types.cpp">
+      <Filter>Direct2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Window.cpp">
+      <Filter>Direct2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Loader.cpp" />
+    <ClCompile Include="Source\PCH.cpp" />
+    <ClCompile Include="Source\UI\IButton.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\IComponent.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\IContainer.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\IDropDown.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\IInput.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\ILabel.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\IPanel.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\ISlider.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\ITabbedPanel.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\main.cpp" />
+  </ItemGroup>
+</Project>
