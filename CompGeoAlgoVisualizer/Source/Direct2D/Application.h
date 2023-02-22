@@ -2,7 +2,6 @@
 
 class Window;
 class Graphics;
-
 /**
 * The Application class represents the program itself.  It handles updates and draws and manages the Window and Graphics objects
 * to perform such tasks.  Class should be extended to add specialized functionality.

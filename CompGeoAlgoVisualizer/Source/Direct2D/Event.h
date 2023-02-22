@@ -1,5 +1,8 @@
 #pragma once
 
+/**
+* Events are initialized by and contain information about user input. 
+*/
 struct Event
 {
 	virtual bool isMouse() { return false; }
@@ -43,9 +46,9 @@ struct KeyEvent : public Event
 	};
 	KeyEvent(Type type, unsigned char keycode, unsigned char keyState) : mKeycode(keycode),	mKeyState(keyState), mType(type) {}
 	bool isKeyboard() override { return true; }
-	bool ctrlHeld() { return (mKeyState & (unsigned char)SysKeyState::CTRL) == (unsigned char)SysKeyState::CTRL; };
-	bool shiftHeld() { return (mKeyState & (unsigned char)SysKeyState::SHIFT) == (unsigned char)SysKeyState::SHIFT; };
-	bool altHeld() { return (mKeyState & (unsigned char)SysKeyState::ALT) == (unsigned char)SysKeyState::ALT; };
+	bool ctrlHeld() { return (mKeyState & (unsigned char)SysKeyState::CTRL); };
+	bool shiftHeld() { return (mKeyState & (unsigned char)SysKeyState::SHIFT); };
+	bool altHeld() { return (mKeyState & (unsigned char)SysKeyState::ALT); };
 	bool isPress() { return mType == Type::PRESS; }
 	bool isRelease() { return mType == Type::RELEASE; }
 

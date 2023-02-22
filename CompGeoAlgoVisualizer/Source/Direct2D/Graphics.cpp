@@ -125,7 +125,7 @@ void Graphics::endFrame()
 {
 	pContext2D->EndDraw();
 	HRESULT hr = pSwapChain->Present(1, 0);
-	ASSERT_IF_FAILED(hr, "Swap Chain present error!");
+	ASSERT_IF_FAILED(hr, "Swap Chain presentation error!");
 }
 
 void Graphics::drawRect(FLOAT2 pos, float width, float height, bool filled, ID2D1SolidColorBrush* pBrush, ID2D1SolidColorBrush* pBorderBrush,

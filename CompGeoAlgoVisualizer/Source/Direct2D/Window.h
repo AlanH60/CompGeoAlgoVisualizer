@@ -1,5 +1,9 @@
 #pragma once
 #include "Event.h"
+
+/**
+* Window class represents a window created using WINAPI.
+*/
 class Window
 {
 	friend class Application;
@@ -50,7 +54,6 @@ class Window
 		*/
 		bool keyPressed(unsigned char keycode);
 
-		
 	private:
 		/************************Used by Application class**************************/
 		//Handles window messages and events from mEventQueue.
@@ -62,14 +65,15 @@ class Window
 		//Links the windows and graphics api(Used by Graphics class)
 		void setGraphics(Graphics* gfx);
 
-		//Handles windows messages by updating mMouseState and mKeyState, and pumping events into mEventQueue.
+		//Window msg handler
 		LRESULT handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
 		static LRESULT handleSetup(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
 		static LRESULT handleAdapter(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
 
 		//Updates mouse and key states when necessary.
 		void initEventHandle(Event& e);
-		void trimQueues();
+		//Pops queue if event queue exceeds MAX_EVENTS
+		void trimQueue();
 	private:
 		//Pointer to the graphics object used for Direct2D api calls.
 		Graphics* pGraphics = nullptr;

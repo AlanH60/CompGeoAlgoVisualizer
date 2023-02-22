@@ -37,8 +37,6 @@ TextFormat Text::getTextFormat()
 void Text::setWidth(float width)
 {
 	mWidth = width;
-	if (pTextLayout)
-		pTextLayout->Release();
 	pGraphics->createTextLayout(mText, mTextFormat.fontFamily, mTextFormat.size, mTextFormat.bold, (unsigned char)mTextFormat.style,
 		(unsigned char)mTextFormat.textAlignment, (unsigned char)mTextFormat.paraAlignment, mWidth, mHeight, pTextLayout);
 }
@@ -46,8 +44,6 @@ void Text::setWidth(float width)
 void Text::setHeight(float height)
 {
 	mHeight = height;
-	if (pTextLayout)
-		pTextLayout->Release();
 	pGraphics->createTextLayout(mText, mTextFormat.fontFamily, mTextFormat.size, mTextFormat.bold, (unsigned char)mTextFormat.style,
 		(unsigned char)mTextFormat.textAlignment, (unsigned char)mTextFormat.paraAlignment, mWidth, mHeight, pTextLayout);
 
@@ -57,8 +53,6 @@ void Text::setDimensions(float width, float height)
 {
 	mWidth = width;
 	mHeight = height;
-	if (pTextLayout)
-		pTextLayout->Release();
 	pGraphics->createTextLayout(mText, mTextFormat.fontFamily, mTextFormat.size, mTextFormat.bold, (unsigned char)mTextFormat.style,
 		(unsigned char)mTextFormat.textAlignment, (unsigned char)mTextFormat.paraAlignment, mWidth, mHeight, pTextLayout);
 
@@ -66,8 +60,6 @@ void Text::setDimensions(float width, float height)
 
 void Text::setText(std::wstring& text)
 {
-	pTextLayout->Release();
-	pTextLayout = nullptr;
 	mText = text;
 	pGraphics->createTextLayout(mText, mTextFormat.fontFamily, mTextFormat.size, mTextFormat.bold, (unsigned char)mTextFormat.style,
 		(unsigned char)mTextFormat.textAlignment, (unsigned char)mTextFormat.paraAlignment, mWidth, mHeight, pTextLayout);

@@ -39,7 +39,9 @@ Window::Window(std::string title, int width, int height)
 		CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, wndClass.hInstance, this);
 
 	if (mHandle == nullptr)
+	{
 		assert(false && "Failed to create window handle!");
+	}
 	ShowWindow(mHandle, SW_SHOWDEFAULT);
 }
 
@@ -90,7 +92,7 @@ void Window::pollEvents()
 		std::shared_ptr<Event> e = mEventQueue.front();
 		mEventQueue.pop();
 		initEventHandle(*e);
-		if (onEvent != nullptr)
+		if (onEvent)
 			onEvent(*e);
 	}
 
@@ -166,7 +168,7 @@ void Window::initEventHandle(Event& e)
 		mKeyState[((KeyEvent&)e).mKeycode] = (((KeyEvent&)e).isPress()) ? 1 : 0;
 }
 
-void Window::trimQueues()
+void Window::trimQueue()
 {
 	while (mEventQueue.size() > MAX_EVENTS)
 		mEventQueue.pop();
@@ -229,6 +231,6 @@ LRESULT Window::handleMsg(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		default:
 			break;
 	}
-	trimQueues();
+	trimQueue();
 	return DefWindowProc(handle, msg, wParam, lParam);
 }

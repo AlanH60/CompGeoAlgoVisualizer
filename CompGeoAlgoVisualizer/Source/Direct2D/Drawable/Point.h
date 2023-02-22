@@ -4,6 +4,9 @@
 
 namespace D2D
 {
+	/**
+	* Point class represents a drawable point.
+	*/ 
 	class Point : public Drawable
 	{
 		public:

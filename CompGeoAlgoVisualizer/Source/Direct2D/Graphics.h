@@ -11,17 +11,18 @@
 	#define ASSERT_IF_FAILED(hr, message)
 #endif
 
-class Window;
 struct Color;
+
+/**
+* Graphics class abstracts Direct2D API and exposes graphics API functionalities to the programmer. 
+*/
 class Graphics
 {
+	friend class Application;
+	friend class Window;
 	public:
 		Graphics(Window* pWindow);
 		~Graphics();
-		//Sets up a new frame for draw calls.
-		void beginFrame();
-		//Displays the new frame.
-		void endFrame();
 
 		/**
 		* Draw a rectangle.
@@ -95,12 +96,24 @@ class Graphics
 		void createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, 
 			unsigned char textAlignment, unsigned char paragraphAlignment, float width, float height, Microsoft::WRL::ComPtr<IDWriteTextLayout>& pTextLayout);
 
-		//Push layer such that all subsequent draw calls are drawn on this layer.
+		/**
+		* Push layer such that all subsequent draw calls are drawn on this layer.
+		* @param rect rectangle that represents the bounds of the layer
+		* @param pGeometry pointer to the direct2d geometry interface that represents the geometric mask for the layer.  Only those lying inside the mask is visible.
+		* @param transform the transformation matrix done to the geometric mask
+		*/
 		void pushLayer(D2D1_RECT_F rect, ID2D1PathGeometry* pGeometry, D2D1_MATRIX_3X2_F& transform);
-		//Pop a layer that was previously pushed.
+		/**
+		* Pops the layer that has been pushed.  SHOULD only be called after pushLayer;
+		*/
 		void popLayer();
-		
-		//Operation to handle the resize of the window.  This includes resizing the back buffers of pSwapChain.
+
+	private:
+		//Sets up a new frame for draw calls. Called by application every frame.
+		void beginFrame();
+		//Displays the new frame. Called by application every frame.
+		void endFrame();
+		//Operation to handle the resize of the window, includeing resizing the back buffers of pSwapChain. Called within the window msg handler.
 		void onResize(int width, int height);
 	private:
 		//Interface that handles the presentation of frames and flipping of back buffers.
