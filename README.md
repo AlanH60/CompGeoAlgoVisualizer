@@ -1,2 +1,2 @@
-# CSE355
- Implementation for concepts in CSE 355 (Computational Geometry)
+# Computational Geometry Algorithms Visualizer
+ Visualizations for algorithms in Computational Geometry
