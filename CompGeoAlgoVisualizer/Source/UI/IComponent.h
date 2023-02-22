@@ -35,24 +35,34 @@ class IComponent
 			RELATIVEY ///The component's height is a factor of the parent container's width.
 		};
 	public:
-		IComponent(int x, int y, int width, int height);
+		IComponent(float x, float y, float width, float height);
 		virtual ~IComponent();
-		int getX();
-		int getY();
-		int getWidth();
-		int getHeight();
+		FLOAT2 getPos();
+		float getWidth();
+		float getHeight();
 		bool getDirtyFlag();
 
 		/**
 		* Sets the x position of the component.
 		* @param x new x-coordinate of the component.
 		*/
-		void setX(int x);
+		void setX(float x);
 		/**
 		* Sets the y position of the component.
 		* @param y new y-coordinate of the component.
 		*/
-		void setY(int y);
+		void setY(float y);
+		/**
+		* Sets the position of the component.
+		* @param pos new position of the component.
+		*/
+		void setPos(FLOAT2 pos);
+		/**
+		* Sets the position of the component.
+		* @param x x-coordinate.
+		* @param y y-coordinate.
+		*/
+		void setPos(float x, float y);
 		/**
 		* Sets the XOrientation setting for the component.
 		* @param xOrientation XOrientation for the component.
@@ -94,12 +104,6 @@ class IComponent
 		*/
 		void setRelativeHeight(float rHeight);
 		/**
-		* Sets the position of the component.
-		* @param x x-coordinate.
-		* @param y y-coordinate.
-		*/
-		void setPos(int x, int y);
-		/**
 		* Sets the dirty flag of the component.
 		* @param isDirty dirty flag.
 		*/
@@ -110,26 +114,26 @@ class IComponent
 		* Sets the width of the component.  Child classes overriding this function should invoke this function.
 		* @param width new width of the component.
 		*/
-		virtual void setWidth(int width);
+		virtual void setWidth(float width);
 		/**
 		* Sets the height of the component.  Child classes overriding this function should invoke this function.
 		* @param height new height of the component.
 		*/
-		virtual void setHeight(int height);
+		virtual void setHeight(float height);
 		/**
 		* Function that is called when the user presses their mouse within the component.
 		* @param x x-coordinate of the mouse relative to the parent container.
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Can be consumed such that no other component retrieves this event.
 		*/
-		virtual void onPress(int x, int y, MouseEvent& mouseEvent) {}
+		virtual void onPress(float x, float y, MouseEvent& mouseEvent) {}
 		/**
 		* Function that is called when the user's mouse hovers/enters the component.
 		* @param x x-coordinate of the mouse relative to the parent container.
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Can be consumed such that no other component retrieves this event.
 		*/
-		virtual void onHover(int x, int y, MouseEvent& mouseEvent) {}
+		virtual void onHover(float x, float y, MouseEvent& mouseEvent) {}
 		/**
 		* Function that is called when the user's mouse exits the component.
 		*/
@@ -140,28 +144,28 @@ class IComponent
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Can be consumed such that no other component retrieves this event.
 		*/
-		virtual void onMove(int x, int y, MouseEvent& mouseEvent) {}
+		virtual void onMove(float x, float y, MouseEvent& mouseEvent) {}
 		/**
 		* Function that is called when the user clicks this component.(Mouse is released)
 		* @param x x-coordinate of the click relative to the parent container.
 		* @param y y-coordinate of the click relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Can be consumed such that no other component retrieves this event.
 		*/
-		virtual void onClick(int x, int y, MouseEvent& mouseEvent) {}
+		virtual void onClick(float x, float y, MouseEvent& mouseEvent) {}
 		/**
 		* Function that is called each time the user moves their mouse when dragging this component.
 		* @param x x-coordinate of the mouse relative to the parent container.
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Can be consumed such that no other component retrieves this event.
 		*/
-		virtual void onDrag(int x, int y, MouseEvent& mouseEvent) {}
+		virtual void onDrag(float x, float y, MouseEvent& mouseEvent) {}
 		/**
 		* Function that is called if this component was being dragged and the user released.
 		* @param x x-coordinate of the mouse relative to the parent container.
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Can be consumed such that no other component retrieves this event.
 		*/
-		virtual void onDragRelease(int x, int y, MouseEvent& mouseEvent) {}
+		virtual void onDragRelease(float x, float y, MouseEvent& mouseEvent) {}
 		/**
 		* Function that is called if this component is currently focused by the user and a key is pressed.
 		* @param keyEvent reference to the key event. Can be consumed such that no other component retrieves this event.
@@ -193,19 +197,19 @@ class IComponent
 		* @param originX absolute x-coordinate of origin.
 		* @param originY absolute y-coordinate of origin.
 		*/
-		virtual void draw(int originX, int originY);
+		virtual void draw(float originX, float originY);
 		/**
 		* Check whether a given point is within the component.  Can be overriden to specialize for implementing classes.
 		* @param x x-coordinate of the point.
 		* @param y y-coordinate of the point.
 		* @returns true if the point is within the bounds of the component.
 		*/
-		virtual bool inComponent(int x, int y);		
+		virtual bool inComponent(float x, float y);		
 	protected:
-		//x and y-coordinates of the bottom-left of the component relative to the origin of its parent.
-		int mPosX, mPosY;
+		//Coordinates of the top-left of the component relative to the origin of its parent.
+		FLOAT2 mPos;
 		//Width and height of the component
-		int mWidth, mHeight;
+		float mWidth, mHeight;
 		//Flag used to indicate whether its orientation or dimensions should be updated
 		bool isDirty = false;
 		//Orientation

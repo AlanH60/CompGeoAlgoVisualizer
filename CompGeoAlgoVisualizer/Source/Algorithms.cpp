@@ -27,23 +27,23 @@ AlgorithmVisualizer::~AlgorithmVisualizer()
 
 bool AlgorithmVisualizer::isIdle()
 {
-	return mState == IDLE;
+	return mState == State::IDLE;
 }
 
 
 bool AlgorithmVisualizer::isRunning()
 {
-	return mState == RUNNING;
+	return mState == State::RUNNING;
 }
 
 bool AlgorithmVisualizer::isFinished()
 {
-	return mState == FINISHED;
+	return mState == State::FINISHED;
 }
 
 bool AlgorithmVisualizer::isSleeping()
 {
-	return mState == SLEEPING;
+	return mState == State::SLEEPING;
 }
 
 bool AlgorithmVisualizer::shouldVisualize()
@@ -100,13 +100,13 @@ void AlgorithmVisualizer::computeConvexHull(std::vector<Vector2f>& points, Conve
 		mThread->join();
 	switch (algorithm)
 	{
-		case GIFT_WRAPPING:
+		case ConvexHullAlgorithm::GIFT_WRAPPING:
 			mThread->swap(std::thread(convexHullGW, this, points));
 			break;
-		case GRAHAM_SCAN:
+		case ConvexHullAlgorithm::GRAHAM_SCAN:
 			mThread->swap(std::thread(convexHullGraham, this, points));
 			break;
-		case QUICK_HULL:
+		case ConvexHullAlgorithm::QUICK_HULL:
 			mThread->swap(std::thread(convexHullQuickHull, this, points));
 			break;
 	}
@@ -121,7 +121,7 @@ void AlgorithmVisualizer::computeTriangulation(std::vector<Vector2f>& polygon, s
 		mThread->join();
 	switch (algorithm)
 	{
-		case EAR_CLIPPING:
+		case TriangulationAlgorithm::EAR_CLIPPING:
 			mThread->swap(std::thread(triangulateEarClipping, this, polygon));
 			break;
 	}
@@ -129,9 +129,9 @@ void AlgorithmVisualizer::computeTriangulation(std::vector<Vector2f>& polygon, s
 
 std::vector<std::pair<Vector2f, Vector2f>> AlgorithmVisualizer::getResult()
 {
-	if (mState == FINISHED)
+	if (mState == State::FINISHED)
 	{
-		mState = IDLE;
+		mState = State::IDLE;
 		std::vector<std::pair<Vector2f, Vector2f>> ret = std::move(mResult);
 		mResult.clear();
 		return ret;
@@ -151,22 +151,23 @@ void AlgorithmVisualizer::clear()
 
 void AlgorithmVisualizer::wait()
 {
-	mState = SLEEPING;
+	mState = State::SLEEPING;
 	std::this_thread::sleep_for(std::chrono::milliseconds((long)(1000 / mSpeed)));
-	mState = RUNNING;
+	mState = State::RUNNING;
+	while (pApp->isDrawingAlgorithmVisualize()) {}
 }
 
 void AlgorithmVisualizer::wait(float multiplier)
 {
-	mState = SLEEPING;
+	mState = State::SLEEPING;
 	std::this_thread::sleep_for(std::chrono::milliseconds((long)(multiplier * 1000 / mSpeed)));
-	mState = RUNNING;
+	mState = State::RUNNING;
 	while (pApp->isDrawingAlgorithmVisualize()) {}
 }
 
 void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
 {
-	pVisualizer->mState = RUNNING;
+	pVisualizer->mState = State::RUNNING;
 
 	int minY = 0;
 	std::vector<Vector2f> convexHull = std::vector<Vector2f>();
@@ -244,7 +245,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 	}
 	for (int i = 0; i < convexHull.size() - 1; i++)
 		pVisualizer->mResult.push_back({ convexHull[i], convexHull[i + 1] });
-	pVisualizer->mState = FINISHED;
+	pVisualizer->mState = State::FINISHED;
 }
 
 //Graham Scan- O(nlogn) - we choose an extreme point, pivot, that is guaranteed to be on the convex hull.
@@ -252,7 +253,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 //We can then use left tests and "wrap" the points in sorted counter-clockwise order.
 void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
 {
-	pVisualizer->mState = RUNNING;
+	pVisualizer->mState = State::RUNNING;
 	//Current lines and points that the algorithm is evaluating
 	Line* pCurrLine = new Line({ 0, 0 }, { 0, 0 }, Color{ 0, 0.5f, 0.5f, 1 });
 	Point* pCurrPoint = new Point({ 0, 0 }, Color{ 0, 0.5f, 0.5f, 1 });
@@ -335,7 +336,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 	hull.push_back(points[pivot]);
 	for (int i = 0; i < hull.size() - 1; i++)
 		pVisualizer->mResult.push_back({ hull[i], hull[i + 1] });
-	pVisualizer->mState = FINISHED;
+	pVisualizer->mState = State::FINISHED;
 }
 
 void AlgorithmVisualizer::quickSortAngle(std::vector<Vector2f>& points, std::vector<float>& dots, size_t start, size_t end)
@@ -444,7 +445,7 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 //Quick Hull- Average - O(nlogn), Worse - O(n^2)
 void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
 {
-	pVisualizer->mState = RUNNING;
+	pVisualizer->mState = State::RUNNING;
 	Vector2f left = points[0];
 	Vector2f right = points[0];
 	Point* pCurrPoint = new Point({ 0, 0 }, Color{ 0, 0.5f, 0.5f, 1 });
@@ -516,13 +517,13 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 	for (int i = 0; i < hull.size() - 1; i++)
 		pVisualizer->mResult.push_back({ hull[i], hull[i + 1] });
 
-	pVisualizer->mState = FINISHED;
+	pVisualizer->mState = State::FINISHED;
 }
 
 //Ear-Clipping triangulation algorithm.  Cut off ears and update ear status of adjacent vertices.  Loop around the polygon until triangulation is done.
 void AlgorithmVisualizer::triangulateEarClipping(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& polygon)
 {
-	pVisualizer->mState = RUNNING;
+	pVisualizer->mState = State::RUNNING;
 	//Vector of VertexStatus of each vertex of the polygon
 	std::vector<VertexStatus> vertexStatus = std::vector<VertexStatus>(polygon.size());
 	//Intialize the VertexStatus of each vertex - O(n^2)
@@ -567,7 +568,7 @@ void AlgorithmVisualizer::triangulateEarClipping(AlgorithmVisualizer* pVisualize
 		i++;
 	}
 
-	pVisualizer->mState = FINISHED;
+	pVisualizer->mState = State::FINISHED;
 }
 
 bool AlgorithmVisualizer::diagonalCrossPolygon(std::vector<Vector2f>& polygon, Vector2f a, Vector2f b)

@@ -85,10 +85,10 @@ App::App()
 		{
 			switch (mState)
 			{
-				case CONVEX_HULL:
+				case State::CONVEX_HULL:
 					startConvexHull();
 					break;
-				case TRIANGULATE:
+				case State::TRIANGULATE:
 					startTriangulation();
 					break;
 			}
@@ -166,9 +166,9 @@ App::App()
 		}
 		if (!pVisualizer->isIdle())
 			return;
-		if (mState == CONVEX_HULL)
+		if (mState == State::CONVEX_HULL)
 			convexHullEventHandler(e);
-		else if (mState == TRIANGULATE)
+		else if (mState == State::TRIANGULATE)
 			triangulateEventHandler(e);
 	});
 }
@@ -189,7 +189,7 @@ void App::onUpdate()
 	if (pVisualizer->isFinished())
 	{
 		std::vector<std::pair<Vector2f, Vector2f>> result = pVisualizer->getResult();
-		if (mState == CONVEX_HULL)
+		if (mState == State::CONVEX_HULL)
 			for (auto& r : result)
 			{
 				Line* l = new Line(r.first, r.second);
@@ -204,7 +204,7 @@ void App::onUpdate()
 	}
 	if (!pVisualizer->isRunning())
 	{
-		if (mState != pAlgorithmDropDown->getSelectedIndex())
+		if ((int)mState != pAlgorithmDropDown->getSelectedIndex())
 		{
 			mState = (State)pAlgorithmDropDown->getSelectedIndex();
 			clear();
@@ -221,10 +221,10 @@ void App::onDraw()
 		for (auto* drawable : drawables.second)
 			drawable->draw();
 	}
-	if (mState == CONVEX_HULL)
+	if (mState == State::CONVEX_HULL)
 		for (auto* pLine : mHullLines)
 			pLine->draw();
-	else if (mState == TRIANGULATE)
+	else if (mState == State::TRIANGULATE)
 	{
 		for (auto* pLine : mPolygonLines)
 			pLine->draw();
@@ -355,7 +355,7 @@ void App::convexHullEventHandler(Event& e)
 	if (e.isMouse())
 	{
 		MouseEvent& mouse = (MouseEvent&)e;
-		FLOAT2 mousePos = { mouse.x, mouse.y };
+		FLOAT2 mousePos = { (float)mouse.x, (float)mouse.y };
 		Point* pHoveredPoint = getPoint(mousePos);
 		switch (mouse.mType)
 		{
@@ -412,15 +412,15 @@ void App::convexHullEventHandler(Event& e)
 			switch (key.mKeycode)
 			{
 				case '1':
-					mCHAlgorithm = AlgorithmVisualizer::GIFT_WRAPPING;
+					mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::GIFT_WRAPPING;
 					e.isConsumed = true;
 					break;
 				case '2':
-					mCHAlgorithm = AlgorithmVisualizer::GRAHAM_SCAN;
+					mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::GRAHAM_SCAN;
 					e.isConsumed = true;
 					break;
 				case '3':
-					mCHAlgorithm = AlgorithmVisualizer::QUICK_HULL;
+					mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::QUICK_HULL;
 					e.isConsumed = true;
 					break;
 				case VK_DELETE:
@@ -482,7 +482,7 @@ void App::triangulateEventHandler(Event& e)
 			switch (key.mKeycode)
 			{
 				case '1':
-					mTriAlgorithm = AlgorithmVisualizer::EAR_CLIPPING;
+					mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::EAR_CLIPPING;
 					e.isConsumed = true;
 					break;
 				default:

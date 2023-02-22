@@ -2,7 +2,7 @@
 #include "IContainer.h"
 
 
-IContainer::IContainer(int x, int y, int width, int height)
+IContainer::IContainer(float x, float y, float width, float height)
 	:
 	IComponent(x, y, width, height)
 {
@@ -109,12 +109,12 @@ void IContainer::onEvent(Event& e)
 }
 
 
-void IContainer::onPress(int x, int y, MouseEvent& mouseEvent)
+void IContainer::onPress(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
-	int relativeX = x - mPosX;
-	int relativeY = y - mPosY;
+	float relativeX = x - mPos.x;
+	float relativeY = y - mPos.y;
 	ILink* pCurrChild = pFrontChild;
 	while (pCurrChild != nullptr)
 	{
@@ -151,12 +151,12 @@ void IContainer::onPress(int x, int y, MouseEvent& mouseEvent)
 }
 
 
-void IContainer::onHover(int x, int y, MouseEvent& mouseEvent)
+void IContainer::onHover(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
-	int relativeX = x - mPosX;
-	int relativeY = y - mPosY;
+	float relativeX = x - mPos.x;
+	float relativeY = y - mPos.y;
 	ILink* pCurrChild = pFrontChild;
 	while (pCurrChild != nullptr)
 	{
@@ -191,41 +191,41 @@ void IContainer::onExit()
 	}
 }
 
-void IContainer::onMove(int x, int y, MouseEvent& mouseEvent)
+void IContainer::onMove(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
 	if (pHovered)
-		pHovered->onMove(x - mPosX, y - mPosY, mouseEvent);
+		pHovered->onMove(x - mPos.x, y - mPos.y, mouseEvent);
 	if (!pDragged && pPressed)
 		pDragged = pPressed;
 	if (bAlwaysConsumeEvent)
 		mouseEvent.isConsumed = true;
 }
 
-void IContainer::onDrag(int x, int y, MouseEvent& mouseEvent)
+void IContainer::onDrag(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
 	if (pDragged)
-		pDragged->onDrag(x - mPosX, y - mPosY, mouseEvent);
+		pDragged->onDrag(x - mPos.x, y - mPos.y, mouseEvent);
 }
 
-void IContainer::onDragRelease(int x, int y, MouseEvent& mouseEvent)
+void IContainer::onDragRelease(float x, float y, MouseEvent& mouseEvent)
 {
 	if (pDragged)
-		pDragged->onDragRelease(x - mPosX, y - mPosY, mouseEvent);
+		pDragged->onDragRelease(x - mPos.x, y - mPos.y, mouseEvent);
 	pDragged = nullptr;
 }
 
-void IContainer::onClick(int x, int y, MouseEvent& mouseEvent)
+void IContainer::onClick(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
 	if (pPressed)
 	{
-		int relativeX = x - mPosX;
-		int relativeY = y - mPosY;
+		float relativeX = x - mPos.x;
+		float relativeY = y - mPos.y;
 		if (pPressed->inComponent(relativeX, relativeY))
 			pPressed->onClick(relativeX, relativeY, mouseEvent);
 		pPressed = nullptr;
@@ -270,14 +270,14 @@ void IContainer::onUpdate(IComponent* parent)
 	}
 }
 
-void IContainer::draw(int originX, int originY)
+void IContainer::draw(float originX, float originY)
 {
 	IComponent::draw(originX, originY);
 	//Draw back to front, so that the front children cover back children
 	ILink* pCurrChild = pBackChild;
 	while (pCurrChild != nullptr)
 	{
-		pCurrChild->component->draw(originX + mPosX, originY + mPosY);
+		pCurrChild->component->draw(originX + mPos.x, originY + mPos.y);
 		pCurrChild = pCurrChild->prev;
 	}
 

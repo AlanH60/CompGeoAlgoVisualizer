@@ -15,26 +15,26 @@ IDropDown::IDropDownOption::IDropDownOption(IDropDown* pDropDown, std::wstring& 
 	pText(new Text(string, pDropDown->pSelectedText->getTextFormat(), pDropDown->mWidth - 2 * pDropDown->PADDING, pDropDown->mHeight)),
 	pRect(new D2D::Rectangle({0, 0}, pDropDown->mWidth, pDropDown->mHeight, 0, 0, true, { 1.0f ,1.0f, 1.0f, 1.0f }))
 {
-	pText->setOffset({ (float)pDropDown->PADDING, 0 });
+	pText->setOffset({ pDropDown->PADDING, 0 });
 	mDrawables.push_back(pRect);
 	mDrawables.push_back(pText);
 }
 
-void IDropDown::IDropDownOption::setWidth(int width)
+void IDropDown::IDropDownOption::setWidth(float width)
 {
 	IComponent::setWidth(width);
 	pRect->setWidth(width);
 	pText->setWidth(width);
 }
 
-void IDropDown::IDropDownOption::setHeight(int height)
+void IDropDown::IDropDownOption::setHeight(float height)
 {
 	IComponent::setHeight(height);
 	pRect->setHeight(height);
 	pText->setHeight(height);
 }
 
-void IDropDown::IDropDownOption::onPress(int x, int y, MouseEvent& e)
+void IDropDown::IDropDownOption::onPress(float x, float y, MouseEvent& e)
 {
 	if (e.isConsumed)
 		return;
@@ -42,7 +42,7 @@ void IDropDown::IDropDownOption::onPress(int x, int y, MouseEvent& e)
 	e.isConsumed = true;
 }
 
-void IDropDown::IDropDownOption::onHover(int x, int y, MouseEvent& e)
+void IDropDown::IDropDownOption::onHover(float x, float y, MouseEvent& e)
 {
 	if (e.isConsumed)
 		return;
@@ -55,12 +55,12 @@ void IDropDown::IDropDownOption::onExit()
 	pRect->setColor({ 1.0f ,1.0f, 1.0f, 1.0f });
 }
 
-IDropDown::IDropDown(std::wstring text, int width, int height)
+IDropDown::IDropDown(std::wstring text, float width, float height)
 	:
 	IDropDown(text, TextFormat(L"Arial", 14, true, Style::NORMAL, TextAlignment::LEFT, ParagraphAlignment::CENTER), width, height)
 {}
 
-IDropDown::IDropDown(std::wstring text, D2D::TextFormat& textFormat, int width, int height)
+IDropDown::IDropDown(std::wstring text, D2D::TextFormat& textFormat, float width, float height)
 	:
 	IContainer(0, 0, width, height),
 	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 0, width / 10, { 0.8f, 0.8f, 0.8f, 1.0f })),
@@ -68,7 +68,7 @@ IDropDown::IDropDown(std::wstring text, D2D::TextFormat& textFormat, int width, 
 	mSelectedIndex(0),
 	isExpanded(false)
 {
-	pSelectedText->setOffset({ (float)PADDING, 0 });
+	pSelectedText->setOffset({ PADDING, 0 });
 	FLOAT2 vertices[3] = { FLOAT2{ 0, 0 }, FLOAT2{ height / 3.0f, 0 }, FLOAT2{ height / 6.0f, height / 6.0f } };
 	pDownArrow = new D2D::Polygon(vertices, 3, true, { 0, 0, 0, 1 });
 	pDownArrow->setOffset({ width - height / 2.0f , 2.5f * height / 6.0f});
@@ -82,13 +82,13 @@ IDropDown::IDropDown(std::wstring text, D2D::TextFormat& textFormat, int width, 
 	mDrawables.push_back(pDownArrow);
 }
 
-IDropDown::IDropDown(int width, int height)
+IDropDown::IDropDown(float width, float height)
 	:
 	IDropDown(TextFormat(L"Arial", 14, true, Style::NORMAL, TextAlignment::LEFT, ParagraphAlignment::CENTER), width, height)
 {
 }
 
-IDropDown::IDropDown(D2D::TextFormat& textFormat, int width, int height)
+IDropDown::IDropDown(D2D::TextFormat& textFormat, float width, float height)
 	:
 	IContainer(0, 0, width, height),
 	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 0, width / 10, { 0.8f, 0.8f, 0.8f, 1.0f })),
@@ -96,7 +96,7 @@ IDropDown::IDropDown(D2D::TextFormat& textFormat, int width, int height)
 	mSelectedIndex(-1),
 	isExpanded(false)
 {
-	pSelectedText->setOffset({ (float)PADDING, 0 });
+	pSelectedText->setOffset({ PADDING, 0 });
 	FLOAT2 vertices[3] = { FLOAT2{ 0, 0 }, FLOAT2{ height / 3.0f, 0 }, FLOAT2{ height / 6.0f, height / 6.0f } };
 	pDownArrow = new D2D::Polygon(vertices, 3, true, { 0, 0, 0, 1 });
 	pDownArrow->setOffset({ width - height / 2.0f , 2.5f * height / 6.0f });
@@ -123,7 +123,7 @@ int IDropDown::getSelectedIndex()
 	return mSelectedIndex;
 }
 
-void IDropDown::setWidth(int width)
+void IDropDown::setWidth(float width)
 {
 	IComponent::setWidth(width);
 	pSelectedText->setWidth(width);
@@ -131,7 +131,7 @@ void IDropDown::setWidth(int width)
 	pDownArrow->setOffset({ mWidth - mHeight / 2.0f , 2.5f * mHeight / 6.0f });
 }
 
-void IDropDown::setHeight(int height)
+void IDropDown::setHeight(float height)
 {
 	IComponent::setHeight(height);
 	pSelectedText->setHeight(height);
@@ -160,7 +160,7 @@ void IDropDown::addChild(IComponent* child)
 		IContainer::addChild(child);
 }
 
-void IDropDown::onPress(int x, int y, MouseEvent& e)
+void IDropDown::onPress(float x, float y, MouseEvent& e)
 {
 	if (isExpanded)
 	{

@@ -6,7 +6,7 @@
 
 using namespace D2D;
 
-ITabbedPanel::ITab::ITab(std::wstring& tabName, TextFormat& textFormat, ITabbedPanel* pTabbedPanel, IPanel* pPanel, int width, int height)
+ITabbedPanel::ITab::ITab(std::wstring& tabName, TextFormat& textFormat, ITabbedPanel* pTabbedPanel, IPanel* pPanel, float width, float height)
 	:
 	IComponent(0, 0, width, height),
 	pText(new Text(tabName, textFormat, width, height)),
@@ -20,21 +20,21 @@ ITabbedPanel::ITab::ITab(std::wstring& tabName, TextFormat& textFormat, ITabbedP
 	mDrawables.push_back(pText);
 }
 
-void ITabbedPanel::ITab::setWidth(int width)
+void ITabbedPanel::ITab::setWidth(float width)
 {
 	mWidth = width;
 	pRect->setWidth(width);
 	pText->setWidth(width);
 }
 
-void ITabbedPanel::ITab::setHeight(int height)
+void ITabbedPanel::ITab::setHeight(float height)
 {
 	mHeight = height;
 	pRect->setHeight(height);
 	pText->setHeight(height);
 }
 
-void ITabbedPanel::ITab::onPress(int x, int y, MouseEvent& e)
+void ITabbedPanel::ITab::onPress(float x, float y, MouseEvent& e)
 {
 	pTabbedPanel->setCurrTab(this);
 	e.isConsumed = true;
@@ -42,7 +42,7 @@ void ITabbedPanel::ITab::onPress(int x, int y, MouseEvent& e)
 
 
 
-ITabbedPanel::ITabbedPanel(int width, int height)
+ITabbedPanel::ITabbedPanel(float width, float height)
 	:
 	IContainer(0, 0, width, height)
 {

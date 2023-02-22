@@ -10,9 +10,9 @@ namespace D2D
 class ILabel : public IComponent
 {
 	public:
-		ILabel(std::wstring text, D2D::TextFormat& textFormat, int width, int height);
-		void setWidth(int width) override;
-		void setHeight(int height) override;
+		ILabel(std::wstring text, D2D::TextFormat& textFormat, float width, float height);
+		void setWidth(float width) override;
+		void setHeight(float height) override;
 		void setText(std::wstring& text);
 		void setTextFormat(D2D::TextFormat& textFormat);
 	private:

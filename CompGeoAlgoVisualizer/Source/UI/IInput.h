@@ -14,17 +14,17 @@ namespace D2D
 class IInput : public IComponent
 {
 	private:
-		static const int PADDING = 5;
+		const float PADDING = 5.0f;
 	public:
-		IInput(std::wstring text, D2D::TextFormat& textFormat, int width, int height);
+		IInput(std::wstring text, D2D::TextFormat& textFormat, float width, float height);
 		~IInput();
-		void onPress(int x, int y, MouseEvent& mouseEvent) override;
-		void onDrag(int x, int y, MouseEvent& mouseEvent) override;
+		void onPress(float x, float y, MouseEvent& mouseEvent) override;
+		void onDrag(float x, float y, MouseEvent& mouseEvent) override;
 		void onChar(CharEvent& charEvent) override;
 		void onKeyPress(KeyEvent& keyEvent) override;
 		void onFocusLoss() override;
 		void onUpdate(IComponent* parent) override;
-		void draw(int originX, int originY) override;
+		void draw(float originX, float originY) override;
 
 		void setInitialText(std::wstring& text);
 		void setTextFormat(D2D::TextFormat& textFormat);

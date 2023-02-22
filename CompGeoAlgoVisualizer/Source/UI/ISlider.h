@@ -14,17 +14,17 @@ class ISlider : public IComponent
 		//Slider's width proportional to the total height 
 		const float SLIDER_WIDTH = 0.2f;
 	public:
-		ISlider(float* value, float min, float max, int width, int height);
-		void setWidth(int width) override;
-		void setHeight(int height) override;
-		void onPress(int x, int y, MouseEvent& mouseEvent) override;
-		void onMove(int x, int y, MouseEvent& mouseEvent) override;
+		ISlider(float* value, float min, float max, float width, float height);
+		void setWidth(float width) override;
+		void setHeight(float height) override;
+		void onPress(float x, float y, MouseEvent& mouseEvent) override;
+		void onMove(float x, float y, MouseEvent& mouseEvent) override;
 		void onExit() override;
-		void onDrag(int x, int y, MouseEvent& mouseEvent) override;
-		void onDragRelease(int x, int y, MouseEvent& mouseEvent) override;
-		void onClick(int x, int y, MouseEvent& mouseEvent) override;
+		void onDrag(float x, float y, MouseEvent& mouseEvent) override;
+		void onDragRelease(float x, float y, MouseEvent& mouseEvent) override;
+		void onClick(float x, float y, MouseEvent& mouseEvent) override;
 		void onUpdate(IComponent* parent) override;
-		bool inComponent(int x, int y) override;
+		bool inComponent(float x, float y) override;
 	private:
 		float* pValue;
 		float mMin, mMax;

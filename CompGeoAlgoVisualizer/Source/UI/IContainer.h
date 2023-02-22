@@ -16,7 +16,7 @@ struct ILink
 class IContainer : public IComponent
 {
 	public:
-		IContainer(int x, int y, int width, int height);
+		IContainer(float x, float y, float width, float height);
 		//Deletes/deallocates all child components.
 		virtual ~IContainer();
 		/**
@@ -49,7 +49,7 @@ class IContainer : public IComponent
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Will be consumed if bAlwaysConsumeEvent flag is true.
 		*/
-		virtual void onPress(int x, int y, MouseEvent& mouseEvent) override;
+		virtual void onPress(float x, float y, MouseEvent& mouseEvent) override;
 		/**
 		* Probagates hover event to a child. Classes overriding this function should call this function,
 		* unless it has its own implementation of event probagation.
@@ -57,7 +57,7 @@ class IContainer : public IComponent
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Will be consumed if bAlwaysConsumeEvent flag is true.
 		*/
-		virtual void onHover(int x, int y, MouseEvent& mouseEvent) override;
+		virtual void onHover(float x, float y, MouseEvent& mouseEvent) override;
 		/**
 		* Calls onExit() for the currently hovered child. Classes overriding this function should call this function,
 		* unless it has its own implementation of event probagation.
@@ -73,7 +73,7 @@ class IContainer : public IComponent
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Will be consumed if bAlwaysConsumeEvent flag is true.
 		*/
-		virtual void onMove(int x, int y, MouseEvent& mouseEvent) override;
+		virtual void onMove(float x, float y, MouseEvent& mouseEvent) override;
 		/**
 		* Calls onDrag() for the currently dragged child. Classes overriding this function should call this function,
 		* unless it has its own implementation of event probagation.
@@ -81,7 +81,7 @@ class IContainer : public IComponent
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Will be consumed if bAlwaysConsumeEvent flag is true.
 		*/
-		virtual void onDrag(int x, int y, MouseEvent& mouseEvent) override;
+		virtual void onDrag(float x, float y, MouseEvent& mouseEvent) override;
 		/**
 		* Calls onDragReleased() for the currently dragged child. Classes overriding this function should call this function,
 		* unless it has its own implementation of event probagation.
@@ -89,7 +89,7 @@ class IContainer : public IComponent
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Will be consumed if bAlwaysConsumeEvent flag is true.
 		*/
-		virtual void onDragRelease(int x, int y, MouseEvent& mouseEvent) override;
+		virtual void onDragRelease(float x, float y, MouseEvent& mouseEvent) override;
 		/**
 		* Calls onClick() for currently pressed child if mouse is currently within that child's bounds. Classes overriding this 
 		* function should call this function, unless it has its own implementation of event probagation.
@@ -97,7 +97,7 @@ class IContainer : public IComponent
 		* @param y y-coordinate of the mouse relative to the parent container.
 		* @param mouseEvent reference to the mouse event. Will be consumed if bAlwaysConsumeEvent flag is true.
 		*/
-		virtual void onClick(int x, int y, MouseEvent& mouseEvent) override;
+		virtual void onClick(float x, float y, MouseEvent& mouseEvent) override;
 		/**
 		* Calls onKeyPress() for the currently focused child. Classes overriding this function should call this function,
 		* unless it has its own implementation of event probagation.
@@ -125,7 +125,7 @@ class IContainer : public IComponent
 		* @param originX absolute x-coordinate of the container's parent
 		* @parent originY absolute y-coordinate of the container's parent.
 		*/
-		virtual void draw(int originX, int originY) override;
+		virtual void draw(float originX, float originY) override;
 	protected:
 		ILink* getFrontChild();
 		ILink* getBackChild();
@@ -141,7 +141,7 @@ class IContainer : public IComponent
 		//Currently dragged child
 		IComponent* pDragged = nullptr;
 		//Flag indicating whether the front child is being focused on.
-		bool isChildFocused;
+		bool isChildFocused = false;
 		//Flag indicating whether it should always consume events that occurs within container.
 		bool bAlwaysConsumeEvent = true;
 

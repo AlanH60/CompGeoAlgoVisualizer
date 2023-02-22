@@ -9,9 +9,9 @@ namespace D2D
 class IPanel : public IContainer
 {
 	public:
-		IPanel(int width, int height, Color color);
-		void setWidth(int width) override;
-		void setHeight(int height) override;
+		IPanel(float width, float height, Color color);
+		void setWidth(float width) override;
+		void setHeight(float height) override;
 	private:
 		D2D::Rectangle* pRect;
 };

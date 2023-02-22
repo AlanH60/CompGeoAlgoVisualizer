@@ -14,20 +14,20 @@ class AlgorithmVisualizer
 	public:
 		//Indicates whether the visualizer is idle, running an algorithm, or finished.  
 		//Results of an algorithm can be obtained when it is in a finished state.
-		enum State
+		enum class State
 		{
 			IDLE, //The no algorithm is running
 			RUNNING, //Algorithm is running
 			SLEEPING, //Algorithm is running, but the thread is currently sleeping
 			FINISHED //Algorithm is done and result is ready to be queried by App.
 		};
-		enum ConvexHullAlgorithm
+		enum class ConvexHullAlgorithm
 		{
 			GRAHAM_SCAN,
 			GIFT_WRAPPING,
 			QUICK_HULL
 		};
-		enum TriangulationAlgorithm
+		enum class TriangulationAlgorithm
 		{
 			EAR_CLIPPING
 		};
@@ -56,8 +56,8 @@ class AlgorithmVisualizer
 		std::vector<D2D::Line*>& getLines();
 		std::vector<D2D::Point*>& getPoints();
 
-		void computeConvexHull(std::vector<Vector2f>& points, ConvexHullAlgorithm algorithm = QUICK_HULL);
-		void computeTriangulation(std::vector<Vector2f>& polygon, std::vector<std::pair<int, int>>& edges, TriangulationAlgorithm algorithm = EAR_CLIPPING);
+		void computeConvexHull(std::vector<Vector2f>& points, ConvexHullAlgorithm algorithm = ConvexHullAlgorithm::QUICK_HULL);
+		void computeTriangulation(std::vector<Vector2f>& polygon, std::vector<std::pair<int, int>>& edges, TriangulationAlgorithm algorithm = TriangulationAlgorithm::EAR_CLIPPING);
 
 		std::vector<std::pair<Vector2f, Vector2f>> getResult();
 	private:
@@ -87,7 +87,7 @@ class AlgorithmVisualizer
 		//Flag that indicates whether or not to perform an algorithm step by step.
 		bool mVisualize = true;
 		//State of the algorithm visualizer.
-		State mState = IDLE;
+		State mState = State::IDLE;
 		//Pointer to the thread that this algorithm will run on.
 		std::thread* mThread = nullptr;
 		//Speed of the algorithm.

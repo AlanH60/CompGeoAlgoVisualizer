@@ -3,10 +3,9 @@
 
 using D2D::Drawable;
 
-IComponent::IComponent(int x, int y, int width, int height)
+IComponent::IComponent(float x, float y, float width, float height)
     :
-    mPosX(x),
-    mPosY(y),
+    mPos({x, y}),
     mWidth(width),
     mHeight(height)
 {}
@@ -17,22 +16,17 @@ IComponent::~IComponent()
         delete d;
 }
 
-int IComponent::getX()
+FLOAT2 IComponent::getPos()
 {
-    return mPosX;
+    return mPos;
 }
 
-int IComponent::getY()
-{
-    return mPosY;
-}
-
-int IComponent::getWidth()
+float IComponent::getWidth()
 {
     return mWidth;
 }
 
-int IComponent::getHeight()
+float IComponent::getHeight()
 {
     return mHeight;
 }
@@ -42,14 +36,24 @@ bool IComponent::getDirtyFlag()
 	return isDirty;
 }
 
-void IComponent::setX(int x)
+void IComponent::setX(float x)
 {
-    mPosX = x;
+    mPos.x = x;
 }
 
-void IComponent::setY(int y)
+void IComponent::setY(float y)
 {
-    mPosY = y;
+	mPos.y = y;
+}
+
+void IComponent::setPos(FLOAT2 pos)
+{
+	mPos = pos;
+}
+
+void IComponent::setPos(float x, float y)
+{
+	mPos = { x, y };
 }
 
 void IComponent::setXOrientation(XOrientation xOrientation)
@@ -100,12 +104,6 @@ void IComponent::setRelativeHeight(float rHeight)
 	isDirty = true;
 }
 
-void IComponent::setPos(int x, int y)
-{
-    mPosX = x;
-    mPosY = y;
-}
-
 void IComponent::setColor(const Color& color)
 {
 	mColor = color;
@@ -116,13 +114,13 @@ void IComponent::setDirtyFlag(bool isDirty)
 	this->isDirty = isDirty;
 }
 
-void IComponent::setWidth(int width)
+void IComponent::setWidth(float width)
 {
     mWidth = width;
 	isDirty = true;
 }
 
-void IComponent::setHeight(int height)
+void IComponent::setHeight(float height)
 {
     mHeight = height;
 	isDirty = true;
@@ -157,16 +155,16 @@ void IComponent::onUpdate(IComponent* parent)
 	switch (mXOrientation)
 	{
 		case XOrientation::CENTER:
-			mPosX = (parent->mWidth - mWidth) / 2;
+			mPos.x = (parent->mWidth - mWidth) / 2;
 			break;
 		case XOrientation::LEFT:
-			mPosX = 0;
+			mPos.x = 0;
 			break;
 		case XOrientation::RIGHT:
-			mPosX = (parent->mWidth - mWidth);
+			mPos.x = (parent->mWidth - mWidth);
 			break;
 		case XOrientation::RELATIVE_WIDTH:
-			mPosX = mRWidthOrientation * parent->mWidth;
+			mPos.x = mRWidthOrientation * parent->mWidth;
 			break;
 		default:
 			break;
@@ -174,16 +172,16 @@ void IComponent::onUpdate(IComponent* parent)
 	switch (mYOrientation)
 	{
 		case YOrientation::CENTER:
-			mPosY = (parent->mHeight - mHeight) / 2;
+			mPos.y = (parent->mHeight - mHeight) / 2;
 			break;
 		case YOrientation::TOP:
-			mPosY = 0;
+			mPos.y = 0;
 			break;
 		case YOrientation::BOTTOM:
-			mPosY = (parent->mHeight - mHeight);
+			mPos.y = (parent->mHeight - mHeight);
 			break;
 		case YOrientation::RELATIVE_HEIGHT:
-			mPosY = mRHeightOrientation * parent->mHeight;
+			mPos.y = mRHeightOrientation * parent->mHeight;
 			break;
 		default:
 			break;
@@ -191,18 +189,18 @@ void IComponent::onUpdate(IComponent* parent)
 	isDirty = false;
 }
 
-void IComponent::draw(int originX, int originY)
+void IComponent::draw(float originX, float originY)
 {
 	for (D2D::Drawable* d : mDrawables)
 	{
-		d->setPos(FLOAT2{ (float)originX + mPosX ,  (float)originY + mPosY });
+		d->setPos(FLOAT2{ (float)originX + mPos.x ,  (float)originY + mPos.y });
 		d->draw();
-		d->setPos(FLOAT2{ mPosX + 0.0f, mPosY + 0.0f });
+		d->setPos(FLOAT2{ mPos.x + 0.0f, mPos.y + 0.0f });
 	}
 }
 
-bool IComponent::inComponent(int x, int y)
+bool IComponent::inComponent(float x, float y)
 {
-	return (x >= mPosX && x <= mPosX + mWidth && y >= mPosY && y <= mPosY + mHeight);
+	return (x >= mPos.x && x <= mPos.x + mWidth && y >= mPos.y && y <= mPos.y + mHeight);
 }
 

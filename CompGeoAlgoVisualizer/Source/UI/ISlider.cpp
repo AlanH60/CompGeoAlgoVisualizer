@@ -4,7 +4,7 @@
 
 using D2D::Rectangle;
 
-ISlider::ISlider(float* pValue, float min, float max, int width, int height)
+ISlider::ISlider(float* pValue, float min, float max, float width, float height)
 	:
 	IComponent(0, 0, width, height),
 	pValue(pValue),
@@ -20,7 +20,7 @@ ISlider::ISlider(float* pValue, float min, float max, int width, int height)
 	mDrawables.push_back(pSliderBar);
 }
 
-void ISlider::setWidth(int width)
+void ISlider::setWidth(float width)
 {
 	IComponent::setWidth(width);
 	pHorizontalBar->setWidth(width);
@@ -28,7 +28,7 @@ void ISlider::setWidth(int width)
 	pSliderBar->setOffset({ prog * mWidth - pSliderBar->getWidth() / 2, 0 });
 }
 
-void ISlider::setHeight(int height)
+void ISlider::setHeight(float height)
 {
 	IComponent::setHeight(height);
 	pSliderBar->setHeight(height);
@@ -39,13 +39,13 @@ void ISlider::setHeight(int height)
 	pHorizontalBar->setCornerRadius(height * HORIZONTAL_HEIGHT / 2);
 }
 
-void ISlider::onPress(int x, int y, MouseEvent& mouseEvent)
+void ISlider::onPress(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
 	if (!pSliderBar->inRect(FLOAT2{ (float)x, (float)y }))
 	{
-		float newX = (x - mPosX) - pSliderBar->getWidth() / 2;
+		float newX = (x - mPos.x) - pSliderBar->getWidth() / 2;
 		newX = std::max(newX, (-pSliderBar->getWidth() / 2));
 		newX = std::min(newX, (mWidth - pSliderBar->getWidth() / 2));
 		pSliderBar->setOffset({ newX, 0 });
@@ -58,7 +58,7 @@ void ISlider::onPress(int x, int y, MouseEvent& mouseEvent)
 }
 
 
-void ISlider::onMove(int x, int y, MouseEvent& mouseEvent)
+void ISlider::onMove(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
@@ -80,13 +80,13 @@ void ISlider::onExit()
 	pSliderBar->setColor({ 0.75f, 0.75f, 0.75f, 1 });
 }
 
-void ISlider::onDrag(int x, int y, MouseEvent& mouseEvent)
+void ISlider::onDrag(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
 	if (isPressed)
 	{
-		float newX = (x - mPosX) - pSliderBar->getWidth() / 2;
+		float newX = (x - mPos.x) - pSliderBar->getWidth() / 2;
 		newX = std::max(newX, (-pSliderBar->getWidth() / 2));
 		newX = std::min(newX, (mWidth - pSliderBar->getWidth() / 2));
 		pSliderBar->setOffset({ newX, 0 });
@@ -97,7 +97,7 @@ void ISlider::onDrag(int x, int y, MouseEvent& mouseEvent)
 	mouseEvent.isConsumed = true;
 }
 
-void ISlider::onDragRelease(int x, int y, MouseEvent& mouseEvent)
+void ISlider::onDragRelease(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
@@ -105,7 +105,7 @@ void ISlider::onDragRelease(int x, int y, MouseEvent& mouseEvent)
 	mouseEvent.isConsumed = true;
 }
 
-void ISlider::onClick(int x, int y, MouseEvent& mouseEvent)
+void ISlider::onClick(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
@@ -120,7 +120,7 @@ void ISlider::onUpdate(IComponent* parent)
 	pSliderBar->setOffset({ prog * mWidth - pSliderBar->getWidth() / 2, 0 });
 }
 
-bool ISlider::inComponent(int x, int y)
+bool ISlider::inComponent(float x, float y)
 {
 	return pSliderBar->inRect({ (float)x, (float)y }) || pHorizontalBar->inRect({ (float)x, (float)y });
 }

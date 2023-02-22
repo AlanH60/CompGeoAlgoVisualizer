@@ -7,7 +7,7 @@
 
 using namespace D2D;
 
-IInput::IInput(std::wstring initialText, TextFormat& textFormat, int width, int height)
+IInput::IInput(std::wstring initialText, TextFormat& textFormat, float width, float height)
 	:
 	IComponent(0, 0, width, height),
 	mInputString(L""),
@@ -93,15 +93,15 @@ void IInput::setHighlightPosition(UINT32 pos)
 	pSelectionHighlight->setVisibility(true);
 }
 
-void IInput::onPress(int x, int y, MouseEvent& mouseEvent)
+void IInput::onPress(float x, float y, MouseEvent& mouseEvent)
 {
 	if (mouseEvent.isConsumed)
 		return;
 	mouseEvent.isConsumed = true;
 	isFocused = true;
 	mCaretCounter = 0;
-	int relativeX = x - mPosX;
-	int relativeY = y - mPosY;
+	float relativeX = x - mPos.x;
+	float relativeY = y - mPos.y;
 	BOOL isTrailing = false;
 	BOOL isInside = false;
 	auto metrics = pInputText->getCoordinateMetrics({ (float)relativeX - mOffset - PADDING, (float)relativeY }, &isTrailing, &isInside);
@@ -112,10 +112,10 @@ void IInput::onPress(int x, int y, MouseEvent& mouseEvent)
 	moveSelectionToCaret();
 }
 
-void IInput::onDrag(int x, int y, MouseEvent& mouseEvent)
+void IInput::onDrag(float x, float y, MouseEvent& mouseEvent)
 {
-	int relativeX = x - mPosX;
-	int relativeY = y - mPosY;
+	float relativeX = x - mPos.x;
+	float relativeY = y - mPos.y;
 	BOOL isTrailing = false;
 	BOOL isInside = false;
 	UINT32 pos = pInputText->getCoordinateMetrics({ (float)relativeX - mOffset - PADDING, (float)relativeY }, &isTrailing, &isInside).textPosition;
@@ -247,14 +247,14 @@ void IInput::onUpdate(IComponent* parent)
 		pCaret->setVisibility(true);
 }
 
-void IInput::draw(int originX, int originY)
+void IInput::draw(float originX, float originY)
 {
 	for (Drawable* d : mDrawables)
 	{
-		d->setPos({ (float)originX + mPosX, (float)originY + mPosY });
+		d->setPos({ (float)originX + mPos.x, (float)originY + mPos.y });
 		if (d == pInputText)
 		{
-			pMask->pushLayer(*pInputBox, D2D1::Matrix3x2F::Translation((float)(originX + mPosX) + PADDING, (float)(originY + mPosY)));
+			pMask->pushLayer(*pInputBox, D2D1::Matrix3x2F::Translation((float)(originX + mPos.x) + PADDING, (float)(originY + mPos.y)));
 			d->draw();
 			pMask->popLayer();
 		}

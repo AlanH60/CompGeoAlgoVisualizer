@@ -12,20 +12,20 @@ namespace D2D
 }
 
 struct Vector2f;
-class Event;
+struct Event;
 
 class IContainer;
 class IDropDown;
 class App : public Application
 {
 	public:
-		static const unsigned int GRID_SIZE = 20;
+		static const int GRID_SIZE = 20;
 		//Size of each partition of the grid square.
-		static const unsigned int CHUNK_SIZE = 100;
-		enum State
+		static const int CHUNK_SIZE = 100;
+		enum class State : unsigned char
 		{
-			CONVEX_HULL = 0x00,
-			TRIANGULATE = 0x01
+			CONVEX_HULL = 0x0,
+			TRIANGULATE = 0x1
 		};
 	public:
 		//Compare class used in mChunks
@@ -93,7 +93,7 @@ class App : public Application
 
 		//Map of chunks, or grid partitions, to make it faster to find points based on where the user clicks.
 		std::map<FLOAT2, std::vector<D2D::Point*>, ChunkCompare> mPoints;
-		State mState = CONVEX_HULL;
+		State mState = State::CONVEX_HULL;
 
 		AlgorithmVisualizer::ConvexHullAlgorithm mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::QUICK_HULL;
 		AlgorithmVisualizer::TriangulationAlgorithm mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::EAR_CLIPPING;

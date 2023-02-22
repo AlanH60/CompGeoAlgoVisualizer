@@ -17,11 +17,11 @@ class ITabbedPanel : public IContainer
 		{
 			friend class ITabbedPanel;
 			public:
-				ITab(std::wstring& tabName, D2D::TextFormat& textFormat, ITabbedPanel* pTabbedPanel, IPanel* pPanel, int width, int height);
+				ITab(std::wstring& tabName, D2D::TextFormat& textFormat, ITabbedPanel* pTabbedPanel, IPanel* pPanel, float width, float height);
 
-				void setWidth(int width) override;
-				void setHeight(int height) override;
-				void onPress(int x, int y, MouseEvent& e) override;
+				void setWidth(float width) override;
+				void setHeight(float height) override;
+				void onPress(float x, float y, MouseEvent& e) override;
 			private:
 				ITabbedPanel* pTabbedPanel;
 				IPanel* pPanel;
@@ -29,7 +29,7 @@ class ITabbedPanel : public IContainer
 				D2D::Text* pText;
 		};
 	public:
-		ITabbedPanel(int width, int height);
+		ITabbedPanel(float width, float height);
 		~ITabbedPanel();
 		void addPanel(std::wstring panelName, IPanel* pPanel);
 		void onUpdate(IComponent* parent) override;

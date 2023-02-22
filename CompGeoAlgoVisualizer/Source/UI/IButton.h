@@ -11,19 +11,19 @@ namespace D2D
 class IButton : public IComponent
 {
 	public:
-		IButton(std::wstring text, int width, int height);
-		IButton(std::wstring text, D2D::TextFormat& fontFormat, int width, int height);
+		IButton(std::wstring text, float width, float height);
+		IButton(std::wstring text, D2D::TextFormat& fontFormat, float width, float height);
 		void setColor(const Color& color);
 		void setTextColor(const Color& color);
-		void setWidth(int width) override;
-		void setHeight(int height) override;
-		void onHover(int x, int y, MouseEvent& mouseEvent) override;
+		void setWidth(float width) override;
+		void setHeight(float height) override;
+		void onHover(float x, float y, MouseEvent& mouseEvent) override;
 		void onExit() override;
-		void onPress(int x, int y, MouseEvent& mouseEvent) override;
-		void onClick(int x, int y, MouseEvent& mouseEvent) override;
+		void onPress(float x, float y, MouseEvent& mouseEvent) override;
+		void onClick(float x, float y, MouseEvent& mouseEvent) override;
 		void setOnClick(const std::function<void()>& handler);
-		void setCornerRadius(int radius);
-		bool inComponent(int x, int y) override;
+		void setCornerRadius(float radius);
+		bool inComponent(float x, float y) override;
 	private:
 		D2D::Text* pText;
 		D2D::Rectangle* pRectangle;
