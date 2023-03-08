@@ -1,9 +1,11 @@
 #include "PCH.h"
 #include "Algorithms.h"
 #include "App.h"
+#include "DataStructs/TriSweepLineStatus.h"
 #include "Direct2D/Color.h"
 #include "Direct2D/Drawable/Point.h"
 #include "Direct2D/Drawable/Line.h"
+#include "DataStructs/BeachLineStatus.h"
 
 
 using D2D::Drawable;
@@ -54,11 +56,6 @@ bool AlgorithmVisualizer::shouldVisualize()
 float AlgorithmVisualizer::getSpeed()
 {
 	return mSpeed;
-}
-
-float* AlgorithmVisualizer::getSpeedPointer()
-{
-	return &mSpeed;
 }
 
 void AlgorithmVisualizer::setVisualization(bool visualize)
@@ -112,7 +109,7 @@ void AlgorithmVisualizer::computeConvexHull(std::vector<Vector2f>& points, Conve
 	}
 }
 
-void AlgorithmVisualizer::computeTriangulation(std::vector<Vector2f>& polygon, std::vector<std::pair<int, int>>& edges, TriangulationAlgorithm algorithm)
+void AlgorithmVisualizer::computeTriangulation(std::vector<Vector2f>& polygon, std::unordered_map<Vector2f, std::vector<Vector2f>>& edges, TriangulationAlgorithm algorithm)
 {
 	if (polygon.size() <= 3)
 		return;
@@ -124,19 +121,22 @@ void AlgorithmVisualizer::computeTriangulation(std::vector<Vector2f>& polygon, s
 		case TriangulationAlgorithm::EAR_CLIPPING:
 			mThread->swap(std::thread(triangulateEarClipping, this, polygon));
 			break;
+		case TriangulationAlgorithm::SWEEP:
+			mThread->swap(std::thread(triangulateSweep, this, edges));
+			break;
 	}
 }
 
-std::vector<std::pair<Vector2f, Vector2f>> AlgorithmVisualizer::getResult()
+std::vector<Edge> AlgorithmVisualizer::getResult()
 {
 	if (mState == State::FINISHED)
 	{
 		mState = State::IDLE;
-		std::vector<std::pair<Vector2f, Vector2f>> ret = std::move(mResult);
+		std::vector<Edge> ret = std::move(mResult);
 		mResult.clear();
 		return ret;
 	}
-	return std::vector<std::pair<Vector2f, Vector2f>>();
+	return std::vector<Edge>();
 }
 
 void AlgorithmVisualizer::clear()
@@ -590,7 +590,222 @@ bool AlgorithmVisualizer::isEar(std::vector<Vector2f>& polygon, int idx, int pre
 	return diagonalCrossPolygon(polygon, polygon[prev], polygon[next]);
 }
 
-void AlgorithmVisualizer::triangulateSweep(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points, std::vector<std::pair<int, int>> edges)
+void AlgorithmVisualizer::triangulateSweep(AlgorithmVisualizer* pVisualizer, std::unordered_map<Vector2f, std::vector<Vector2f>>& edges)
 {
-	
+	pVisualizer->mState = State::RUNNING;
+	TriSweepLineStatus sweepLineStatus;
+	//Event queue will sort the points in order of greatest y.
+	std::priority_queue<Vector2f, std::vector<Vector2f>, VertexCompareY> eventQueue;
+	//Push all points into events queue.
+	for (auto& pair : edges)
+		eventQueue.push(pair.first);
+	//Map from edge to its bottom most left and right trapezoids(the defining vertices of the trapezoids).
+	std::unordered_map<Edge, std::pair<Vector2f, Vector2f>> trapezoids;
+	std::vector<Edge> edgesToRemove;
+	//**************VISUALIZER*********************
+	Line* line = new Line({ 0, 0 }, { 10000, 0 }, { 0, 0, 0, 1.0f });
+	pVisualizer->mLines.push_back(line);
+	//*****************************************
+
+	while (!eventQueue.empty())
+	{
+		Vector2f vertex = eventQueue.top();
+		sweepLineStatus.setY(vertex.y);
+		eventQueue.pop();
+		edgesToRemove.clear();
+
+		//Update sweep line
+		line->setPoints({ 0, vertex.y }, { 10000, vertex.y });
+		pVisualizer->wait();
+
+		//Remove all edges above vertex.
+		for (Vector2f& v : edges[vertex])
+		{
+			if (VertexCompareY()(vertex, v))
+			{
+				Edge e = { v, vertex };
+				if (trapezoids.find(e) != trapezoids.end())
+					edgesToRemove.push_back(e);
+				sweepLineStatus.remove(e);
+			}
+		}
+		Edge leftEdge;
+		Edge rightEdge;
+		bool leftFound = false;
+		bool rightFound = false;
+		std::pair<bool, bool> res = sweepLineStatus.findNeighbors({ vertex, { vertex.x + 1, vertex.y + 1 } }, &leftEdge, &rightEdge);
+		if (res.first)
+		{
+			if (trapezoids[leftEdge].second != Vector2f())
+			{
+				if (trapezoids.find({ trapezoids[leftEdge].second, vertex }) == trapezoids.end())
+				{
+					pVisualizer->mResult.push_back({ trapezoids[leftEdge].second, vertex });
+					pVisualizer->mLines.push_back(new Line{ trapezoids[leftEdge].second, vertex, {0, 0, 0, 1.0f} });
+					edges[vertex].push_back(trapezoids[leftEdge].second);
+					edges[trapezoids[leftEdge].second].push_back(vertex);
+				}
+				leftFound = true;
+				pVisualizer->wait();
+			}
+		}
+		if (res.second)
+		{
+			if (trapezoids[rightEdge].first != Vector2f())
+			{
+				if (trapezoids.find({ trapezoids[rightEdge].first, vertex }) == trapezoids.end() && !(leftFound && trapezoids[rightEdge].first == trapezoids[leftEdge].second))
+				{
+					pVisualizer->mResult.push_back({ trapezoids[rightEdge].first, vertex });
+					pVisualizer->mLines.push_back(new Line{ trapezoids[rightEdge].first, vertex, {0, 0, 0, 1.0f} });
+					edges[vertex].push_back(trapezoids[rightEdge].first);
+					edges[trapezoids[rightEdge].first].push_back(vertex);
+				}
+				rightFound = true;
+				pVisualizer->wait();
+			}
+		}
+		//Update trapezoids map
+		if (leftFound)
+			trapezoids[leftEdge].second = vertex;
+		if (rightFound)
+			trapezoids[rightEdge].first = vertex;
+		//Remove edges from trapezoids
+		for (Edge& e : edgesToRemove)
+			trapezoids.erase(e);
+
+		//Add new edges below vertex into SLS.
+		for (int i = 0; i < edges[vertex].size(); i++)
+		{
+			if (VertexCompareY()(edges[vertex][i], vertex))
+			{
+				Edge e = { vertex, edges[vertex][i] };
+				sweepLineStatus.insert(e);
+				if (i % 2 == 0) //Vertex is predecessor
+					trapezoids[e] = { vertex, Vector2f() };
+				else
+					trapezoids[e] = { Vector2f() , vertex };
+			}
+		}
+
+	}
+
+
+	DCEL dcel(edges);
+	std::unordered_map<Edge, DCEL::HalfEdge*>& halfEdges = dcel.getHalfEdges();
+	std::unordered_map<Vector2f, DCEL::Vertex*>& vertices = dcel.getVertices();
+	std::vector<DCEL::Face*>& faces = dcel.getFaces();
+	for (DCEL::Face* face : faces)
+		triangulateMonotoneMountain(pVisualizer, face);
+
+	pVisualizer->mState = State::FINISHED;
+}
+
+void AlgorithmVisualizer::triangulateMonotoneMountain(AlgorithmVisualizer* pVisualizer, DCEL::Face* face)
+{
+	DCEL::HalfEdge* bottom = face->rep;
+	DCEL::HalfEdge* top = face->rep;
+	DCEL::HalfEdge* e = face->rep->next;
+	while (e != face->rep)
+	{
+		if (e->tail->y < bottom->tail->y || (e->tail->y == bottom->tail->y && e->tail->x < bottom->tail->x))
+			bottom = e;
+		if (e->tail->y > top->tail->y || (e->tail->y == top->tail->y && e->tail->x < top->tail->x))
+			top = e;
+		e = e->next;
+	}
+	if (!leftOf(bottom->tail->v, bottom->next->tail->v, bottom->prev->tail->v)) //If CW(Face at infinity)
+		return;
+	std::vector<Vector2f> stack;
+	e = bottom;
+	DCEL::HalfEdge* start = bottom;
+	if (e->next == top)
+	{
+		e = e->next;
+		start = top;
+	}
+	stack.push_back(start->tail->v);
+	Vector2f curr;
+	Vector2f next;
+	while (e->next->next != start && !(stack.size() == 1 && e->next->next->next == start))
+	{
+		curr = e->next->tail->v;
+		stack.push_back(curr);
+		next = e->next->next->tail->v;
+		while (stack.size() >= 2 && isConvex(*----stack.end(), *--stack.end(), next))
+		{
+			stack.erase(--stack.end());
+			pVisualizer->mLines.push_back(new Line{ *--stack.end(), next, {0, 1, 0, 1} });
+			pVisualizer->mResult.push_back({ *--stack.end(), next });
+			pVisualizer->wait();
+		}
+		e = e->next;
+	}
+
+}
+
+void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
+{
+	pVisualizer->mState = State::RUNNING;
+	BeachLineStatus sweepLineStatus;
+	//Event queue will sort the points in order of greatest y.
+	std::priority_queue<FortuneEvent, std::vector<FortuneEvent>, FortuneEventCompare> eventQueue;
+	//Push all points into events queue.
+	for (auto& p : points)
+		eventQueue.push(p);
+
+	while (!eventQueue.empty())
+	{
+		FortuneEvent e = eventQueue.top();
+		eventQueue.pop();
+
+		if (e.isCircle)
+		{
+			
+		}
+		else
+		{
+
+		}
+	}
+
+	pVisualizer->mState = State::FINISHED;
+}
+
+//Get parabolic intersection
+Vector2f AlgorithmVisualizer::getParabolicIntersection(const Vector2f& f1, const Vector2f& f2, float directrix)
+{
+	float a1 = 1 / (2 * (f1.y - directrix));
+	float a2 = 1 / (2 * (f2.y - directrix));
+
+	float a = (a1 - a2);
+	float b = -2 * (a1 * f1.x - a2 * f2.x);
+	float c = (f1.x * f1.x * a1 - f2.x * f2.x * a2 + (f1.y - f2.y) / 2);
+
+	if (a == 0) //Linear(1 intersection)
+		return { -c / b, std::numeric_limits<float>::quiet_NaN() };
+
+	float sqrtTerm = b * b - 4 * a * c;
+	if (sqrtTerm < 0)
+		return Vector2f();
+	float pmTerm = sqrt(sqrtTerm);
+	float x1 = (-b + pmTerm) / (2 * a);
+	float x2 = (-b - pmTerm) / (2 * a);
+
+	return { x1, x2 };
+}
+
+Vector2f AlgorithmVisualizer::getCircleLowest(const Vector2f& v1, const Vector2f& v2, const Vector2f& v3)
+{
+	float v1x2 = v1.x * v1.x;
+	float v1y2 = v1.y * v1.y;
+	float v2x2 = v2.x * v2.x;
+	float v2y2 = v2.y * v2.y;
+	float v3x2 = v3.x * v3.x;
+	float v3y2 = v3.y * v3.y;
+	float h = (v1x2 + v1y2 - v2x2 - v2y2) / (2 * (v1.y - v2.y)) - (v1x2 + v1y2 - v3x2 - v3y2) / (2 * (v1.y - v3.y));
+	float k = (v1x2 + v1y2 - v3x2 - v3y2) / (2 * (v1.x - v3.x)) - (v1x2 + v1y2 - v2x2 - v2y2) / (2 * (v1.x - v2.x));
+	float xDiff = (v1.x - h);
+	float yDiff = (v1.y - k);
+	float r = sqrt(xDiff * xDiff + yDiff * yDiff);
+	return { h, k - r };
 }

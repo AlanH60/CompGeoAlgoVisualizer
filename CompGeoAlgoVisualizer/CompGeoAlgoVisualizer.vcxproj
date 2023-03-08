@@ -92,8 +92,12 @@
   <ItemGroup>
     <ClInclude Include="Source\Algorithms.h" />
     <ClInclude Include="Source\App.h" />
-    <ClInclude Include="Source\DataStructs\AVLTree.h" />
+    <ClInclude Include="Source\DataStructs\BeachLineStatus.h" />
+    <ClInclude Include="Source\DataStructs\DCEL.h" />
+    <ClInclude Include="Source\DataStructs\Edge.h" />
+    <ClInclude Include="Source\DataStructs\RedBlackTree.h" />
     <ClInclude Include="Source\DataStructs\TriSweepLineStatus.h" />
+    <ClInclude Include="Source\DataStructs\Vector2f.h" />
     <ClInclude Include="Source\Direct2D\Application.h" />
     <ClInclude Include="Source\Direct2D\Color.h" />
     <ClInclude Include="Source\Direct2D\DrawRes\Bitmap.h" />
@@ -122,12 +126,17 @@
     <ClInclude Include="Source\UI\IPanel.h" />
     <ClInclude Include="Source\UI\ISlider.h" />
     <ClInclude Include="Source\UI\ITabbedPanel.h" />
+    <ClInclude Include="SweepLine.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
     <ClCompile Include="Source\App.cpp" />
-    <ClCompile Include="Source\DataStructs\AVLTree.cpp" />
+    <ClCompile Include="Source\DataStructs\BeachLineStatus.cpp" />
+    <ClCompile Include="Source\DataStructs\DCEL.cpp" />
+    <ClCompile Include="Source\DataStructs\Edge.cpp" />
+    <ClCompile Include="Source\DataStructs\RedBlackTree.cpp" />
     <ClCompile Include="Source\DataStructs\TriSweepLineStatus.cpp" />
+    <ClCompile Include="Source\DataStructs\Vector2f.cpp" />
     <ClCompile Include="Source\Direct2D\Application.cpp" />
     <ClCompile Include="Source\Direct2D\Color.cpp" />
     <ClCompile Include="Source\Direct2D\DrawRes\Bitmap.cpp" />
@@ -158,6 +167,7 @@
     <ClCompile Include="Source\UI\ISlider.cpp" />
     <ClCompile Include="Source\UI\ITabbedPanel.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="SweepLine.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

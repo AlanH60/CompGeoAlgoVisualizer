@@ -25,7 +25,7 @@ using D2D::Text;
 App::App()
 {
 	pVisualizer = new AlgorithmVisualizer(this);
-
+	mVisualizerSpeed = pVisualizer->getSpeed();
 	//********************************** UI *****************************************//
 	pRoot = new IContainer(0, 0, pWindow->getWidth(), pWindow->getHeight());
 	pRoot->setAlwaysConsumeEvent(false);
@@ -61,7 +61,7 @@ App::App()
 	pSpeedLabel->setRelativeHeight(0.075f);
 
 	//Slider used to modify the speed of the algorithm visualizer
-	ISlider* pSpeedSlider = new ISlider(pVisualizer->getSpeedPointer(), 1, 10, 0, 0);
+	ISlider* pSpeedSlider = new ISlider(&mVisualizerSpeed, 1, 10, 0, 0);
 	pSpeedSlider->setXOrientation(IComponent::XOrientation::CENTER);
 	pSpeedSlider->setYOrientation(IComponent::YOrientation::RELATIVE_HEIGHT);
 	pSpeedSlider->setXDimension(IComponent::XDimension::RELATIVEX);
@@ -188,27 +188,34 @@ void App::onUpdate()
 	pRoot->onUpdate(nullptr);
 	if (pVisualizer->isFinished())
 	{
-		std::vector<std::pair<Vector2f, Vector2f>> result = pVisualizer->getResult();
+		std::vector<Edge> result = pVisualizer->getResult();
 		if (mState == State::CONVEX_HULL)
 			for (auto& r : result)
 			{
-				Line* l = new Line(r.first, r.second);
+				Line* l = new Line(r.v1, r.v2);
 				mHullLines.push_back(l);
 			}
 		else
 			for (auto& r : result)
 			{
-				Line* l = new Line(r.first, r.second);
+				Line* l = new Line(r.v1, r.v2);
 				mTriangulationLines.push_back(l);
 			}
 	}
-	if (!pVisualizer->isRunning())
+	if (pVisualizer->isIdle())
 	{
+		//Update the speed of the visualizer if UI changed its value.
+		pVisualizer->setSpeed(mVisualizerSpeed);
 		if ((int)mState != pAlgorithmDropDown->getSelectedIndex())
 		{
 			mState = (State)pAlgorithmDropDown->getSelectedIndex();
 			clear();
 		}
+	}
+	else if (pVisualizer->isSleeping())
+	{
+		//Update the speed of the visualizer if UI changed its value.
+		pVisualizer->setSpeed(mVisualizerSpeed);
 	}
 }
 
@@ -244,7 +251,6 @@ void App::onDraw()
 		pSelectedOutline = new D2D::Polygon(f, 4, false, { 0.0f, 0.5f, 1.0f, 0.8f });
 		pSelectedOutline->draw();
 	}
-
 
 
 	//Algorithm Visualizer
@@ -318,6 +324,16 @@ Point* App::getPoint(FLOAT2 pos)
 		}
 	}
 	return p;
+}
+
+int App::getWidth()
+{
+	return pWindow->getWidth();
+}
+
+int App::getHeight()
+{
+	return pWindow->getHeight();
 }
 
 bool App::removePoint(Point* pPoint)
@@ -459,12 +475,19 @@ void App::triangulateEventHandler(Event& e)
 							p = new Point(mousePos);
 							addPoint(p);
 						}
+						
 						if (!mPolygon.empty())
 						{
-							Line* l = new Line({ mPolygon[mPolygon.size() - 1].x, mPolygon[mPolygon.size() - 1].y }, p->getPos());
-							mPolygonLines.push_back(l);
+							//If the point is the same as the last polygon point, we reject.
+							if (mPolygon[mPolygon.size() - 1] != Vector2f{ p->getPos().x, p->getPos().y })
+							{
+								Line* l = new Line(mPolygon[mPolygon.size() - 1], p->getPos());
+								mPolygonLines.push_back(l);
+								mPolygon.push_back(Vector2f{ p->getPos().x, p->getPos().y });
+							}
 						}
-						mPolygon.push_back(Vector2f{ p->getPos().x, p->getPos().y });
+						else
+							mPolygon.push_back(Vector2f{ p->getPos().x, p->getPos().y });
 						updatePolygonValidity();
 					}
 						e.isConsumed = true;
@@ -483,6 +506,10 @@ void App::triangulateEventHandler(Event& e)
 			{
 				case '1':
 					mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::EAR_CLIPPING;
+					e.isConsumed = true;
+					break;
+				case '2':
+					mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::SWEEP;
 					e.isConsumed = true;
 					break;
 				default:
@@ -539,8 +566,20 @@ void App::startTriangulation()
 			std::reverse(++mPolygon.begin(), --mPolygon.end());
 		}
 		mPolygon.erase(--mPolygon.end());
-		std::vector<std::pair<int, int>> a;
-		pVisualizer->computeTriangulation(mPolygon, a, mTriAlgorithm);
+		std::unordered_map<Vector2f, std::vector<Vector2f>> edges;
+		for (size_t i = 0; i < mPolygon.size() - 1; i++)
+		{
+			size_t next = (i + 1) % mPolygon.size();
+			if (edges.find(mPolygon[i]) == edges.end())
+				edges[mPolygon[i]] = std::vector<Vector2f>();
+			if (edges.find(mPolygon[next]) == edges.end())
+				edges[mPolygon[next]] = std::vector<Vector2f>();
+			edges[mPolygon[i]].push_back(mPolygon[next]);
+			edges[mPolygon[next]].push_back(mPolygon[i]);
+		}
+		edges[mPolygon[0]].insert(edges[mPolygon[0]].begin(), mPolygon[mPolygon.size() - 1]);
+		edges[mPolygon[mPolygon.size() - 1]].push_back(mPolygon[0]);
+		pVisualizer->computeTriangulation(mPolygon, edges, mTriAlgorithm);
 		mPolygon.push_back(mPolygon[0]);
 	}
 }

@@ -1,45 +1,8 @@
 #pragma once
 #include <math.h>
-#include "Direct2D/Types.h"
-struct Vector2f
-{
-	float x, y;
+#include "DataStructs/Vector2f.h"
 
-	Vector2f invertY()
-	{
-		return { x, -y };
-	}
-
-	operator FLOAT2()
-	{
-		return FLOAT2{ x, y };
-	}
-};
-inline Vector2f operator+(const Vector2f& v1, const Vector2f& v2)
-{
-	return { v1.x + v2.x, v1.y + v2.y };
-}
-inline Vector2f operator-(const Vector2f& v1, const Vector2f& v2)
-{
-	return { v1.x - v2.x, v1.y - v2.y };
-}
-inline Vector2f operator/(const Vector2f& v1, float s)
-{
-	return { v1.x / s, v1.y / s };
-}
-inline Vector2f operator*(const Vector2f& v1, float s)
-{
-	return { v1.x * s, v1.y * s };
-}
-inline bool operator==(const Vector2f& v1, const Vector2f& v2)
-{
-	return v1.x == v2.x && v1.y == v2.y;
-}
-inline bool operator!=(const Vector2f& v1, const Vector2f& v2)
-{
-	return v1.x != v2.x || v1.y != v2.y;
-}
-inline float length(const Vector2f v)
+inline float length(const Vector2f& v)
 {
 	return sqrtf(v.x * v.x + v.y * v.y);
 }

@@ -59,6 +59,9 @@ class App : public Application
 		bool isDrawingAlgorithmVisualize();
 		D2D::Point* getPoint(FLOAT2 pos);
 
+		int getWidth();
+		int getHeight();
+
 	private:
 		template<typename T>
 		void deleteAndClear(std::vector<T*>& v)
@@ -76,12 +79,15 @@ class App : public Application
 		void startConvexHull();
 		void startTriangulation();
 	private:
-		AlgorithmVisualizer* pVisualizer = nullptr;
+		
 		bool mDragging = false;
 		D2D::Point* pSelectedPoint = nullptr;
 		D2D::Polygon* pSelectedOutline = nullptr;
 		std::vector<D2D::Line*> mGridLines;
-
+			
+		/********************* Algorithm Visualizer *************************/
+		AlgorithmVisualizer* pVisualizer = nullptr;
+		float mVisualizerSpeed;
 		//Convex Hull
 		std::vector<D2D::Line*> mHullLines;
 

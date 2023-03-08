@@ -7,9 +7,27 @@ C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source
 C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(40,35): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
 C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(40,59): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
 C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(40,59): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\Algorithms.cpp(531,173): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\DataStructs\TriSweepLineStatus.h(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\Algorithms.cpp(530,173): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\Algorithms.cpp(558,90): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
 C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\Algorithms.cpp(559,90): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\Algorithms.cpp(560,90): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  App.cpp
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(39,35): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(39,35): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(39,59): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(39,59): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(40,35): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(40,35): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(40,59): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(40,59): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.cpp(30,70): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.cpp(30,48): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.cpp(147,33): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.cpp(148,34): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.cpp(463,33): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.cpp(463,33): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.cpp(463,47): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
+C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.cpp(463,47): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   main.cpp
 C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(39,35): warning C4838: conversion from 'int' to 'float' requires a narrowing conversion
 C:\Users\Hau\Documents\GitHub\CompGeoAlgoVisualizer\CompGeoAlgoVisualizer\Source\App.h(39,35): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
