@@ -41,6 +41,7 @@ class IComponent
 		float getWidth();
 		float getHeight();
 		bool getDirtyFlag();
+		bool getVisibleFlag();
 
 		/**
 		* Sets the x position of the component.
@@ -108,6 +109,11 @@ class IComponent
 		* @param isDirty dirty flag.
 		*/
 		void setDirtyFlag(bool isDirty);
+		/**
+		* Sets the isVisible flag of the component.
+		* @param isVisible isVisible flag.
+		*/
+		void setVisibleFlag(bool isVisible);
 
 		virtual void setColor(const Color& color);
 		/**
@@ -212,6 +218,8 @@ class IComponent
 		float mWidth, mHeight;
 		//Flag used to indicate whether its orientation or dimensions should be updated
 		bool isDirty = false;
+		//Flag used to indicate whether this component should be visible.
+		bool isVisible = true;
 		//Orientation
 		XOrientation mXOrientation = XOrientation::RELATIVEX;
 		YOrientation mYOrientation = YOrientation::RELATIVEY;

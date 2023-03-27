@@ -113,9 +113,14 @@
     <ClInclude Include="Source\UI\ITabbedPanel.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="SweepLine.h" />
     <ClInclude Include="Source\DataStructs\BeachLineStatus.h">
       <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DataStructs\VoronoiDiagram.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\QuadBezierCurve.h">
+      <Filter>Direct2D\Drawable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -214,9 +219,14 @@
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="SweepLine.cpp" />
     <ClCompile Include="Source\DataStructs\BeachLineStatus.cpp">
       <Filter>DataStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DataStructs\VoronoiDiagram.cpp">
+      <Filter>DataStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\QuadBezierCurve.cpp">
+      <Filter>Direct2D\Drawable</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

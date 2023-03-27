@@ -23,6 +23,11 @@ IButton::IButton(std::wstring text, TextFormat& textFormat, float width, float h
 	mDrawables.push_back(pText);
 }
 
+void IButton::setText(std::wstring text)
+{
+	pText->setText(text);
+}
+
 void IButton::setColor(const Color& color)
 {
 	IComponent::setColor(color);

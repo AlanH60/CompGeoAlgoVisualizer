@@ -10,7 +10,7 @@ Polygon::Polygon(FLOAT2* vertices, unsigned int vertexCount, bool filled, Color 
 	mFilled(filled),
 	mScale(1)
 {
-	pGeometry = std::unique_ptr<Geometry>(new Geometry(*pGraphics, vertices, vertexCount, filled));
+	pGeometry = std::unique_ptr<Geometry>(Geometry::generatePolygon(*pGraphics, vertices, vertexCount, filled));
 }
 
 void D2D::Polygon::setScale(float scale)

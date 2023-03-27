@@ -13,6 +13,7 @@ class IButton : public IComponent
 	public:
 		IButton(std::wstring text, float width, float height);
 		IButton(std::wstring text, D2D::TextFormat& fontFormat, float width, float height);
+		void setText(std::wstring text);
 		void setColor(const Color& color);
 		void setTextColor(const Color& color);
 		void setWidth(float width) override;

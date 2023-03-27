@@ -36,6 +36,11 @@ bool IComponent::getDirtyFlag()
 	return isDirty;
 }
 
+bool IComponent::getVisibleFlag()
+{
+	return isVisible;
+}
+
 void IComponent::setX(float x)
 {
     mPos.x = x;
@@ -102,6 +107,11 @@ void IComponent::setRelativeHeight(float rHeight)
 {
 	mRelativeHeight = rHeight;
 	isDirty = true;
+}
+
+void IComponent::setVisibleFlag(bool isVisible)
+{
+	this->isVisible = isVisible;
 }
 
 void IComponent::setColor(const Color& color)

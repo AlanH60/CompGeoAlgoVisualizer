@@ -62,10 +62,13 @@
       <AdditionalIncludeDirectories>Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <OmitFramePointers>false</OmitFramePointers>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;d2d1.lib;D3DCompiler.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -98,8 +101,10 @@
     <ClInclude Include="Source\DataStructs\RedBlackTree.h" />
     <ClInclude Include="Source\DataStructs\TriSweepLineStatus.h" />
     <ClInclude Include="Source\DataStructs\Vector2f.h" />
+    <ClInclude Include="Source\DataStructs\VoronoiDiagram.h" />
     <ClInclude Include="Source\Direct2D\Application.h" />
     <ClInclude Include="Source\Direct2D\Color.h" />
+    <ClInclude Include="Source\Direct2D\Drawable\QuadBezierCurve.h" />
     <ClInclude Include="Source\Direct2D\DrawRes\Bitmap.h" />
     <ClInclude Include="Source\Direct2D\DrawRes\Brush.h" />
     <ClInclude Include="Source\Direct2D\DrawRes\Geometry.h" />
@@ -126,7 +131,6 @@
     <ClInclude Include="Source\UI\IPanel.h" />
     <ClInclude Include="Source\UI\ISlider.h" />
     <ClInclude Include="Source\UI\ITabbedPanel.h" />
-    <ClInclude Include="SweepLine.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
@@ -137,8 +141,10 @@
     <ClCompile Include="Source\DataStructs\RedBlackTree.cpp" />
     <ClCompile Include="Source\DataStructs\TriSweepLineStatus.cpp" />
     <ClCompile Include="Source\DataStructs\Vector2f.cpp" />
+    <ClCompile Include="Source\DataStructs\VoronoiDiagram.cpp" />
     <ClCompile Include="Source\Direct2D\Application.cpp" />
     <ClCompile Include="Source\Direct2D\Color.cpp" />
+    <ClCompile Include="Source\Direct2D\Drawable\QuadBezierCurve.cpp" />
     <ClCompile Include="Source\Direct2D\DrawRes\Bitmap.cpp" />
     <ClCompile Include="Source\Direct2D\DrawRes\Brush.cpp" />
     <ClCompile Include="Source\Direct2D\DrawRes\Geometry.cpp" />
@@ -167,7 +173,6 @@
     <ClCompile Include="Source\UI\ISlider.cpp" />
     <ClCompile Include="Source\UI\ITabbedPanel.cpp" />
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="SweepLine.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -66,6 +66,7 @@ class Graphics
 		* @param pBrush pointer to the brush that will be used to color the text. (Created by createSolidColorBrush)
 		*/
 		void drawGeometry(ID2D1PathGeometry* pGeometry, ID2D1SolidColorBrush* pBrush, bool filled, FLOAT2 offset = { 0, 0 }, float scale = 1);
+		
 		/**
 		* Create a brush of a specified color that is used for draw calls.
 		* @param color color of the brush.
@@ -80,6 +81,14 @@ class Graphics
 		* @param pGeometry comptr to the direct2d geometry interface that should be filled with the new geometry.
 		*/
 		void createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bool filled, Microsoft::WRL::ComPtr<ID2D1PathGeometry>& pGeometry);
+		/**
+		* Create a quadratic bezier curve.
+		* @param startPoitn start point of the bezier curve.
+		* @param controlPoint control point of the bezier curve.
+		* @param endPoint end point of the bezier curve.
+		* @param pGeometry comptr to the direct2d geometry interface that should be filled with the new geometry.
+		*/
+		void createQuadraticBezierCurve(FLOAT2 startPoint, FLOAT2 controlPoint, FLOAT2 endPoint, Microsoft::WRL::ComPtr<ID2D1PathGeometry>& pGeometry);
 		/**
 		* Create a text layout used for drawing text.
 		* @param wstr wide string containing the text.

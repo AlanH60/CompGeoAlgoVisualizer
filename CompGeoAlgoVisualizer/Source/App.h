@@ -9,6 +9,7 @@ namespace D2D
 	class Point;
 	class Line;
 	class Polygon;
+	class QuadBezierCurve;
 }
 
 struct Vector2f;
@@ -16,6 +17,8 @@ struct Event;
 
 class IContainer;
 class IDropDown;
+class IButton;
+
 class App : public Application
 {
 	public:
@@ -25,7 +28,8 @@ class App : public Application
 		enum class State : unsigned char
 		{
 			CONVEX_HULL = 0x0,
-			TRIANGULATE = 0x1
+			TRIANGULATE = 0x1,
+			VORONOI = 0x2
 		};
 	public:
 		//Compare class used in mChunks
@@ -76,8 +80,11 @@ class App : public Application
 		void updatePolygonValidity();
 		bool isCCW();
 		
+		void voronoiDiagramEventHandler(Event& e);
+
 		void startConvexHull();
 		void startTriangulation();
+		void startVoronoiDiagram();
 	private:
 		
 		bool mDragging = false;
@@ -97,15 +104,24 @@ class App : public Application
 		std::vector<D2D::Line*> mPolygonLines;
 		bool isValidPolygon = false;
 
+		//Voronoi Diagram
+		std::vector<D2D::Line*> mVoronoiEdges;
+
 		//Map of chunks, or grid partitions, to make it faster to find points based on where the user clicks.
 		std::map<FLOAT2, std::vector<D2D::Point*>, ChunkCompare> mPoints;
 		State mState = State::CONVEX_HULL;
 
 		AlgorithmVisualizer::ConvexHullAlgorithm mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::QUICK_HULL;
 		AlgorithmVisualizer::TriangulationAlgorithm mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::EAR_CLIPPING;
+		AlgorithmVisualizer::VoronoiDiagramAlgorithm mVoronoiAlgorithm = AlgorithmVisualizer::VoronoiDiagramAlgorithm::FORTUNE;
 		bool isDrawingAlgo = false;
+
+		
 
 		//*******************UI********************//
 		IContainer* pRoot;
 		IDropDown* pAlgorithmDropDown;
+		IButton* pStartButton;
+		IButton* pClearButton;
+		IButton* pPauseButton;
 };

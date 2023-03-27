@@ -3,7 +3,7 @@
 
 struct Edge
 {
-	Vector2f v1 = { -1, -1 }, v2 = { -1, -1 };
+	Vector2f v1, v2;
 };
 
 inline bool operator==(const Edge& e1, const Edge& e2)

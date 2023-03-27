@@ -196,6 +196,21 @@ void Graphics::createPathGeometry(FLOAT2* vertices, unsigned int vertexCount, bo
 	ASSERT_IF_FAILED(hr, "Failed to close geometry sink!");
 }
 
+void Graphics::createQuadraticBezierCurve(FLOAT2 startPoint, FLOAT2 controlPoint, FLOAT2 endPoint, Microsoft::WRL::ComPtr<ID2D1PathGeometry>& pGeometry)
+{
+	HRESULT hr = pFactory2D->CreatePathGeometry(&pGeometry);
+	ASSERT_IF_FAILED(hr, "Failed to create path geometry!");
+	Microsoft::WRL::ComPtr<ID2D1GeometrySink> pSink;
+	hr = pGeometry->Open(&pSink);
+	ASSERT_IF_FAILED(hr, "Failed to open geometry sink!");
+	pSink->BeginFigure({ startPoint.x, startPoint.y }, D2D1_FIGURE_BEGIN_FILLED);
+	pSink->AddQuadraticBezier({ {controlPoint.x, controlPoint.y }, { endPoint.x, endPoint.y } });
+	pSink->EndFigure(D2D1_FIGURE_END_OPEN);
+
+	hr = pSink->Close();
+	ASSERT_IF_FAILED(hr, "Failed to close geometry sink!");
+}
+
 void Graphics::createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, unsigned char textAlignment, unsigned char paragraphAlignment, float width, float height, ComPtr<IDWriteTextLayout>& pTextLayout)
 {
 	HRESULT hr;

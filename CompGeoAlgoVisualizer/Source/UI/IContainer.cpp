@@ -118,7 +118,7 @@ void IContainer::onPress(float x, float y, MouseEvent& mouseEvent)
 	ILink* pCurrChild = pFrontChild;
 	while (pCurrChild != nullptr)
 	{
-		if (pCurrChild->component->inComponent(relativeX, relativeY))
+		if (pCurrChild->component->inComponent(relativeX, relativeY) && pCurrChild->component->getVisibleFlag())
 		{
 			pPressed = pCurrChild->component;
 			pCurrChild->component->onPress(relativeX, relativeY, mouseEvent);
@@ -160,7 +160,7 @@ void IContainer::onHover(float x, float y, MouseEvent& mouseEvent)
 	ILink* pCurrChild = pFrontChild;
 	while (pCurrChild != nullptr)
 	{
-		if (pCurrChild->component->inComponent(relativeX, relativeY))
+		if (pCurrChild->component->inComponent(relativeX, relativeY) && pCurrChild->component->getVisibleFlag())
 		{
 			//If the child is already hovered there is no need to call onHover() again unless the child is a container.
 			if (pHovered != pCurrChild->component || dynamic_cast<IContainer*>(pCurrChild->component))
@@ -277,7 +277,8 @@ void IContainer::draw(float originX, float originY)
 	ILink* pCurrChild = pBackChild;
 	while (pCurrChild != nullptr)
 	{
-		pCurrChild->component->draw(originX + mPos.x, originY + mPos.y);
+		if (pCurrChild->component->getVisibleFlag())
+			pCurrChild->component->draw(originX + mPos.x, originY + mPos.y);
 		pCurrChild = pCurrChild->prev;
 	}
 

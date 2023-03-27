@@ -8,6 +8,7 @@
 #include "Direct2D/Drawable/Line.h"
 #include "Direct2D/Drawable/Polygon.h"
 #include "Direct2D/Drawable/Text.h"
+#include "Direct2D/Drawable/QuadBezierCurve.h"
 #include "UI/IContainer.h"
 #include "UI/IButton.h"
 #include "UI/ISlider.h"
@@ -21,6 +22,7 @@ using D2D::Line;
 using D2D::Point;
 using D2D::Polygon;
 using D2D::Text;
+using D2D::QuadBezierCurve;
 
 App::App()
 {
@@ -40,6 +42,7 @@ App::App()
 	//Dropdown menu used to select a purpose for the algorithm
 	pAlgorithmDropDown = new IDropDown(L"Convex Hull", 200, 30);
 	pAlgorithmDropDown->addOption(L"Triangulation");
+	pAlgorithmDropDown->addOption(L"Voronoi Diagram");
 	pAlgorithmDropDown->setXOrientation(IComponent::XOrientation::CENTER);
 	pAlgorithmDropDown->setYOrientation(IComponent::YOrientation::RELATIVE_HEIGHT);
 	pAlgorithmDropDown->setXDimension(IComponent::XDimension::RELATIVEX);
@@ -71,7 +74,7 @@ App::App()
 	pSpeedSlider->setRelativeHeight(0.04f);
 
 	//Start button used to start the algorithm visualizer
-	IButton* pStartButton = new IButton(L"Start", 50, 50);
+	pStartButton = new IButton(L"Start", 50, 50);
 	pStartButton->setColor({ 0.3f, 1.0f, 0.3f, 1.0f });
 	pStartButton->setTextColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	pStartButton->setXOrientation(IComponent::XOrientation::RIGHT);
@@ -91,12 +94,44 @@ App::App()
 				case State::TRIANGULATE:
 					startTriangulation();
 					break;
+				case State::VORONOI:
+					startVoronoiDiagram();
+					break;
 			}
+		}
+		pStartButton->setVisibleFlag(false);
+		pClearButton->setVisibleFlag(false);
+		pPauseButton->setVisibleFlag(true);
+	});
+
+	//Start button used to start the algorithm visualizer
+	pPauseButton = new IButton(L"Pause", 50, 50);
+	pPauseButton->setColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+	pPauseButton->setTextColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+	pPauseButton->setXOrientation(IComponent::XOrientation::RIGHT);
+	pPauseButton->setYOrientation(IComponent::YOrientation::BOTTOM);
+	pPauseButton->setXDimension(IComponent::XDimension::RELATIVEX);
+	pPauseButton->setYDimension(IComponent::YDimension::RELATIVEY);
+	pPauseButton->setRelativeWidth(0.5f);
+	pPauseButton->setRelativeHeight(0.1f);
+	pPauseButton->setVisibleFlag(false);
+	pPauseButton->setOnClick([this]()-> void {
+		if (pVisualizer->shouldPause())
+		{
+			pPauseButton->setText(L"Pause");
+			pVisualizer->setShouldPause(false);
+			pPauseButton->setColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+		}
+		else
+		{
+			pPauseButton->setText(L"Resume");
+			pVisualizer->setShouldPause(true);
+			pPauseButton->setColor({ 0.3f, 1.0f, 0.3f, 1.0f });
 		}
 	});
 	
 	//Clear button used to clear the grid of points and lines
-	IButton* pClearButton = new IButton(L"Clear", 0, 0);
+	pClearButton = new IButton(L"Clear", 0, 0);
 	pClearButton->setColor({ 0.7f, 0.7f, 0.7f, 1.0f });
 	pClearButton->setTextColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	pClearButton->setXOrientation(IComponent::XOrientation::LEFT);
@@ -115,6 +150,7 @@ App::App()
 
 	pMenuPanel->addChild(pClearButton);
 	pMenuPanel->addChild(pStartButton);
+	pMenuPanel->addChild(pPauseButton);
 	pMenuPanel->addChild(pSpeedSlider);
 	pMenuPanel->addChild(pSpeedLabel);
 	pMenuPanel->addChild(pAlgorithmDropDown);
@@ -170,6 +206,10 @@ App::App()
 			convexHullEventHandler(e);
 		else if (mState == State::TRIANGULATE)
 			triangulateEventHandler(e);
+		else if (mState == State::VORONOI)
+			voronoiDiagramEventHandler(e);
+
+
 	});
 }
 
@@ -189,18 +229,35 @@ void App::onUpdate()
 	if (pVisualizer->isFinished())
 	{
 		std::vector<Edge> result = pVisualizer->getResult();
-		if (mState == State::CONVEX_HULL)
-			for (auto& r : result)
-			{
-				Line* l = new Line(r.v1, r.v2);
-				mHullLines.push_back(l);
-			}
-		else
-			for (auto& r : result)
-			{
-				Line* l = new Line(r.v1, r.v2);
-				mTriangulationLines.push_back(l);
-			}
+		switch (mState)
+		{
+			case State::CONVEX_HULL:
+				for (auto& r : result)
+				{
+					Line* l = new Line(r.v1, r.v2);
+					mHullLines.push_back(l);
+				}
+				break;
+			case State::TRIANGULATE:
+				for (auto& r : result)
+				{
+					Line* l = new Line(r.v1, r.v2);
+					mTriangulationLines.push_back(l);
+				}
+				break;
+			case State::VORONOI:
+				for (auto& r : result)
+				{
+					Line* l = new Line(r.v1, r.v2);
+					mVoronoiEdges.push_back(l);
+				}
+				break;
+			default:
+				break;
+		}
+		pStartButton->setVisibleFlag(true);
+		pClearButton->setVisibleFlag(true);
+		pPauseButton->setVisibleFlag(false);
 	}
 	if (pVisualizer->isIdle())
 	{
@@ -228,15 +285,24 @@ void App::onDraw()
 		for (auto* drawable : drawables.second)
 			drawable->draw();
 	}
-	if (mState == State::CONVEX_HULL)
-		for (auto* pLine : mHullLines)
-			pLine->draw();
-	else if (mState == State::TRIANGULATE)
+	switch (mState)
 	{
-		for (auto* pLine : mPolygonLines)
-			pLine->draw();
-		for (auto* pLine : mTriangulationLines)
-			pLine->draw();
+		case State::CONVEX_HULL:
+			for (auto* pLine : mHullLines)
+				pLine->draw();
+			break;
+		case State::TRIANGULATE:
+			for (auto* pLine : mPolygonLines)
+				pLine->draw();
+			for (auto* pLine : mTriangulationLines)
+				pLine->draw();
+			break;
+		case State::VORONOI:
+			for (auto* pLine : mVoronoiEdges)
+				pLine->draw();
+			break;
+		default:
+			break;
 	}
 
 	//Selection box
@@ -259,14 +325,20 @@ void App::onDraw()
 		isDrawingAlgo = true;
 		//Wait until the algorithm is sleeping to draw.
 		while (!pVisualizer->isSleeping()) {}
+		//std::cout << "[App] --- Drawing" << std::endl;
 		std::vector<Point*>& points = pVisualizer->getPoints();
 		std::vector<Line*>& lines = pVisualizer->getLines();
-		for (Line* l : lines)
-			l->draw();
-		for (Point* p : points)
-			p->draw();
+		std::vector<QuadBezierCurve*>& arcs = pVisualizer->getArcs();
+		for (int i = 0; i < lines.size(); i ++)
+			lines[i]->draw();
+		for (int i = 0; i < points.size(); i ++)
+			points[i]->draw();
+		for (int i = 0; i < arcs.size(); i ++)
+			arcs[i]->draw();
 		isDrawingAlgo = false;
+		//std::cout << "[App] --- Done Drawing" << std::endl;
 	}
+
 
 	//UI
 	pRoot->draw(0, 0);
@@ -286,6 +358,7 @@ void App::clear()
 	deleteAndClear(mHullLines);
 	deleteAndClear(mPolygonLines);
 	deleteAndClear(mTriangulationLines);
+	deleteAndClear(mVoronoiEdges);
 	mPolygon.clear();
 }
 
@@ -544,6 +617,87 @@ bool App::isCCW()
 	return leftOf(mPolygon[minY], mPolygon[(minY + 1) % (mPolygon.size() - 1)], mPolygon[(minY + mPolygon.size() - 2) % (mPolygon.size() - 1)]);
 }
 
+void App::voronoiDiagramEventHandler(Event& e) 
+{
+	if (e.isMouse())
+	{
+		MouseEvent& mouse = (MouseEvent&)e;
+		FLOAT2 mousePos = { (float)mouse.x, (float)mouse.y };
+		Point* pHoveredPoint = getPoint(mousePos);
+		switch (mouse.mType)
+		{
+			case MouseEvent::Type::PRESS:
+				switch (mouse.mKeycode)
+				{
+					case VK_LBUTTON:
+						if (pWindow->keyPressed(VK_SHIFT) || pWindow->keyPressed(VK_CONTROL))
+						{
+							if (!pHoveredPoint)
+							{
+								Point* pPoint = new Point(mousePos);
+								if (mPoints.find(mousePos) == mPoints.end())
+									mPoints[mousePos] = std::vector<Point*>();
+								mPoints[mousePos].push_back(pPoint);
+								pSelectedPoint = nullptr;
+							}
+						}
+						else
+						{
+							if (pHoveredPoint)
+								pSelectedPoint = pHoveredPoint;
+							else
+								pSelectedPoint = nullptr;
+						}
+						break;
+					default:
+						break;
+				}
+				break;
+			case MouseEvent::Type::RELEASE:
+				if (mDragging)
+					mDragging = false;
+				break;
+			case MouseEvent::Type::MOVE:
+				if (pHoveredPoint && pSelectedPoint != nullptr && pWindow->lButtonPressed() && pSelectedPoint == pHoveredPoint)
+					mDragging = true;
+				if (mDragging)
+				{
+					if (removePoint(pSelectedPoint))
+					{
+						pSelectedPoint->setPos(mousePos);
+						addPoint(pSelectedPoint);
+					}
+				}
+				break;
+		}
+	}
+	if (e.isKeyboard())
+	{
+		KeyEvent& key = (KeyEvent&)e;
+		if (key.isPress())
+		{
+			switch (key.mKeycode)
+			{
+				case '1':
+					mVoronoiAlgorithm = AlgorithmVisualizer::VoronoiDiagramAlgorithm::FORTUNE;
+					e.isConsumed = true;
+					break;
+				case VK_DELETE:
+				case VK_BACK:
+					if (pSelectedPoint != nullptr)
+					{
+						deletePoint(pSelectedPoint);
+						pSelectedPoint = nullptr;
+					}
+					e.isConsumed = true;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+}
+
 void App::startConvexHull()
 {
 	deleteAndClear(mHullLines);
@@ -582,4 +736,14 @@ void App::startTriangulation()
 		pVisualizer->computeTriangulation(mPolygon, edges, mTriAlgorithm);
 		mPolygon.push_back(mPolygon[0]);
 	}
+}
+
+void App::startVoronoiDiagram()
+{
+	deleteAndClear(mVoronoiEdges);
+	std::vector<Vector2f> points = std::vector<Vector2f>();
+	for (auto& a : mPoints)
+		for (Drawable* d : a.second)
+			points.push_back({ d->getPos().x, d->getPos().y });
+	pVisualizer->computeVoronoiDiagram(points, mVoronoiAlgorithm);
 }
