@@ -1,10 +1,6 @@
 #include "PCH.h"
 #include "VoronoiDiagram.h"
 
-VoronoiDiagram::VoronoiDiagram()
-{
-}
-
 VoronoiDiagram::~VoronoiDiagram()
 {
 	for (auto& face : mFaces)

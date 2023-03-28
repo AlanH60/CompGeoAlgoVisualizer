@@ -127,6 +127,7 @@
     <ClInclude Include="Source\PCH.h" />
     <ClInclude Include="Source\Primatives.h" />
     <ClInclude Include="Source\UI\IButton.h" />
+    <ClInclude Include="Source\UI\ICheckBox.h" />
     <ClInclude Include="Source\UI\IComponent.h" />
     <ClInclude Include="Source\UI\IContainer.h" />
     <ClInclude Include="Source\UI\IDropDown.h" />
@@ -170,6 +171,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Source\UI\IButton.cpp" />
+    <ClCompile Include="Source\UI\ICheckBox.cpp" />
     <ClCompile Include="Source\UI\IComponent.cpp" />
     <ClCompile Include="Source\UI\IContainer.cpp" />
     <ClCompile Include="Source\UI\IDropDown.cpp" />

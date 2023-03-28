@@ -128,6 +128,9 @@
     <ClInclude Include="Source\DataStructs\Vector2D.h">
       <Filter>DataStructs</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\ICheckBox.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
@@ -239,6 +242,9 @@
     </ClCompile>
     <ClCompile Include="Source\DataStructs\EdgeD.cpp">
       <Filter>DataStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\ICheckBox.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

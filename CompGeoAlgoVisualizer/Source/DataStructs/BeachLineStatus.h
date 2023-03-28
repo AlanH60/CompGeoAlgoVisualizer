@@ -4,6 +4,7 @@ class BeachLineStatus
 {
 	public:
 		struct Arc;
+		//An event struct used to represent an event that the algorithm encounters.
 		struct Event
 		{
 			Vector2D point; //Point where the directrix/sweepline should go to.
@@ -15,6 +16,7 @@ class BeachLineStatus
 			Event(const Vector2D& point) : point(point), isCircle(false) {}
 			Event(Arc* arc, const Vector2D& point, const Vector2D& center) : arc(arc), point(point), center(center), isCircle(true) {}
 		};
+		//Comparison class used to sort the events in the queue.
 		class EventCompare
 		{
 			public:
@@ -24,6 +26,9 @@ class BeachLineStatus
 					return LESSF(e1->point.y, e2->point.y) || (EQUALF(e1->point.y, e2->point.y) && GREATERF(e1->point.x, e2->point.x));
 				}
 		};
+		//Structure representing both a node in the tree and an arc in the beachline.  
+		//arc->left, arc->right, arc->parent are relative to the tree.
+		//arc->prev and arc->next are relative to the beachline(left to right, like a linked list)
 		struct Arc
 		{
 			Arc* parent = nullptr; //Parent arc in the tree
@@ -43,7 +48,10 @@ class BeachLineStatus
 		};
 
 	public:
-		BeachLineStatus(int directrixBegin) : mDirectrix(directrixBegin) {}
+		/*
+		* @param directrixBegin initial value of the directrix.
+		*/
+		BeachLineStatus(double directrixBegin) : mDirectrix(directrixBegin) {}
 		~BeachLineStatus();
 		/**
 		* @returns number of elements in the tree.
@@ -66,8 +74,9 @@ class BeachLineStatus
 		*/
 		void insertAfter(Arc* arc, Arc* newArc);
 		/**
-		* Remove an element from the tree.
-		* @param element - the element to be removed.
+		* Remove an arc from the tree. ONLY called if its circle event is triggered.
+		* @param arc - arc to be removed.
+		* @param eventQueue - reference to the event queue of the algorithm so that new circle events can be pushed.
 		* @returns True if element was successfully removed. False if the element doesn't exist in the tree.
 		*/
 		bool remove(Arc* arc, std::priority_queue<Event*, std::vector<Event*>, EventCompare>& eventQueue);
@@ -79,6 +88,8 @@ class BeachLineStatus
 
 		/**
 		* Adds the arc to the beachline and returns the pointer to the arc.
+		* @param site the coordinate of the site.
+		* @param eventQueue reference to the event queue used for pushing new circle events.
 		* @returns pointer to the new arc.
 		*/
 		Arc* addArc(const Vector2D& site, std::priority_queue<Event*, std::vector<Event*>, EventCompare>& eventQueue);
@@ -136,8 +147,9 @@ class BeachLineStatus
 	protected:
 		/**
 		* Recursive function to remove an arc.
-		* @param element - the element to be deleted.
 		* @param arc - current arc to check for deletion
+		* @param eventQueue - reference to the event queue used to insert new circle events.
+		* @param dealloc - whether we should deallocate the arc.  Only true when used for circle events.
 		* @returns True if element was successfully found and deleted. False if the element doesn't exist in the tree.
 		*/
 		bool __remove(Arc* arc, std::priority_queue<Event*, std::vector<Event*>, EventCompare>& eventQueue, bool dealloc = true);
@@ -242,7 +254,9 @@ class BeachLineStatus
 		Event* getCircleEvent(Arc* arc);
 
 	private:
+		//Root of the tree.
 		Arc* pRoot = nullptr;
+		//Number of arcs in the beachline.
 		size_t mSize = 0;
 		//Y-coordinate of directrix/sweepline.
 		double mDirectrix;

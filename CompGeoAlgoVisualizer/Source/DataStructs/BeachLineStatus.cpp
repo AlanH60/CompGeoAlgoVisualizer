@@ -19,46 +19,56 @@ double BeachLineStatus::getDirectrix()
 
 void BeachLineStatus::insertBefore(Arc* arc, Arc* newArc)
 {
+	//New arcs are always red
 	newArc->isBlack = false;
+	//If the arc's left is null, insert the new arc
 	if (!arc->left)
 	{
 		arc->left = newArc;
 		newArc->parent = arc;
 	}
-	else
+	else //If arc has a left arc, then insert the new arc as the arc->prev's right child.  arc->prev->right is guaranteed to be nullptr
 	{
 		arc->prev->right = newArc;
 		newArc->parent = arc->prev;
 	}
 
+	//Insert the new arc between arc->prev and arc
 	newArc->prev = arc->prev;
 	if (newArc->prev)
 		newArc->prev->next = newArc;
 	arc->prev = newArc;
 	newArc->next = arc;
+
+	//Increment size of tree and balance the tree
 	mSize++;
 	validateTreePostInsertion(newArc);
 }
 
 void BeachLineStatus::insertAfter(Arc* arc, Arc* newArc)
 {
+	//New arcs are always red
 	newArc->isBlack = false;
+	//If the arc's right is null, insert the new arc
 	if (!arc->right)
 	{
 		arc->right = newArc;
 		newArc->parent = arc;
 	}
-	else
+	else //If arc has a right arc, then insert the new arc as the arc->next's left child.  arc->next->left is guaranteed to be nullptr
 	{
 		arc->next->left = newArc;
 		newArc->parent = arc->next;
 	}
 
+	//Insert the new arc in between arc and arc->next
 	newArc->next = arc->next;
 	if (newArc->next)
 		newArc->next->prev = newArc;
 	arc->next = newArc;
 	newArc->prev = arc;
+
+	//Increment size of tree and balance the tree
 	mSize++;
 	validateTreePostInsertion(newArc);
 }
