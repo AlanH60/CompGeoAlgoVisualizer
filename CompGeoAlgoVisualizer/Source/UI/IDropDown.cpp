@@ -6,7 +6,7 @@
 
 using namespace D2D;
 
-IDropDown::IDropDownOption::IDropDownOption(IDropDown* pDropDown, std::wstring& string, int index)
+IDropDown::IDropDownOption::IDropDownOption(IDropDown* pDropDown, const std::wstring& string, int index)
 	:
 	IComponent(0, 0, pDropDown->mWidth, pDropDown->mHeight),
 	pDropDown(pDropDown),
@@ -55,12 +55,12 @@ void IDropDown::IDropDownOption::onExit()
 	pRect->setColor({ 1.0f ,1.0f, 1.0f, 1.0f });
 }
 
-IDropDown::IDropDown(std::wstring text, float width, float height)
+IDropDown::IDropDown(const std::wstring& text, float width, float height)
 	:
 	IDropDown(text, TextFormat(L"Arial", 14, true, Style::NORMAL, TextAlignment::LEFT, ParagraphAlignment::CENTER), width, height)
 {}
 
-IDropDown::IDropDown(std::wstring text, D2D::TextFormat& textFormat, float width, float height)
+IDropDown::IDropDown(const std::wstring& text, const D2D::TextFormat& textFormat, float width, float height)
 	:
 	IContainer(0, 0, width, height),
 	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 0, width / 10, { 0.8f, 0.8f, 0.8f, 1.0f })),
@@ -88,7 +88,7 @@ IDropDown::IDropDown(float width, float height)
 {
 }
 
-IDropDown::IDropDown(D2D::TextFormat& textFormat, float width, float height)
+IDropDown::IDropDown(const D2D::TextFormat& textFormat, float width, float height)
 	:
 	IContainer(0, 0, width, height),
 	pRectangle(new D2D::Rectangle({ 0, 0 }, width, height, 0, width / 10, { 0.8f, 0.8f, 0.8f, 1.0f })),

@@ -7,7 +7,7 @@
 
 using namespace D2D;
 
-IInput::IInput(std::wstring initialText, TextFormat& textFormat, float width, float height)
+IInput::IInput(const std::wstring& initialText, const TextFormat& textFormat, float width, float height)
 	:
 	IComponent(0, 0, width, height),
 	mInputString(L""),

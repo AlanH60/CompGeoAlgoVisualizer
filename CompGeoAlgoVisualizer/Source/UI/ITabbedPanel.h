@@ -17,7 +17,7 @@ class ITabbedPanel : public IContainer
 		{
 			friend class ITabbedPanel;
 			public:
-				ITab(std::wstring& tabName, D2D::TextFormat& textFormat, ITabbedPanel* pTabbedPanel, IPanel* pPanel, float width, float height);
+				ITab(const std::wstring& tabName, const D2D::TextFormat& textFormat, ITabbedPanel* pTabbedPanel, IPanel* pPanel, float width, float height);
 
 				void setWidth(float width) override;
 				void setHeight(float height) override;
@@ -31,7 +31,7 @@ class ITabbedPanel : public IContainer
 	public:
 		ITabbedPanel(float width, float height);
 		~ITabbedPanel();
-		void addPanel(std::wstring panelName, IPanel* pPanel);
+		void addPanel(const std::wstring& panelName, IPanel* pPanel);
 		void onUpdate(IComponent* parent) override;
 	private:
 		void setCurrTab(ITab* tab);

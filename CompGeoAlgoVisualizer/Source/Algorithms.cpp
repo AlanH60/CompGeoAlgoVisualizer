@@ -116,14 +116,23 @@ void AlgorithmVisualizer::computeConvexHull(std::vector<Vector2f>& points, Conve
 	switch (algorithm)
 	{
 		case ConvexHullAlgorithm::GIFT_WRAPPING:
-			mThread->swap(std::thread(convexHullGW, this, points));
+		{
+			std::thread t(convexHullGW, this, points);
+			mThread->swap(t);
 			break;
+		}
 		case ConvexHullAlgorithm::GRAHAM_SCAN:
-			mThread->swap(std::thread(convexHullGraham, this, points));
+		{
+			std::thread t(convexHullGraham, this, points);
+			mThread->swap(t);
 			break;
+		}
 		case ConvexHullAlgorithm::QUICK_HULL:
-			mThread->swap(std::thread(convexHullQuickHull, this, points));
+		{
+			std::thread t(convexHullQuickHull, this, points);
+			mThread->swap(t);
 			break;
+		}
 	}
 }
 
@@ -137,11 +146,17 @@ void AlgorithmVisualizer::computeTriangulation(std::vector<Vector2f>& polygon, s
 	switch (algorithm)
 	{
 		case TriangulationAlgorithm::EAR_CLIPPING:
-			mThread->swap(std::thread(triangulateEarClipping, this, polygon));
+		{
+			std::thread t(triangulateEarClipping, this, polygon);
+			mThread->swap(t);
 			break;
+		}
 		case TriangulationAlgorithm::SWEEP:
-			mThread->swap(std::thread(triangulateSweep, this, edges));
+		{
+			std::thread t(triangulateSweep, this, edges);
+			mThread->swap(t);
 			break;
+		}
 	}
 }
 
@@ -153,8 +168,11 @@ void AlgorithmVisualizer::computeVoronoiDiagram(std::vector<Vector2f>& points, V
 	switch (algorithm)
 	{
 		case VoronoiDiagramAlgorithm::FORTUNE:
-			mThread->swap(std::thread(voronoiFortune, this, points));
+		{
+			std::thread t(voronoiFortune, this, points);
+			mThread->swap(t);
 			break;
+		}
 	}
 }
 
@@ -206,7 +224,7 @@ void AlgorithmVisualizer::finish()
 	this->mState = State::FINISHED;
 }
 
-void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
+void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points)
 {
 	pVisualizer->mState = State::RUNNING;
 
@@ -292,7 +310,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 //Graham Scan- O(nlogn) - we choose an extreme point, pivot, that is guaranteed to be on the convex hull.
 //Then we sort the points by angle from the pivot point, using dot product. 
 //We can then use left tests and "wrap" the points in sorted counter-clockwise order.
-void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
+void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points)
 {
 	pVisualizer->mState = State::RUNNING;
 	//Current lines and points that the algorithm is evaluating
@@ -334,7 +352,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 	{
 		if (i == pivot) //Exclude the pivot point
 			continue;
-		dots.push_back(dot({ 1, 0 }, normalize(Vector2f{ points[i] - points[pivot] })));
+		dots.push_back(dot(Vector2f{ 1.0f, 0.0f }, normalize(Vector2f{ points[i] - points[pivot] })));
 	}
 	std::vector<Vector2f> sortedPoints = points;
 	sortedPoints.erase((pivot == 0) ? sortedPoints.begin() : std::next(sortedPoints.begin(), pivot));
@@ -486,7 +504,7 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 }
 
 //Quick Hull- Average - O(nlogn), Worse - O(n^2)
-void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
+void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points)
 {
 	pVisualizer->mState = State::RUNNING;
 	Vector2f left = points[0];
@@ -564,7 +582,7 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 }
 
 //Ear-Clipping triangulation algorithm.  Cut off ears and update ear status of adjacent vertices.  Loop around the polygon until triangulation is done.
-void AlgorithmVisualizer::triangulateEarClipping(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& polygon)
+void AlgorithmVisualizer::triangulateEarClipping(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> polygon)
 {
 	pVisualizer->mState = State::RUNNING;
 	//Vector of VertexStatus of each vertex of the polygon
@@ -633,7 +651,7 @@ bool AlgorithmVisualizer::isEar(std::vector<Vector2f>& polygon, int idx, int pre
 	return diagonalCrossPolygon(polygon, polygon[prev], polygon[next]);
 }
 
-void AlgorithmVisualizer::triangulateSweep(AlgorithmVisualizer* pVisualizer, std::unordered_map<Vector2f, std::vector<Vector2f>>& edges)
+void AlgorithmVisualizer::triangulateSweep(AlgorithmVisualizer* pVisualizer, std::unordered_map<Vector2f, std::vector<Vector2f>> edges)
 {
 	pVisualizer->mState = State::RUNNING;
 	TriSweepLineStatus sweepLineStatus;
@@ -796,7 +814,7 @@ void AlgorithmVisualizer::triangulateMonotoneMountain(AlgorithmVisualizer* pVisu
 
 }
 
-void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points)
+void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points)
 {
 	pVisualizer->mState = State::RUNNING;
 	BeachLineStatus beachLine(100000);
@@ -810,7 +828,7 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 	pVisualizer->mLines.push_back(sweepLine);
 
 	//Map from half edges of the voronoi diagram to lines to draw and update.
-	std::unordered_map<VoronoiDiagram::HalfEdge*, Line*> edgesToLines;
+	std::vector<Line*> lines;
 	//Pointers to half edges, used to query into edgesToLines map and add lines when new half edges appear.
 	std::vector<VoronoiDiagram::HalfEdge*>& halfEdgePtrs = beachLine.getHalfEdgePtrs();
 
@@ -826,7 +844,7 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 		//Visually move the sweepline
 		sweepLine->setPoints({ 0, e->point.y }, { 2000, e->point.y });
 		//Draw the current status of the algorithm(All arcs and edges)
-		drawVoronoiStatus(pVisualizer, beachLine, edgesToLines, halfEdgePtrs, e->point.y);
+		drawVoronoiStatus(pVisualizer, beachLine, lines, halfEdgePtrs);
 
 		//Flag used to determine whether a circle event was successfully(Arc removed).
 		bool success = true;
@@ -835,7 +853,7 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 		else
 			success = beachLine.remove(e->arc, eventQueue);
 		if (success) //If an arc was removed, we redraw the scene.
-			drawVoronoiStatus(pVisualizer, beachLine, edgesToLines, halfEdgePtrs, e->point.y);
+			drawVoronoiStatus(pVisualizer, beachLine, lines, halfEdgePtrs);
 
 		delete e;
 	}
@@ -846,7 +864,7 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 	pVisualizer->finish();
 }
 
-void AlgorithmVisualizer::arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachLineStatus::Arc* leftmostArc, float directrix)
+void AlgorithmVisualizer::arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachLineStatus& beachLine)
 {
 	for (QuadBezierCurve* a : pVisualizer->mArcs)
 		delete a;
@@ -858,10 +876,10 @@ void AlgorithmVisualizer::arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachL
 	float a = 0;
 	float b = 0;
 	float c = 0;
-	BeachLineStatus::Arc* arc = leftmostArc;
+	BeachLineStatus::Arc* arc = beachLine.getLeftmostArc();
 	while (arc)
 	{
-		if (arc->face->site.y == directrix)
+		if (EQUALF(arc->face->site.y, beachLine.getDirectrix()))
 		{
 			start = arc->face->site;
 			control = arc->face->site;
@@ -871,7 +889,7 @@ void AlgorithmVisualizer::arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachL
 			arc = arc->next;
 			continue;
 		}
-		p = (arc->face->site.y - directrix) / 2;
+		p = (arc->face->site.y - beachLine.getDirectrix()) / 2;
 		a = 1 / (4 * p);
 		b = -arc->face->site.x / (2 * p);
 		c = (arc->face->site.x * arc->face->site.x) / (4 * p) + arc->face->site.y - p;
@@ -882,25 +900,15 @@ void AlgorithmVisualizer::arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachL
 			start = { 0, c };
 		if (arc->next)
 		{
-			if (arc->next->face->site.y == directrix)
+			if (EQUALF(arc->next->face->site.y, beachLine.getDirectrix()))
 			{
 				float x = arc->next->face->site.x;
 				end = { x, x * x * a + x * b + c };
 			}
 			else
 			{
-				Vector2f intersection = getArcIntersection(arc, arc->next, directrix);
-				if (isnan(intersection.y))
-					end = { intersection.x, intersection.x * intersection.x * a + intersection.x * b + c };
-				else
-				{
-					float right;
-					if (arc->face->site.y < arc->next->face->site.y)
-						right = std::max(intersection.x, intersection.y);
-					else
-						right = std::min(intersection.x, intersection.y);
-					end = { right, right * right * a + right * b + c };
-				}
+				float endX = beachLine.getRightX(arc);
+				end = { endX, endX * endX * a + endX * b + c };
 			}
 		}
 		else
@@ -912,52 +920,20 @@ void AlgorithmVisualizer::arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachL
 	}
 }
 
-Vector2f AlgorithmVisualizer::getArcIntersection(BeachLineStatus::Arc* arc1, BeachLineStatus::Arc* arc2, float directrix)
-{
-	Vector2f site1 = arc1->face->site;
-	Vector2f site2 = arc2->face->site;
-	if (site1.y == site2.y) //If the two sites have the same y, their intersection is the middle of their xs'.
-		return { (site1.x + site2.x) / 2, std::numeric_limits<float>::quiet_NaN() };
-
-	if (directrix == site1.y) //If the sites have different y but one site is at the directrix.
-		return { site1.x, std::numeric_limits<float>::quiet_NaN() };
-	if (directrix == site2.y)
-		return { site2.x, std::numeric_limits<float>::quiet_NaN() };
-
-	float a1 = 1 / (2 * (site1.y - directrix));
-	float a2 = 1 / (2 * (site2.y - directrix));
-
-	float a = (a1 - a2);
-	float b = -2 * (a1 * site1.x - a2 * site2.x);
-	float c = (site1.x * site1.x * a1 - site2.x * site2.x * a2 + (site1.y - site2.y) / 2);
-
-	if (a == 0) //Linear(1 intersection)
-		return { -c / b, std::numeric_limits<float>::quiet_NaN() };
-
-	float sqrtTerm = b * b - 4 * a * c;
-	if (sqrtTerm < 0)
-		return Vector2f();
-	float pmTerm = sqrt(sqrtTerm);
-	float x1 = (-b + pmTerm) / (2 * a);
-	float x2 = (-b - pmTerm) / (2 * a);
-
-	return { x1, x2 };
-}
-
-void AlgorithmVisualizer::drawVoronoiStatus(AlgorithmVisualizer* pVisualizer, BeachLineStatus& beachLine, std::unordered_map<VoronoiDiagram::HalfEdge*, Line*>& edgesToLines, std::vector<VoronoiDiagram::HalfEdge*>& halfEdgePtrs, float directrix)
+void AlgorithmVisualizer::drawVoronoiStatus(AlgorithmVisualizer* pVisualizer, BeachLineStatus& beachLine, std::vector<Line*>& lines, std::vector<VoronoiDiagram::HalfEdge*>& halfEdgePtrs)
 {
 	beachLine.updateEdges();
 	for (int i = 0 ; i < halfEdgePtrs.size(); i ++)
 	{
 		VoronoiDiagram::HalfEdge* pHalfEdge = halfEdgePtrs[i];
-		if (edgesToLines.find(pHalfEdge) == edgesToLines.end())
+		if (i >= lines.size())
 		{
-			Line* l = new Line(pHalfEdge->v1, pHalfEdge->v2);
-			pVisualizer->mLines.push_back(l);
-			edgesToLines[pHalfEdge] = l;
+			lines.push_back(new Line(pHalfEdge->v1, pHalfEdge->v2));
+			pVisualizer->mLines.push_back(lines[i]);
 		}
-		edgesToLines[pHalfEdge]->setPoints(pHalfEdge->v1, pHalfEdge->v2);
+		else
+			lines[i]->setPoints(pHalfEdge->v1, pHalfEdge->v2);
 	}
-	arcsToBenzier(pVisualizer, beachLine.getLeftmostArc(), directrix);
-	pVisualizer->wait(0.01f);
+	arcsToBenzier(pVisualizer, beachLine);
+	pVisualizer->wait(0.1f);
 }

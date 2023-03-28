@@ -9,6 +9,7 @@ project "CompGeoAlgoVisualizer"
     location "%{prj.name}"
     kind "ConsoleApp"
     language "C++"
+    cppdialect "C++20"
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputDir .. "/%{prj.name}")
 

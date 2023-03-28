@@ -169,29 +169,28 @@ class AlgorithmVisualizer
 		//Called to finish the algorithm.
 		void finish();
 		//Convex Hull Algorithms
-		static void convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points);
-		static void convexHullGraham(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points);
+		static void convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points);
+		static void convexHullGraham(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points);
 		static void quickSortAngle(std::vector<Vector2f>& points, std::vector<float>& dots, size_t start, size_t end);
 		static size_t partition(std::vector<Vector2f>& points, std::vector<float>& dots, size_t start, size_t end);
-		static void convexHullQuickHull(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points);
+		static void convexHullQuickHull(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points);
 		static std::vector<Vector2f> quickHullHelper(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points, Vector2f left, Vector2f right);
 		
 		//Triangulation Algorithms
 		//Ear Clipping
-		static void triangulateEarClipping(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& polygon);
+		static void triangulateEarClipping(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> polygon);
 		static bool diagonalCrossPolygon(std::vector<Vector2f>& polygon, Vector2f a, Vector2f b);
 		static bool isEar(std::vector<Vector2f>& polygon, int idx, int prev, int next);
 
 		//Sweep
-		static void triangulateSweep(AlgorithmVisualizer* pVisualizer, std::unordered_map<Vector2f, std::vector<Vector2f>>& edges);
+		static void triangulateSweep(AlgorithmVisualizer* pVisualizer, std::unordered_map<Vector2f, std::vector<Vector2f>> edges);
 		static void triangulateMonotoneMountain(AlgorithmVisualizer* pVisualizer, DCEL::Face* face);
 
 
 		//Voronoi
-		static void voronoiFortune(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f>& points);
-		static void arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachLineStatus::Arc* arc, float directrix);
-		static Vector2f getArcIntersection(BeachLineStatus::Arc* arc1, BeachLineStatus::Arc* arc2, float directrix);
-		static void drawVoronoiStatus(AlgorithmVisualizer* pVisualizer, BeachLineStatus& beachLine, std::unordered_map<VoronoiDiagram::HalfEdge*, D2D::Line*>& edgesToLines, std::vector<VoronoiDiagram::HalfEdge*>& halfEdgePtrs, float directrix);
+		static void voronoiFortune(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points);
+		static void arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachLineStatus& beachLine);
+		static void drawVoronoiStatus(AlgorithmVisualizer* pVisualizer, BeachLineStatus& beachLine, std::vector<D2D::Line*>& lines, std::vector<VoronoiDiagram::HalfEdge*>& halfEdgePtrs);
 	
 
 	private:

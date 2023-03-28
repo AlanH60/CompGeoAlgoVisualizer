@@ -62,11 +62,10 @@ class VoronoiDiagram
 		Vertex* getVertex(const Vector2f& vertex);
 		Face* getFace(const Vector2f& site);
 
-		std::unordered_map<Edge, VoronoiDiagram::HalfEdge*>& getHalfEdges();
+		std::map<Edge, VoronoiDiagram::HalfEdge*>& getHalfEdges();
 	private:
-		std::vector<void*> pointers;
-		std::unordered_map<Edge, VoronoiDiagram::HalfEdge*> mHalfEdges;
-		std::unordered_map<Vector2f, VoronoiDiagram::Vertex*> mVertices;
-		std::unordered_map<Vector2f, VoronoiDiagram::Face*> mFaces;
+		std::map<Edge, VoronoiDiagram::HalfEdge*> mHalfEdges;
+		std::map<Vector2f, VoronoiDiagram::Vertex*> mVertices;
+		std::map<Vector2f, VoronoiDiagram::Face*> mFaces;
 };
 

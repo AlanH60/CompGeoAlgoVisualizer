@@ -102,7 +102,7 @@ class Graphics
 		* @param height height of the text region.
 		* 
 		*/
-		void createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, 
+		void createTextLayout(const std::wstring& wstr, const std::wstring& fontFamily, float size, bool bold, unsigned char style,
 			unsigned char textAlignment, unsigned char paragraphAlignment, float width, float height, Microsoft::WRL::ComPtr<IDWriteTextLayout>& pTextLayout);
 
 		/**
@@ -111,7 +111,7 @@ class Graphics
 		* @param pGeometry pointer to the direct2d geometry interface that represents the geometric mask for the layer.  Only those lying inside the mask is visible.
 		* @param transform the transformation matrix done to the geometric mask
 		*/
-		void pushLayer(D2D1_RECT_F rect, ID2D1PathGeometry* pGeometry, D2D1_MATRIX_3X2_F& transform);
+		void pushLayer(const D2D1_RECT_F& rect, ID2D1PathGeometry* pGeometry, const D2D1_MATRIX_3X2_F& transform);
 		/**
 		* Pops the layer that has been pushed.  SHOULD only be called after pushLayer;
 		*/

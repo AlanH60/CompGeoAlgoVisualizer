@@ -16,7 +16,7 @@ class IInput : public IComponent
 	private:
 		const float PADDING = 5.0f;
 	public:
-		IInput(std::wstring text, D2D::TextFormat& textFormat, float width, float height);
+		IInput(const std::wstring& text, const D2D::TextFormat& textFormat, float width, float height);
 		~IInput();
 		void onPress(float x, float y, MouseEvent& mouseEvent) override;
 		void onDrag(float x, float y, MouseEvent& mouseEvent) override;

@@ -5,13 +5,13 @@
 
 using namespace D2D;
 
-IButton::IButton(std::wstring text, float width, float height)
+IButton::IButton(const std::wstring& text, float width, float height)
 	:
 	IButton(text, TextFormat(L"Arial", 14, true, Style::NORMAL, TextAlignment::CENTER, ParagraphAlignment::CENTER), width, height)
 {
 }
 
-IButton::IButton(std::wstring text, TextFormat& textFormat, float width, float height)
+IButton::IButton(const std::wstring& text, const TextFormat& textFormat, float width, float height)
 	:
 	IComponent(0, 0, width, height),
 	pText(new Text(text, textFormat, width, height)),

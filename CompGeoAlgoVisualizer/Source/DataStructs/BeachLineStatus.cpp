@@ -12,6 +12,11 @@ size_t BeachLineStatus::getSize()
 	return mSize;
 }
 
+float BeachLineStatus::getDirectrix()
+{
+	return mDirectrix;
+}
+
 void BeachLineStatus::insertBefore(Arc* arc, Arc* newArc)
 {
 	newArc->isBlack = false;
@@ -248,18 +253,9 @@ bool BeachLineStatus::__remove(Arc* arc, std::priority_queue<Event*, std::vector
 	//If we're not deallocating the arc, it is still in the beachline.  It is just getting moved around in the tree bc of replacing a deleted arc.
 	if (dealloc) 
 	{
-		float x = 0;
-		Vector2f intersection = getArcIntersection(arc, arc->next);
-		if (isnan(intersection.y))
-			x = intersection.x;
-		else
-		{
-			if (arc->face->site.y < arc->next->face->site.y)
-				x = std::max(intersection.x, intersection.y);
-			else
-				x = std::min(intersection.x, intersection.y);
-		}
-		if (std::abs(x - arc->circleEvent->center.x) > 0.2f) //If the arc's right boundary(or left) isn't at the center of the circle event, then this circle event is invalid.
+		float x1 = getRightX(arc);
+		float x2 = getLeftX(arc);
+		if (!EQUALF(x1, arc->circleEvent->center.x) || !EQUALF(x2, arc->circleEvent->center.x) || EQUALF(arc->face->site.y, arc->circleEvent->point.y)) //If the arc's right boundary(or left) isn't at the center of the circle event, then this circle event is invalid.
 			return false;
 
 		VoronoiDiagram::Vertex* vertex = mVoronoi.getVertex(arc->circleEvent->center);
@@ -709,9 +705,9 @@ Vector2f BeachLineStatus::getArcIntersection(Arc* arc1, Arc* arc2)
 	if (site1.y == site2.y) //If the two sites have the same y, their intersection is the middle of their xs'.
 		return { (site1.x + site2.x) / 2, std::numeric_limits<float>::quiet_NaN() };
 
-	if (mDirectrix == site1.y) //If the sites have different y but one site is at the directrix.
+	if (site1.y == mDirectrix) //If the sites have different y but one site is at the directrix.
 		return { site1.x, std::numeric_limits<float>::quiet_NaN() };
-	if (mDirectrix == site2.y)
+	if (site2.y == mDirectrix)
 		return { site2.x, std::numeric_limits<float>::quiet_NaN() };
 
 
@@ -763,7 +759,7 @@ BeachLineStatus::Event* BeachLineStatus::getCircleEvent(Arc* arc)
 	float s1 = -(v1.x - v2.x) / (v1.y - v2.y);
 	float s2 = -(v2.x - v3.x) / (v2.y - v3.y);
 
-	if (EQUALF(s1, s2)) //Arc sites are collinear.
+	if (abs(s1 - s2) < 0.1f) //Arc sites are collinear.
 		return nullptr;
 
 	float x = 0;
@@ -791,7 +787,7 @@ BeachLineStatus::Event* BeachLineStatus::getCircleEvent(Arc* arc)
 	float yDiff = v1.y - y;
 	float r = sqrt(xDiff * xDiff + yDiff * yDiff);
 
-	if (GREATERF(y - r, mDirectrix)) //Invalid circle event.
+	if (y - r - 0.5f > mDirectrix) //Invalid circle event.
 		return nullptr;
 
 	Event* e = new Event(arc, { x, y - r }, { x, y });

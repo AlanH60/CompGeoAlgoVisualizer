@@ -211,7 +211,7 @@ void Graphics::createQuadraticBezierCurve(FLOAT2 startPoint, FLOAT2 controlPoint
 	ASSERT_IF_FAILED(hr, "Failed to close geometry sink!");
 }
 
-void Graphics::createTextLayout(std::wstring& wstr, std::wstring& fontFamily, float size, bool bold, unsigned char style, unsigned char textAlignment, unsigned char paragraphAlignment, float width, float height, ComPtr<IDWriteTextLayout>& pTextLayout)
+void Graphics::createTextLayout(const std::wstring& wstr, const std::wstring& fontFamily, float size, bool bold, unsigned char style, unsigned char textAlignment, unsigned char paragraphAlignment, float width, float height, ComPtr<IDWriteTextLayout>& pTextLayout)
 {
 	HRESULT hr;
 	ComPtr<IDWriteTextFormat> pTextFormat;
@@ -226,7 +226,7 @@ void Graphics::createTextLayout(std::wstring& wstr, std::wstring& fontFamily, fl
 	ASSERT_IF_FAILED(hr, "Failed to set word wrapping!");
 }
 
-void Graphics::pushLayer(D2D1_RECT_F rect, ID2D1PathGeometry* pGeometry, D2D1_MATRIX_3X2_F& transform)
+void Graphics::pushLayer(const D2D1_RECT_F& rect, ID2D1PathGeometry* pGeometry, const D2D1_MATRIX_3X2_F& transform)
 {
 	D2D1_LAYER_PARAMETERS layerParams = D2D1::LayerParameters(rect, pGeometry, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE, transform);
 	pContext2D->PushLayer(layerParams, pLayer.Get());

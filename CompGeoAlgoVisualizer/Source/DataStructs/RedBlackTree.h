@@ -22,7 +22,7 @@ class RedBlackTree
 		};
 
 	public:
-		RedBlackTree(std::function<bool(const T&, const T&)>& compare)
+		RedBlackTree(const std::function<bool(const T&, const T&)>& compare)
 		{
 			mCompare = compare;
 		}

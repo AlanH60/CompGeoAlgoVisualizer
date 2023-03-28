@@ -17,7 +17,7 @@ class IDropDown : public IContainer
 		{
 			friend IDropDown;
 			public:
-				IDropDownOption(IDropDown* pDropDown, std::wstring& string, int index);
+				IDropDownOption(IDropDown* pDropDown, const std::wstring& string, int index);
 				void setWidth(float width) override;
 				void setHeight(float height) override;
 				void onPress(float x, float y, MouseEvent& e) override;
@@ -32,10 +32,10 @@ class IDropDown : public IContainer
 		};
 	friend IDropDownOption;
 	public:
-		IDropDown(std::wstring text, float width, float height);
-		IDropDown(std::wstring text, D2D::TextFormat& textFormat, float width, float height);
+		IDropDown(const std::wstring& text, float width, float height);
+		IDropDown(const std::wstring& text, const D2D::TextFormat& textFormat, float width, float height);
 		IDropDown(float width, float height);
-		IDropDown(D2D::TextFormat& textFormat, float width, float height);
+		IDropDown(const D2D::TextFormat& textFormat, float width, float height);
 		~IDropDown();
 		void setColor(const Color& color) override;
 		int getSelectedIndex();

@@ -50,6 +50,10 @@ class BeachLineStatus
 		*/
 		size_t getSize();
 		/**
+		* @returns directrix of the beachline.
+		*/
+		float getDirectrix();
+		/**
 		* Inserts a new arc before a specific arc. The new arc will either be the arc's left child or its prev's right child.
 		* @param arc the specific arc that the new arc is supposed to be before.
 		* @param newArc the new arc to be inserted.
@@ -104,6 +108,31 @@ class BeachLineStatus
 		* Updates all edges in the beach line.  Only used for visualization purposes.
 		*/
 		void updateEdges();
+
+		/**
+		* Gets the interesection between two arcs.
+		* @param arc1 pointer to the first arc.
+		* @param arc2 pointer to the second arc.
+		* @returns the two intersections as a Vector2f.  If there is only 1 intersection, then the second float value is NaN.
+		*/
+		Vector2f getArcIntersection(Arc* arc1, Arc* arc2);
+		/**
+		* Given an x-value, this function returns the y-coordinate of the point that lies on (x, y) of the parabolic arc.
+		* @param arc pointer to the arc.
+		* @param x the x-value in question.
+		* @returns y-coordinate of the point on the arc at that given x-coordinate.
+		*/
+		float getY(Arc* arc, float x);
+		/*
+		* Returns the x-coordinate of the arc's left bound.
+		* @returns x-coordinate of the arc's left bound.
+		*/
+		float getLeftX(Arc* arc);
+		/*
+		* Returns the x-coordinate of the arc's right bound.
+		* @returns x-coordinate of the arc's right bound.
+		*/
+		float getRightX(Arc* arc);
 	protected:
 		/**
 		* Recursive function to remove an arc.
@@ -205,37 +234,13 @@ class BeachLineStatus
 		* @param parent the parent arc that the rotation will be centered around.
 		*/
 		void RLRotation(Arc* parent);
-
-		/**
-		* Gets the interesection between two arcs.
-		* @param arc1 pointer to the first arc.
-		* @param arc2 pointer to the second arc.
-		* @returns the two intersections as a Vector2f.  If there is only 1 intersection, then the second float value is NaN.
-		*/
-		Vector2f getArcIntersection(Arc* arc1, Arc* arc2);
-		/**
-		* Given an x-value, this function returns the y-coordinate of the point that lies on (x, y) of the parabolic arc.
-		* @param arc pointer to the arc.
-		* @param x the x-value in question.
-		* @returns y-coordinate of the point on the arc at that given x-coordinate.
-		*/
-		float getY(Arc* arc, float x);
 		/**
 		* Given an arc, allocates a NEW circle event for the arc.
 		* @param arc pointer to the arc.
 		* @returns pointer to the circle event.  nullptr if no valid circle event exists for the arc.
 		*/
 		Event* getCircleEvent(Arc* arc);
-		/*
-		* Returns the x-coordinate of the arc's left bound.
-		* @returns x-coordinate of the arc's left bound.
-		*/
-		float getLeftX(Arc* arc);
-		/*
-		* Returns the x-coordinate of the arc's right bound.
-		* @returns x-coordinate of the arc's right bound.
-		*/
-		float getRightX(Arc* arc);
+
 	private:
 		Arc* pRoot = nullptr;
 		size_t mSize = 0;

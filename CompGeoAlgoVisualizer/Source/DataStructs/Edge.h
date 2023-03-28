@@ -4,6 +4,8 @@
 struct Edge
 {
 	Vector2f v1, v2;
+	Edge() = default;
+	Edge(const Vector2f v1, const Vector2f v2) : v1(v1), v2(v2) {}
 };
 
 inline bool operator==(const Edge& e1, const Edge& e2)
@@ -14,6 +16,16 @@ inline bool operator==(const Edge& e1, const Edge& e2)
 inline bool operator!=(const Edge& e1, const Edge& e2)
 {
 	return !(e1 == e2);
+}
+
+inline bool operator<(const Edge& e1, const Edge& e2)
+{
+	return e1.v1 < e2.v1 || (e1.v1 == e2.v1 && e1.v2 < e2.v2);
+}
+
+inline bool operator>(const Edge& e1, const Edge& e2)
+{
+	return e1.v1 > e2.v1 || (e1.v1 == e2.v1 && e1.v2 > e2.v2);
 }
 
 namespace std

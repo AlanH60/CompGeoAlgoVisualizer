@@ -3,7 +3,7 @@
 
 using namespace D2D;
 
-Text::Text(const std::wstring& text, TextFormat& textFormat, float width, float height)
+Text::Text(const std::wstring& text, const TextFormat& textFormat, float width, float height)
 	:
 	Drawable({ 0, 0 }, { 0, 0, 0, 1 }),
 	mText(text),
@@ -65,7 +65,7 @@ void Text::setText(std::wstring& text)
 		(unsigned char)mTextFormat.textAlignment, (unsigned char)mTextFormat.paraAlignment, mWidth, mHeight, pTextLayout);
 }
 
-void Text::setTextFormat(TextFormat& textFormat)
+void Text::setTextFormat(const TextFormat& textFormat)
 {
 	mTextFormat = textFormat;
 	ASSERT_IF_FAILED(pTextLayout->SetFontFamilyName(mTextFormat.fontFamily.c_str(), { 0, (unsigned int)(mText.length()) }), "Failed to set font family!");

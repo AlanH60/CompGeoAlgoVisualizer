@@ -92,12 +92,12 @@ std::unordered_map<Edge, DCEL::HalfEdge*>& DCEL::getHalfEdges()
 	return mHalfEdges;
 }
 
-std::unordered_map<Vector2f, DCEL::Vertex*> DCEL::getVertices()
+std::unordered_map<Vector2f, DCEL::Vertex*>& DCEL::getVertices()
 {
 	return mVertices;
 }
 
-std::vector<DCEL::Face*> DCEL::getFaces()
+std::vector<DCEL::Face*>& DCEL::getFaces()
 {
 	return mFaces;
 }

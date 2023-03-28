@@ -17,7 +17,7 @@ inline float cross(const Vector2f& v1, const Vector2f& v2)
 inline Vector2f normalize(const Vector2f& v)
 {
 	if (v.x == 0 && v.y == 0)
-		return { 0 , 0 };
+		return Vector2f(0 , 0);
 	return v / length(v);
 }
 inline int compareX(const Vector2f& v1, const Vector2f& v2)

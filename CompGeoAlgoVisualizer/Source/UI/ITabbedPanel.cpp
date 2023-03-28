@@ -6,7 +6,7 @@
 
 using namespace D2D;
 
-ITabbedPanel::ITab::ITab(std::wstring& tabName, TextFormat& textFormat, ITabbedPanel* pTabbedPanel, IPanel* pPanel, float width, float height)
+ITabbedPanel::ITab::ITab(const std::wstring& tabName, const TextFormat& textFormat, ITabbedPanel* pTabbedPanel, IPanel* pPanel, float width, float height)
 	:
 	IComponent(0, 0, width, height),
 	pText(new Text(tabName, textFormat, width, height)),
@@ -58,7 +58,7 @@ ITabbedPanel::~ITabbedPanel()
 	}
 }
 
-void ITabbedPanel::addPanel(std::wstring panelName, IPanel* pPanel)
+void ITabbedPanel::addPanel(const std::wstring& panelName, IPanel* pPanel)
 {
 	ITab* pTab = new ITab(panelName, TextFormat(L"Arial", 16, true, Style::NORMAL, TextAlignment::CENTER, ParagraphAlignment::CENTER), this, pPanel, mWidth, mHeight / 25);
 	pTab->setXDimension(XDimension::RELATIVEX);

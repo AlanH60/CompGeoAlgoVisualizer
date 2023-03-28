@@ -62,8 +62,8 @@ class DCEL
 		~DCEL();
 
 		std::unordered_map<Edge, DCEL::HalfEdge*>& getHalfEdges();
-		std::unordered_map<Vector2f, DCEL::Vertex*> getVertices();
-		std::vector<DCEL::Face*> getFaces();
+		std::unordered_map<Vector2f, DCEL::Vertex*>& getVertices();
+		std::vector<DCEL::Face*>& getFaces();
 
 	private:
 		std::unordered_map<Edge, DCEL::HalfEdge*> mHalfEdges;

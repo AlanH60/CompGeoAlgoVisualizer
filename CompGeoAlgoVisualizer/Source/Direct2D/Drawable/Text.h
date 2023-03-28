@@ -9,7 +9,7 @@ namespace D2D
 	class Text : public Drawable
 	{
 		public:
-			Text(const std::wstring& text, TextFormat& textFormat, float width, float height);
+			Text(const std::wstring& text, const TextFormat& textFormat, float width, float height);
 			~Text();
 			float getWidth();
 			float getHeight();
@@ -40,7 +40,7 @@ namespace D2D
 			* Sets the text format.
 			* @param textFormat reference to the new textformat for the text.
 			*/
-			void setTextFormat(TextFormat& textFormat);
+			void setTextFormat(const TextFormat& textFormat);
 			/**
 			* Get information regarding the coordinates of the caret given its position within the text.
 			* @param textPosition index within the text that the caret is at.

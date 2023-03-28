@@ -20,7 +20,7 @@
 #define NOMINMAX
 #include <Windows.h>
 
-#define EPSILONF 0.05f
+#define EPSILONF 0.25f
 
 #define EQUALF(f1, f2) (abs(f1 - f2) < EPSILONF)
 #define LESSF(f1, f2) (f1 < f2 && f2 - f1 > EPSILONF)

@@ -7,30 +7,26 @@ VoronoiDiagram::VoronoiDiagram()
 
 VoronoiDiagram::~VoronoiDiagram()
 {
-	mFaces.clear();
-	mHalfEdges.clear();
-	mVertices.clear();
-	for (int i = 0; i < pointers.size(); i++)
-		delete pointers[i];
-	pointers.clear();
-
+	for (auto& face : mFaces)
+		delete face.second;
+	for (auto& halfEdge : mHalfEdges)
+		delete halfEdge.second;
+	for (auto& vertex : mVertices)
+		delete vertex.second;
 }
 
 void VoronoiDiagram::insertFace(Face* pFace)
 {
-	pointers.push_back(pFace);
 	mFaces[pFace->site] = pFace;
 }
 
 void VoronoiDiagram::insertHalfEdge(HalfEdge* pHalfEdge)
 {
-	pointers.push_back(pHalfEdge);
 	mHalfEdges[pHalfEdge->e] = pHalfEdge;
 }
 
 void VoronoiDiagram::insertVertex(Vertex* pVertex)
 {
-	pointers.push_back(pVertex);
 	mVertices[pVertex->v] = pVertex;
 }
 
@@ -60,7 +56,7 @@ VoronoiDiagram::Face* VoronoiDiagram::getFace(const Vector2f& site)
 		return it->second;
 }
 
-std::unordered_map<Edge, VoronoiDiagram::HalfEdge*>& VoronoiDiagram::getHalfEdges()
+std::map<Edge, VoronoiDiagram::HalfEdge*>& VoronoiDiagram::getHalfEdges()
 {
 	return mHalfEdges;
 }

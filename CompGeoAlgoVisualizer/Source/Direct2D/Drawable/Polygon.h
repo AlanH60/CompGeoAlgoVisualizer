@@ -18,7 +18,7 @@ namespace D2D
 			* @param rect reference to a rect to use as the layer's bounds.
 			* @param transform transformation that should be done to the geometric mask.
 			*/ 
-			void pushLayer(D2D::Rectangle& rect, D2D1_MATRIX_3X2_F& transform);
+			void pushLayer(D2D::Rectangle& rect, const D2D1_MATRIX_3X2_F& transform);
 			/**
 			* Pops the layer that has been pushed.  SHOULD only be called after pushLayer;
 			*/

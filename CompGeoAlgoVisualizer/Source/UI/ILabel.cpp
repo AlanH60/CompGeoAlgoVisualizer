@@ -4,7 +4,7 @@
 
 using namespace D2D;
 
-ILabel::ILabel(std::wstring text, TextFormat& textFormat, float width, float height)
+ILabel::ILabel(const std::wstring& text, const TextFormat& textFormat, float width, float height)
 	:
 	IComponent(0, 0, width, height),
 	pText(new Text(text, textFormat, width, height))
