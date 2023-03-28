@@ -122,6 +122,12 @@
     <ClInclude Include="Source\Direct2D\Drawable\QuadBezierCurve.h">
       <Filter>Direct2D\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="Source\DataStructs\EdgeD.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DataStructs\Vector2D.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
@@ -227,6 +233,12 @@
     </ClCompile>
     <ClCompile Include="Source\Direct2D\Drawable\QuadBezierCurve.cpp">
       <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DataStructs\Vector2D.cpp">
+      <Filter>DataStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DataStructs\EdgeD.cpp">
+      <Filter>DataStructs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

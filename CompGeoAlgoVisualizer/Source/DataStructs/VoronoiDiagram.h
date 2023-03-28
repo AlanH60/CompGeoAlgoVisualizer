@@ -1,6 +1,6 @@
 #pragma once
-#include "Edge.h"
-#include "Vector2f.h"
+#include "EdgeD.h"
+#include "Vector2D.h"
 
 class VoronoiDiagram
 {
@@ -12,24 +12,24 @@ class VoronoiDiagram
 			union
 			{
 				struct {
-					float x, y;
+					double x, y;
 				};
-				Vector2f v;
+				Vector2D v;
 			};
 			//Half Edge representing this vertex.  rep->tail == this.
 			HalfEdge* rep = nullptr;
 
-			Vertex(const Vector2f& v) : v(v) {}
+			Vertex(const Vector2D& v) : v(v) {}
 		};
 
 		struct Face
 		{
 			//Site associated with the voronoi face.
-			Vector2f site;
+			Vector2D site;
 			//Half Edge representing this face. rep->left == this.
 			HalfEdge* rep = nullptr;
 
-			Face(const Vector2f& site) : site(site) {}
+			Face(const Vector2D& site) : site(site) {}
 		};
 
 		//A directed edge.
@@ -38,9 +38,9 @@ class VoronoiDiagram
 			union
 			{
 				struct {
-					Vector2f v1, v2;
+					Vector2D v1, v2;
 				};
-				Edge e;
+				EdgeD e;
 			};
 			HalfEdge* next = nullptr; //The next half edge in the cycle.
 			HalfEdge* prev = nullptr; //The previous half edge in the cycle.
@@ -49,7 +49,7 @@ class VoronoiDiagram
 			Vertex* head = nullptr; //The vertix that the half edge points to.
 			Face* left = nullptr; //Face to the left of this half edge.
 
-			HalfEdge(const Edge& e) : e(e) {}
+			HalfEdge(const EdgeD& e) : e(e) {}
 		};
 
 	public:
@@ -59,13 +59,13 @@ class VoronoiDiagram
 		void insertFace(Face* pFace);
 		void insertHalfEdge(HalfEdge* pHalfEdge);
 		void insertVertex(Vertex* pVertex);
-		Vertex* getVertex(const Vector2f& vertex);
-		Face* getFace(const Vector2f& site);
+		Vertex* getVertex(const Vector2D& vertex);
+		Face* getFace(const Vector2D& site);
 
-		std::map<Edge, VoronoiDiagram::HalfEdge*>& getHalfEdges();
+		std::map<EdgeD, VoronoiDiagram::HalfEdge*>& getHalfEdges();
 	private:
-		std::map<Edge, VoronoiDiagram::HalfEdge*> mHalfEdges;
-		std::map<Vector2f, VoronoiDiagram::Vertex*> mVertices;
-		std::map<Vector2f, VoronoiDiagram::Face*> mFaces;
+		std::map<EdgeD, VoronoiDiagram::HalfEdge*> mHalfEdges;
+		std::map<Vector2D, VoronoiDiagram::Vertex*> mVertices;
+		std::map<Vector2D, VoronoiDiagram::Face*> mFaces;
 };
 

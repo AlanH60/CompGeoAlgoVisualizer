@@ -100,8 +100,10 @@
     <ClInclude Include="Source\DataStructs\BeachLineStatus.h" />
     <ClInclude Include="Source\DataStructs\DCEL.h" />
     <ClInclude Include="Source\DataStructs\Edge.h" />
+    <ClInclude Include="Source\DataStructs\EdgeD.h" />
     <ClInclude Include="Source\DataStructs\RedBlackTree.h" />
     <ClInclude Include="Source\DataStructs\TriSweepLineStatus.h" />
+    <ClInclude Include="Source\DataStructs\Vector2D.h" />
     <ClInclude Include="Source\DataStructs\Vector2f.h" />
     <ClInclude Include="Source\DataStructs\VoronoiDiagram.h" />
     <ClInclude Include="Source\Direct2D\Application.h" />
@@ -140,8 +142,10 @@
     <ClCompile Include="Source\DataStructs\BeachLineStatus.cpp" />
     <ClCompile Include="Source\DataStructs\DCEL.cpp" />
     <ClCompile Include="Source\DataStructs\Edge.cpp" />
+    <ClCompile Include="Source\DataStructs\EdgeD.cpp" />
     <ClCompile Include="Source\DataStructs\RedBlackTree.cpp" />
     <ClCompile Include="Source\DataStructs\TriSweepLineStatus.cpp" />
+    <ClCompile Include="Source\DataStructs\Vector2D.cpp" />
     <ClCompile Include="Source\DataStructs\Vector2f.cpp" />
     <ClCompile Include="Source\DataStructs\VoronoiDiagram.cpp" />
     <ClCompile Include="Source\Direct2D\Application.cpp" />

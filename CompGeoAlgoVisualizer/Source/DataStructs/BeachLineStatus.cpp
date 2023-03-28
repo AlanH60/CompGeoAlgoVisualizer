@@ -12,7 +12,7 @@ size_t BeachLineStatus::getSize()
 	return mSize;
 }
 
-float BeachLineStatus::getDirectrix()
+double BeachLineStatus::getDirectrix()
 {
 	return mDirectrix;
 }
@@ -71,12 +71,12 @@ bool BeachLineStatus::remove(Arc* arc, std::priority_queue<Event*, std::vector<E
 	return r;
 }
 
-void BeachLineStatus::setDirectrix(float directrix)
+void BeachLineStatus::setDirectrix(double directrix)
 {
 	mDirectrix = directrix;
 }
 
-BeachLineStatus::Arc* BeachLineStatus::addArc(const Vector2f& site, std::priority_queue<Event*, std::vector<Event*>, EventCompare>& eventQueue)
+BeachLineStatus::Arc* BeachLineStatus::addArc(const Vector2D& site, std::priority_queue<Event*, std::vector<Event*>, EventCompare>& eventQueue)
 {
 	Arc* newArc = new Arc();
 	newArc->face = mVoronoi.getFace(site);
@@ -89,11 +89,11 @@ BeachLineStatus::Arc* BeachLineStatus::addArc(const Vector2f& site, std::priorit
 	}
 	Arc* currArc = pRoot;
 
-	Vector2f bounds = {};
+	Vector2D bounds = {};
 	while (currArc)
 	{
 		bounds = { -10000, 10000 };
-		Vector2f intersection;
+		Vector2D intersection;
 		//Left edge
 		bounds.x = getLeftX(currArc);
 		bounds.y = getRightX(currArc);
@@ -106,8 +106,8 @@ BeachLineStatus::Arc* BeachLineStatus::addArc(const Vector2f& site, std::priorit
 			if (currArc->face->site.y == site.y) //Sites have the same y(Only possible with the first points with the same y coordinate.
 			{
 				VoronoiDiagram::Vertex* v = mVoronoi.getVertex({ (currArc->face->site.x + site.x) / 2, 10000 });
-				VoronoiDiagram::HalfEdge* currEdge = new VoronoiDiagram::HalfEdge(Edge());
-				VoronoiDiagram::HalfEdge* newEdge = new VoronoiDiagram::HalfEdge(Edge());
+				VoronoiDiagram::HalfEdge* currEdge = new VoronoiDiagram::HalfEdge(EdgeD());
+				VoronoiDiagram::HalfEdge* newEdge = new VoronoiDiagram::HalfEdge(EdgeD());
 				mHalfEdgePtrs.push_back(currEdge);
 				mHalfEdgePtrs.push_back(newEdge);
 
@@ -136,8 +136,8 @@ BeachLineStatus::Arc* BeachLineStatus::addArc(const Vector2f& site, std::priorit
 				splitArc->face = currArc->face;
 				splitArc->rightEdge = currArc->rightEdge;
 
-				VoronoiDiagram::HalfEdge* topEdge = new VoronoiDiagram::HalfEdge(Edge());
-				VoronoiDiagram::HalfEdge* bottomEdge = new VoronoiDiagram::HalfEdge(Edge());
+				VoronoiDiagram::HalfEdge* topEdge = new VoronoiDiagram::HalfEdge(EdgeD());
+				VoronoiDiagram::HalfEdge* bottomEdge = new VoronoiDiagram::HalfEdge(EdgeD());
 				mHalfEdgePtrs.push_back(topEdge);
 				mHalfEdgePtrs.push_back(bottomEdge);
 
@@ -189,8 +189,8 @@ void BeachLineStatus::resolveLastArcs()
 		return;
 	while (arc->next)
 	{
-		float rightX = getRightX(arc);
-		Vector2f intersection = { rightX, getY(arc, rightX) };
+		double rightX = getRightX(arc);
+		Vector2D intersection = { rightX, getY(arc, rightX) };
 		VoronoiDiagram::Vertex* vertex = mVoronoi.getVertex(intersection);
 		arc->rightEdge->tail = vertex;
 		arc->rightEdge->v1 = intersection;
@@ -206,9 +206,9 @@ void BeachLineStatus::resolveLastArcs()
 	}
 }
 
-std::vector<Edge> BeachLineStatus::getEdges()
+std::vector<EdgeD> BeachLineStatus::getEdges()
 {
-	std::vector<Edge> edges;
+	std::vector<EdgeD> edges;
 	for (auto& pair : mVoronoi.getHalfEdges())
 		edges.push_back(pair.first);
 	return edges;
@@ -235,12 +235,12 @@ void BeachLineStatus::updateEdges()
 	Arc* arc = getLeftmostArc();
 	if (arc)
 	{
-		Vector2f rightPoint = {};
+		Vector2D rightPoint = {};
 		while (arc->next)
 		{
 			if (arc->prev)
 				arc->leftEdge->v2 = rightPoint;
-			float right = getRightX(arc);
+			double right = getRightX(arc);
 			rightPoint = { right, getY(arc, right) };
 			arc->rightEdge->v1 = rightPoint;
 			arc = arc->next;
@@ -253,9 +253,9 @@ bool BeachLineStatus::__remove(Arc* arc, std::priority_queue<Event*, std::vector
 	//If we're not deallocating the arc, it is still in the beachline.  It is just getting moved around in the tree bc of replacing a deleted arc.
 	if (dealloc) 
 	{
-		float x1 = getRightX(arc);
-		float x2 = getLeftX(arc);
-		if (!EQUALF(x1, arc->circleEvent->center.x) || !EQUALF(x2, arc->circleEvent->center.x) || EQUALF(arc->face->site.y, arc->circleEvent->point.y)) //If the arc's right boundary(or left) isn't at the center of the circle event, then this circle event is invalid.
+		double x1 = getRightX(arc);
+		double x2 = getLeftX(arc);
+		if (!EQUALD(x1, arc->circleEvent->center.x) || !EQUALD(x2, arc->circleEvent->center.x) || EQUALD(arc->face->site.y, arc->circleEvent->point.y)) //If the arc's right boundary(or left) isn't at the center of the circle event, then this circle event is invalid.
 			return false;
 
 		VoronoiDiagram::Vertex* vertex = mVoronoi.getVertex(arc->circleEvent->center);
@@ -287,8 +287,8 @@ bool BeachLineStatus::__remove(Arc* arc, std::priority_queue<Event*, std::vector
 			mVoronoi.insertHalfEdge(arc->next->leftEdge);
 
 		//Create new edges between arc->prev and arc->next
-		VoronoiDiagram::HalfEdge* prevEdge = new VoronoiDiagram::HalfEdge(Edge());
-		VoronoiDiagram::HalfEdge* nextEdge = new VoronoiDiagram::HalfEdge(Edge());
+		VoronoiDiagram::HalfEdge* prevEdge = new VoronoiDiagram::HalfEdge(EdgeD());
+		VoronoiDiagram::HalfEdge* nextEdge = new VoronoiDiagram::HalfEdge(EdgeD());
 		mHalfEdgePtrs.push_back(prevEdge);
 		mHalfEdgePtrs.push_back(nextEdge);
 
@@ -698,72 +698,72 @@ void BeachLineStatus::RLRotation(Arc* parent)
 	parent->parent = childArc;
 }
 
-Vector2f BeachLineStatus::getArcIntersection(Arc* arc1, Arc* arc2)
+Vector2D BeachLineStatus::getArcIntersection(Arc* arc1, Arc* arc2)
 {
-	Vector2f site1 = arc1->face->site;
-	Vector2f site2 = arc2->face->site;
+	Vector2D& site1 = arc1->face->site;
+	Vector2D& site2 = arc2->face->site;
 	if (site1.y == site2.y) //If the two sites have the same y, their intersection is the middle of their xs'.
-		return { (site1.x + site2.x) / 2, std::numeric_limits<float>::quiet_NaN() };
+		return { (site1.x + site2.x) / 2, std::numeric_limits<double>::quiet_NaN() };
 
 	if (site1.y == mDirectrix) //If the sites have different y but one site is at the directrix.
-		return { site1.x, std::numeric_limits<float>::quiet_NaN() };
+		return { site1.x, std::numeric_limits<double>::quiet_NaN() };
 	if (site2.y == mDirectrix)
-		return { site2.x, std::numeric_limits<float>::quiet_NaN() };
+		return { site2.x, std::numeric_limits<double>::quiet_NaN() };
 
 
-	float a1 = 1 / (2 * (site1.y - mDirectrix));
-	float a2 = 1 / (2 * (site2.y - mDirectrix));
+	double a1 = 1 / (2 * (site1.y - mDirectrix));
+	double a2 = 1 / (2 * (site2.y - mDirectrix));
 
-	float a = (a1 - a2);
-	float b = -2 * (a1 * site1.x - a2 * site2.x);
-	float c = (site1.x * site1.x * a1 - site2.x * site2.x * a2 + (site1.y - site2.y) / 2);
+	double a = (a1 - a2);
+	double b = -2 * (a1 * site1.x - a2 * site2.x);
+	double c = (site1.x * site1.x * a1 - site2.x * site2.x * a2 + (site1.y - site2.y) / 2);
 
 	if (a == 0) //Linear(1 intersection)
-		return { -c / b, std::numeric_limits<float>::quiet_NaN() };
+		return { -c / b, std::numeric_limits<double>::quiet_NaN() };
 
-	float sqrtTerm = b * b - 4 * a * c;
+	double sqrtTerm = b * b - 4 * a * c;
 	if (sqrtTerm < 0)
-		return Vector2f();
-	float pmTerm = sqrt(sqrtTerm);
-	float x1 = (-b + pmTerm) / (2 * a);
-	float x2 = (-b - pmTerm) / (2 * a);
+		return Vector2D();
+	double pmTerm = sqrt(sqrtTerm);
+	double x1 = (-b + pmTerm) / (2 * a);
+	double x2 = (-b - pmTerm) / (2 * a);
 
 	return { x1, x2 };
 }
 
-float BeachLineStatus::getY(Arc* arc, float x)
+double BeachLineStatus::getY(Arc* arc, double x)
 {
-	float p = (arc->face->site.y - mDirectrix) / 2;
-	float xDiff = x - arc->face->site.x;
+	double p = (arc->face->site.y - mDirectrix) / 2;
+	double xDiff = x - arc->face->site.x;
 	return (xDiff * xDiff) / (4 * p) + arc->face->site.y - p;
 }
 
 BeachLineStatus::Event* BeachLineStatus::getCircleEvent(Arc* arc)
 {
-	Vector2f v1 = arc->prev->face->site;
-	Vector2f v2 = arc->face->site;
-	Vector2f v3 = arc->next->face->site;
+	Vector2D v1 = arc->prev->face->site;
+	Vector2D v2 = arc->face->site;
+	Vector2D v3 = arc->next->face->site;
 
-	//Vector2f dv2 = { v2.x - v1.x, v2.y - v1.y };
-	//Vector2f dv3 = { v3.x - v1.x, v3.y - v1.y };
+	//Vector2D dv2 = { v2.x - v1.x, v2.y - v1.y };
+	//Vector2D dv3 = { v3.x - v1.x, v3.y - v1.y };
 
-	//Vector2f dv22 = { dv2.x * dv2.x, dv2.y * dv2.y };
-	//Vector2f dv32 = { dv3.x * dv3.x, dv3.y * dv3.y };
+	//Vector2D dv22 = { dv2.x * dv2.x, dv2.y * dv2.y };
+	//Vector2D dv32 = { dv3.x * dv3.x, dv3.y * dv3.y };
 
-	//float deno = 2 * (dv2.x * dv3.y - dv3.x * dv2.y);
+	//double deno = 2 * (dv2.x * dv3.y - dv3.x * dv2.y);
 
-	//float x = v1.x + (dv22.x * dv3.y - dv32.x * dv2.y + dv22.y * dv3.y - dv32.y * dv2.y) / deno;
-	//float y = v1.y + (dv22.x * dv3.x - dv32.x * dv2.x + dv22.y * dv3.x - dv32.y * dv2.x) / -deno;
+	//double x = v1.x + (dv22.x * dv3.y - dv32.x * dv2.y + dv22.y * dv3.y - dv32.y * dv2.y) / deno;
+	//double y = v1.y + (dv22.x * dv3.x - dv32.x * dv2.x + dv22.y * dv3.x - dv32.y * dv2.x) / -deno;
 
 
-	float s1 = -(v1.x - v2.x) / (v1.y - v2.y);
-	float s2 = -(v2.x - v3.x) / (v2.y - v3.y);
+	double s1 = -(v1.x - v2.x) / (v1.y - v2.y);
+	double s2 = -(v2.x - v3.x) / (v2.y - v3.y);
 
-	if (abs(s1 - s2) < 0.1f) //Arc sites are collinear.
+	if (EQUALD(s1,s2)) //Arc sites are collinear.
 		return nullptr;
 
-	float x = 0;
-	float y = 0;
+	double x = 0;
+	double y = 0;
 
 	if (!isinf(s1) && isinf(s2)) //Arcs 1 and 2 sites don't have the same y-value but arcs 2 and 3 do.
 	{
@@ -783,22 +783,22 @@ BeachLineStatus::Event* BeachLineStatus::getCircleEvent(Arc* arc)
 		y = s1 * (x - (v1.x + v2.x) / 2) + (v1.y + v2.y) / 2;
 	}
 
-	float xDiff = v1.x - x;
-	float yDiff = v1.y - y;
-	float r = sqrt(xDiff * xDiff + yDiff * yDiff);
+	double xDiff = v1.x - x;
+	double yDiff = v1.y - y;
+	double r = sqrt(xDiff * xDiff + yDiff * yDiff);
 
-	if (y - r - 0.5f > mDirectrix) //Invalid circle event.
+	if (GREATERD(y - r, mDirectrix)) //Invalid circle event.
 		return nullptr;
 
 	Event* e = new Event(arc, { x, y - r }, { x, y });
 	return e;
 }
 
-float BeachLineStatus::getLeftX(Arc* arc)
+double BeachLineStatus::getLeftX(Arc* arc)
 {
 	if (arc->prev)
 	{
-		Vector2f intersection = getArcIntersection(arc, arc->prev);
+		Vector2D intersection = getArcIntersection(arc, arc->prev);
 
 		if (isnan(intersection.y))
 			return intersection.x;
@@ -813,11 +813,11 @@ float BeachLineStatus::getLeftX(Arc* arc)
 	return -10000;
 }
 
-float BeachLineStatus::getRightX(Arc* arc)
+double BeachLineStatus::getRightX(Arc* arc)
 {
 	if (arc->next)
 	{
-		Vector2f intersection = getArcIntersection(arc, arc->next);
+		Vector2D intersection = getArcIntersection(arc, arc->next);
 		if (isnan(intersection.y))
 			return intersection.x;
 		else

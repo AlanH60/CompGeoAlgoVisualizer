@@ -30,7 +30,7 @@ void VoronoiDiagram::insertVertex(Vertex* pVertex)
 	mVertices[pVertex->v] = pVertex;
 }
 
-VoronoiDiagram::Vertex* VoronoiDiagram::getVertex(const Vector2f& vertex)
+VoronoiDiagram::Vertex* VoronoiDiagram::getVertex(const Vector2D& vertex)
 {
 	auto it = mVertices.find(vertex);
 	if (it == mVertices.end())
@@ -43,7 +43,7 @@ VoronoiDiagram::Vertex* VoronoiDiagram::getVertex(const Vector2f& vertex)
 		return it->second;
 }
 
-VoronoiDiagram::Face* VoronoiDiagram::getFace(const Vector2f& site)
+VoronoiDiagram::Face* VoronoiDiagram::getFace(const Vector2D& site)
 {
 	auto it = mFaces.find(site);
 	if (it == mFaces.end())
@@ -56,7 +56,7 @@ VoronoiDiagram::Face* VoronoiDiagram::getFace(const Vector2f& site)
 		return it->second;
 }
 
-std::map<Edge, VoronoiDiagram::HalfEdge*>& VoronoiDiagram::getHalfEdges()
+std::map<EdgeD, VoronoiDiagram::HalfEdge*>& VoronoiDiagram::getHalfEdges()
 {
 	return mHalfEdges;
 }

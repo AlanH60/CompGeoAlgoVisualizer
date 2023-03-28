@@ -822,7 +822,7 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 	std::priority_queue<BeachLineStatus::Event*, std::vector<BeachLineStatus::Event*>, BeachLineStatus::EventCompare> eventQueue;
 	//Push all points into events queue.
 	for (auto& p : points)
-		eventQueue.push(new BeachLineStatus::Event(p));
+		eventQueue.push(new BeachLineStatus::Event((Vector2D)p));
 	//Sweepline
 	Line* sweepLine = new Line({ 0, 0 }, { 2000, 0 });
 	pVisualizer->mLines.push_back(sweepLine);
@@ -842,7 +842,7 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 		beachLine.setDirectrix(e->point.y);
 
 		//Visually move the sweepline
-		sweepLine->setPoints({ 0, e->point.y }, { 2000, e->point.y });
+		sweepLine->setPoints({ 0, (float)e->point.y }, { 2000, (float)e->point.y });
 		//Draw the current status of the algorithm(All arcs and edges)
 		drawVoronoiStatus(pVisualizer, beachLine, lines, halfEdgePtrs);
 
@@ -860,7 +860,8 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 	//Resolve the edges of the arcs that go off to infinity.
 	beachLine.resolveLastArcs();
 	//Move the edges from the voronoi diagram to the result of the visualizer.
-	pVisualizer->mResult = std::move(beachLine.getEdges());
+	for (EdgeD& e : beachLine.getEdges())
+		pVisualizer->mResult.push_back(e);
 	pVisualizer->finish();
 }
 
@@ -869,17 +870,17 @@ void AlgorithmVisualizer::arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachL
 	for (QuadBezierCurve* a : pVisualizer->mArcs)
 		delete a;
 	pVisualizer->mArcs.clear();
-	Vector2f start = {};
-	Vector2f control = {};
-	Vector2f end = {};
-	float p = 0;
-	float a = 0;
-	float b = 0;
-	float c = 0;
+	Vector2D start = {};
+	Vector2D control = {};
+	Vector2D end = {};
+	double p = 0;
+	double a = 0;
+	double b = 0;
+	double c = 0;
 	BeachLineStatus::Arc* arc = beachLine.getLeftmostArc();
 	while (arc)
 	{
-		if (EQUALF(arc->face->site.y, beachLine.getDirectrix()))
+		if (EQUALD(arc->face->site.y, beachLine.getDirectrix()))
 		{
 			start = arc->face->site;
 			control = arc->face->site;
@@ -900,14 +901,14 @@ void AlgorithmVisualizer::arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachL
 			start = { 0, c };
 		if (arc->next)
 		{
-			if (EQUALF(arc->next->face->site.y, beachLine.getDirectrix()))
+			if (EQUALD(arc->next->face->site.y, beachLine.getDirectrix()))
 			{
-				float x = arc->next->face->site.x;
+				double x = arc->next->face->site.x;
 				end = { x, x * x * a + x * b + c };
 			}
 			else
 			{
-				float endX = beachLine.getRightX(arc);
+				double endX = beachLine.getRightX(arc);
 				end = { endX, endX * endX * a + endX * b + c };
 			}
 		}

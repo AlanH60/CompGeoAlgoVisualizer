@@ -6,14 +6,14 @@ class BeachLineStatus
 		struct Arc;
 		struct Event
 		{
-			Vector2f point; //Point where the directrix/sweepline should go to.
+			Vector2D point; //Point where the directrix/sweepline should go to.
 			Arc* arc; //If it is a circle event, pointer to the arc that should disappear.
-			Vector2f center; //If it is a circle event, the center of the circle.
+			Vector2D center; //If it is a circle event, the center of the circle.
 			bool isCircle; //Flag whether this event is a circle event.
 			bool isValid = true; //Flag whether this is still a valid circle event.
 
-			Event(const Vector2f& point) : point(point), isCircle(false) {}
-			Event(Arc* arc, const Vector2f& point, const Vector2f& center) : arc(arc), point(point), center(center), isCircle(true) {}
+			Event(const Vector2D& point) : point(point), isCircle(false) {}
+			Event(Arc* arc, const Vector2D& point, const Vector2D& center) : arc(arc), point(point), center(center), isCircle(true) {}
 		};
 		class EventCompare
 		{
@@ -52,7 +52,7 @@ class BeachLineStatus
 		/**
 		* @returns directrix of the beachline.
 		*/
-		float getDirectrix();
+		double getDirectrix();
 		/**
 		* Inserts a new arc before a specific arc. The new arc will either be the arc's left child or its prev's right child.
 		* @param arc the specific arc that the new arc is supposed to be before.
@@ -75,13 +75,13 @@ class BeachLineStatus
 		/**
 		* Sets the y coordinate of the directrix/sweepline.
 		*/
-		void setDirectrix(float directrix);
+		void setDirectrix(double directrix);
 
 		/**
 		* Adds the arc to the beachline and returns the pointer to the arc.
 		* @returns pointer to the new arc.
 		*/
-		Arc* addArc(const Vector2f& site, std::priority_queue<Event*, std::vector<Event*>, EventCompare>& eventQueue);
+		Arc* addArc(const Vector2D& site, std::priority_queue<Event*, std::vector<Event*>, EventCompare>& eventQueue);
 
 		/**
 		* Resolves the arc intersections that go to infinity at the end of the algorithm.
@@ -91,7 +91,7 @@ class BeachLineStatus
 		* Returns the edges that make up the voronoi diagram. Should be called when algorithm is done(After resolve last arcs)
 		* @returns vector of voronoi edges.
 		*/
-		std::vector<Edge> getEdges();
+		std::vector<EdgeD> getEdges();
 
 		/**
 		* Returns the vector of pointers to half edges.  Used for visualization.
@@ -113,26 +113,26 @@ class BeachLineStatus
 		* Gets the interesection between two arcs.
 		* @param arc1 pointer to the first arc.
 		* @param arc2 pointer to the second arc.
-		* @returns the two intersections as a Vector2f.  If there is only 1 intersection, then the second float value is NaN.
+		* @returns the two intersections as a Vector2D.  If there is only 1 intersection, then the second float value is NaN.
 		*/
-		Vector2f getArcIntersection(Arc* arc1, Arc* arc2);
+		Vector2D getArcIntersection(Arc* arc1, Arc* arc2);
 		/**
 		* Given an x-value, this function returns the y-coordinate of the point that lies on (x, y) of the parabolic arc.
 		* @param arc pointer to the arc.
 		* @param x the x-value in question.
 		* @returns y-coordinate of the point on the arc at that given x-coordinate.
 		*/
-		float getY(Arc* arc, float x);
+		double getY(Arc* arc, double x);
 		/*
 		* Returns the x-coordinate of the arc's left bound.
 		* @returns x-coordinate of the arc's left bound.
 		*/
-		float getLeftX(Arc* arc);
+		double getLeftX(Arc* arc);
 		/*
 		* Returns the x-coordinate of the arc's right bound.
 		* @returns x-coordinate of the arc's right bound.
 		*/
-		float getRightX(Arc* arc);
+		double getRightX(Arc* arc);
 	protected:
 		/**
 		* Recursive function to remove an arc.
@@ -245,7 +245,7 @@ class BeachLineStatus
 		Arc* pRoot = nullptr;
 		size_t mSize = 0;
 		//Y-coordinate of directrix/sweepline.
-		float mDirectrix;
+		double mDirectrix;
 		//VoronoiDiagram that this beach line will build.
 		VoronoiDiagram mVoronoi;
 		//Vector of pointers to half edges.  Used for visualization.

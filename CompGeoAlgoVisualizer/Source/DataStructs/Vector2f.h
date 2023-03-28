@@ -1,20 +1,18 @@
 #pragma once
 #include "Direct2D/Types.h"
-
+struct Vector2D;
 struct Vector2f
 {
 	float x = std::numeric_limits<float>::max(), y = std::numeric_limits<float>::max();
 	Vector2f() = default;
 	Vector2f(float x, float y) : x(x), y(y) {}
-	Vector2f invertY()
-	{
-		return Vector2f{ x, -y };
-	}
 
 	operator FLOAT2()
 	{
-		return FLOAT2{ x, y };
+		return FLOAT2( x, y );
 	}
+
+	operator Vector2D();
 };
 
 inline Vector2f operator+(const Vector2f& v1, const Vector2f& v2)
