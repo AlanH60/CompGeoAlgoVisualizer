@@ -43,6 +43,7 @@ class IDropDown : public IContainer
 		void setHeight(float height) override;
 		void addOption(std::wstring text);
 		void addChild(IComponent* child) override;
+		void clearOptions(std::wstring newDefault);
 		void onPress(float x ,float y, MouseEvent& e) override;
 		void onUpdate(IComponent* parent) override;
 		void onFocusLoss() override;

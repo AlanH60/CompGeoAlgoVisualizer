@@ -39,6 +39,17 @@ App::App()
 	pMenuPanel->setRelativeHeight(1.0f);
 	pMenuPanel->setRelativeWidth(0.25f);
 
+	//Label for the speed slider
+	ILabel* pAlgorithmLabel = new ILabel(L"Select an Algorithm:", D2D::TextFormat(L"Arial", 16, true, D2D::Style::NORMAL,
+		D2D::TextAlignment::CENTER, D2D::ParagraphAlignment::CENTER), 0, 0);
+	pAlgorithmLabel->setXOrientation(IComponent::XOrientation::CENTER);
+	pAlgorithmLabel->setYOrientation(IComponent::YOrientation::RELATIVE_HEIGHT);
+	pAlgorithmLabel->setXDimension(IComponent::XDimension::RELATIVEX);
+	pAlgorithmLabel->setYDimension(IComponent::YDimension::RELATIVEY);
+	pAlgorithmLabel->setRelativeHeightOrientation(0.03f);
+	pAlgorithmLabel->setRelativeWidth(1.0f);
+	pAlgorithmLabel->setRelativeHeight(0.075f);
+
 	//Dropdown menu used to select a purpose for the algorithm
 	pAlgorithmDropDown = new IDropDown(L"Convex Hull", 200, 30);
 	pAlgorithmDropDown->addOption(L"Triangulation");
@@ -47,10 +58,21 @@ App::App()
 	pAlgorithmDropDown->setYOrientation(IComponent::YOrientation::RELATIVE_HEIGHT);
 	pAlgorithmDropDown->setXDimension(IComponent::XDimension::RELATIVEX);
 	pAlgorithmDropDown->setYDimension(IComponent::YDimension::RELATIVEY);
-	pAlgorithmDropDown->setRelativeHeightOrientation(0.05f);
+	pAlgorithmDropDown->setRelativeHeightOrientation(0.10f);
 	pAlgorithmDropDown->setRelativeWidth(0.8f);
 	pAlgorithmDropDown->setRelativeHeight(0.05f);
 	pAlgorithmDropDown->setColor(Color{ 0.7f, 0.7f, 0.7f, 1 });
+
+	pAlgorithmTypeDropDown = new IDropDown(L"", 200, 30);
+	pAlgorithmTypeDropDown->setXOrientation(IComponent::XOrientation::CENTER);
+	pAlgorithmTypeDropDown->setYOrientation(IComponent::YOrientation::RELATIVE_HEIGHT);
+	pAlgorithmTypeDropDown->setXDimension(IComponent::XDimension::RELATIVEX);
+	pAlgorithmTypeDropDown->setYDimension(IComponent::YDimension::RELATIVEY);
+	pAlgorithmTypeDropDown->setRelativeHeightOrientation(0.2f);
+	pAlgorithmTypeDropDown->setRelativeWidth(0.8f);
+	pAlgorithmTypeDropDown->setRelativeHeight(0.05f);
+	pAlgorithmTypeDropDown->setColor(Color{ 0.7f, 0.7f, 0.7f, 1 });
+	updateAlgorithmTypeDropdown();
 
 	//Label for the speed slider
 	ILabel* pSpeedLabel = new ILabel(L"Speed:", D2D::TextFormat(L"Arial", 16, true, D2D::Style::NORMAL, 
@@ -59,7 +81,7 @@ App::App()
 	pSpeedLabel->setYOrientation(IComponent::YOrientation::RELATIVE_HEIGHT);
 	pSpeedLabel->setXDimension(IComponent::XDimension::RELATIVEX);
 	pSpeedLabel->setYDimension(IComponent::YDimension::RELATIVEY);
-	pSpeedLabel->setRelativeHeightOrientation(0.225f);
+	pSpeedLabel->setRelativeHeightOrientation(0.325f);
 	pSpeedLabel->setRelativeWidth(1.0f);
 	pSpeedLabel->setRelativeHeight(0.075f);
 
@@ -69,7 +91,7 @@ App::App()
 	pSpeedSlider->setYOrientation(IComponent::YOrientation::RELATIVE_HEIGHT);
 	pSpeedSlider->setXDimension(IComponent::XDimension::RELATIVEX);
 	pSpeedSlider->setYDimension(IComponent::YDimension::RELATIVEY);
-	pSpeedSlider->setRelativeHeightOrientation(0.3f);
+	pSpeedSlider->setRelativeHeightOrientation(0.4f);
 	pSpeedSlider->setRelativeWidth(0.6f);
 	pSpeedSlider->setRelativeHeight(0.04f);
 
@@ -154,6 +176,8 @@ App::App()
 	pMenuPanel->addChild(pSpeedSlider);
 	pMenuPanel->addChild(pSpeedLabel);
 	pMenuPanel->addChild(pAlgorithmDropDown);
+	pMenuPanel->addChild(pAlgorithmTypeDropDown);
+	pMenuPanel->addChild(pAlgorithmLabel);
 
 	pRoot->addChild(pMenuPanel);
 	//*******************************************************************************//
@@ -263,9 +287,12 @@ void App::onUpdate()
 	{
 		//Update the speed of the visualizer if UI changed its value.
 		pVisualizer->setSpeed(mVisualizerSpeed);
+
+		//Update the algorithm depending on which drop down option the user chooses.
 		if ((int)mState != pAlgorithmDropDown->getSelectedIndex())
 		{
 			mState = (State)pAlgorithmDropDown->getSelectedIndex();
+			updateAlgorithmTypeDropdown();
 			clear();
 		}
 	}
@@ -452,24 +479,16 @@ void App::convexHullEventHandler(Event& e)
 				switch (mouse.mKeycode)
 				{
 					case VK_LBUTTON:
-						if (pWindow->keyPressed(VK_SHIFT) || pWindow->keyPressed(VK_CONTROL))
+						if (!pHoveredPoint)
 						{
-							if (!pHoveredPoint)
-							{
-								Point* pPoint = new Point(mousePos);
-								if (mPoints.find(mousePos) == mPoints.end())
-									mPoints[mousePos] = std::vector<Point*>();
-								mPoints[mousePos].push_back(pPoint);
-								pSelectedPoint = nullptr;
-							}
+							Point* pPoint = new Point(mousePos);
+							if (mPoints.find(mousePos) == mPoints.end())
+								mPoints[mousePos] = std::vector<Point*>();
+							mPoints[mousePos].push_back(pPoint);
+							pSelectedPoint = nullptr;
 						}
 						else
-						{
-							if (pHoveredPoint)
-								pSelectedPoint = pHoveredPoint;
-							else
-								pSelectedPoint = nullptr;
-						}
+							pSelectedPoint = pHoveredPoint;
 						break;
 					default:
 						break;
@@ -500,18 +519,6 @@ void App::convexHullEventHandler(Event& e)
 		{
 			switch (key.mKeycode)
 			{
-				case '1':
-					mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::GIFT_WRAPPING;
-					e.isConsumed = true;
-					break;
-				case '2':
-					mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::GRAHAM_SCAN;
-					e.isConsumed = true;
-					break;
-				case '3':
-					mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::QUICK_HULL;
-					e.isConsumed = true;
-					break;
 				case VK_DELETE:
 				case VK_BACK:
 					if (pSelectedPoint != nullptr)
@@ -570,26 +577,6 @@ void App::triangulateEventHandler(Event& e)
 				}
 		}
 	}
-	if (e.isKeyboard())
-	{
-		KeyEvent& key = (KeyEvent&)e;
-		if (key.isPress())
-		{
-			switch (key.mKeycode)
-			{
-				case '1':
-					mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::EAR_CLIPPING;
-					e.isConsumed = true;
-					break;
-				case '2':
-					mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::SWEEP;
-					e.isConsumed = true;
-					break;
-				default:
-					break;
-			}
-		}
-	}
 }
 
 void App::updatePolygonValidity()
@@ -630,24 +617,16 @@ void App::voronoiDiagramEventHandler(Event& e)
 				switch (mouse.mKeycode)
 				{
 					case VK_LBUTTON:
-						if (pWindow->keyPressed(VK_SHIFT) || pWindow->keyPressed(VK_CONTROL))
+						if (!pHoveredPoint)
 						{
-							if (!pHoveredPoint)
-							{
-								Point* pPoint = new Point(mousePos);
-								if (mPoints.find(mousePos) == mPoints.end())
-									mPoints[mousePos] = std::vector<Point*>();
-								mPoints[mousePos].push_back(pPoint);
-								pSelectedPoint = nullptr;
-							}
+							Point* pPoint = new Point(mousePos);
+							if (mPoints.find(mousePos) == mPoints.end())
+								mPoints[mousePos] = std::vector<Point*>();
+							mPoints[mousePos].push_back(pPoint);
+							pSelectedPoint = nullptr;
 						}
 						else
-						{
-							if (pHoveredPoint)
-								pSelectedPoint = pHoveredPoint;
-							else
-								pSelectedPoint = nullptr;
-						}
+							pSelectedPoint = pHoveredPoint;
 						break;
 					default:
 						break;
@@ -707,6 +686,7 @@ void App::startConvexHull()
 		for (Drawable* d : a.second)
 			points.push_back({ d->getPos().x, d->getPos().y });
 	}
+	mCHAlgorithm = (AlgorithmVisualizer::ConvexHullAlgorithm)(pAlgorithmTypeDropDown->getSelectedIndex());
 	pVisualizer->computeConvexHull(points, mCHAlgorithm);
 }
 
@@ -733,6 +713,7 @@ void App::startTriangulation()
 		}
 		edges[mPolygon[0]].insert(edges[mPolygon[0]].begin(), mPolygon[mPolygon.size() - 1]);
 		edges[mPolygon[mPolygon.size() - 1]].push_back(mPolygon[0]);
+		mTriAlgorithm = (AlgorithmVisualizer::TriangulationAlgorithm)(pAlgorithmTypeDropDown->getSelectedIndex());
 		pVisualizer->computeTriangulation(mPolygon, edges, mTriAlgorithm);
 		mPolygon.push_back(mPolygon[0]);
 	}
@@ -745,5 +726,25 @@ void App::startVoronoiDiagram()
 	for (auto& a : mPoints)
 		for (Drawable* d : a.second)
 			points.push_back({ d->getPos().x, d->getPos().y });
+	mVoronoiAlgorithm = (AlgorithmVisualizer::VoronoiDiagramAlgorithm)(pAlgorithmTypeDropDown->getSelectedIndex());
 	pVisualizer->computeVoronoiDiagram(points, mVoronoiAlgorithm);
+}
+
+void App::updateAlgorithmTypeDropdown()
+{
+	switch (mState) 
+	{
+		case State::CONVEX_HULL:
+			pAlgorithmTypeDropDown->clearOptions(L"Gift Wrapping");
+			pAlgorithmTypeDropDown->addOption(L"Graham Scan");
+			pAlgorithmTypeDropDown->addOption(L"Quick Hull");
+			break;
+		case State::TRIANGULATE:
+			pAlgorithmTypeDropDown->clearOptions(L"Ear Clipping");
+			pAlgorithmTypeDropDown->addOption(L"Sweep");
+			break;
+		case State::VORONOI:
+			pAlgorithmTypeDropDown->clearOptions(L"Fortune");
+			break;
+	}
 }

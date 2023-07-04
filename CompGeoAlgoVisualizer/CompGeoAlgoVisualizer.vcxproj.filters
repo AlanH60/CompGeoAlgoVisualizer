@@ -20,10 +20,16 @@
   <ItemGroup>
     <ClInclude Include="Source\Algorithms.h" />
     <ClInclude Include="Source\App.h" />
+    <ClInclude Include="Source\DataStructs\BeachLineStatus.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
     <ClInclude Include="Source\DataStructs\DCEL.h">
       <Filter>DataStructs</Filter>
     </ClInclude>
     <ClInclude Include="Source\DataStructs\Edge.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DataStructs\EdgeD.h">
       <Filter>DataStructs</Filter>
     </ClInclude>
     <ClInclude Include="Source\DataStructs\RedBlackTree.h">
@@ -32,7 +38,13 @@
     <ClInclude Include="Source\DataStructs\TriSweepLineStatus.h">
       <Filter>DataStructs</Filter>
     </ClInclude>
+    <ClInclude Include="Source\DataStructs\Vector2D.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
     <ClInclude Include="Source\DataStructs\Vector2f.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DataStructs\VoronoiDiagram.h">
       <Filter>DataStructs</Filter>
     </ClInclude>
     <ClInclude Include="Source\Direct2D\Application.h">
@@ -62,6 +74,9 @@
     <ClInclude Include="Source\Direct2D\Drawable\Polygon.h">
       <Filter>Direct2D\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Direct2D\Drawable\QuadBezierCurve.h">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Direct2D\Drawable\Rectangle.h">
       <Filter>Direct2D\Drawable</Filter>
     </ClInclude>
@@ -89,6 +104,9 @@
     <ClInclude Include="Source\UI\IButton.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\ICheckBox.h">
+      <Filter>UI</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\IComponent.h">
       <Filter>UI</Filter>
     </ClInclude>
@@ -113,32 +131,20 @@
     <ClInclude Include="Source\UI\ITabbedPanel.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\DataStructs\BeachLineStatus.h">
-      <Filter>DataStructs</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\DataStructs\VoronoiDiagram.h">
-      <Filter>DataStructs</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Direct2D\Drawable\QuadBezierCurve.h">
-      <Filter>Direct2D\Drawable</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\DataStructs\EdgeD.h">
-      <Filter>DataStructs</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\DataStructs\Vector2D.h">
-      <Filter>DataStructs</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\ICheckBox.h">
-      <Filter>UI</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
     <ClCompile Include="Source\App.cpp" />
+    <ClCompile Include="Source\DataStructs\BeachLineStatus.cpp">
+      <Filter>DataStructs</Filter>
+    </ClCompile>
     <ClCompile Include="Source\DataStructs\DCEL.cpp">
       <Filter>DataStructs</Filter>
     </ClCompile>
     <ClCompile Include="Source\DataStructs\Edge.cpp">
+      <Filter>DataStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DataStructs\EdgeD.cpp">
       <Filter>DataStructs</Filter>
     </ClCompile>
     <ClCompile Include="Source\DataStructs\RedBlackTree.cpp">
@@ -147,7 +153,13 @@
     <ClCompile Include="Source\DataStructs\TriSweepLineStatus.cpp">
       <Filter>DataStructs</Filter>
     </ClCompile>
+    <ClCompile Include="Source\DataStructs\Vector2D.cpp">
+      <Filter>DataStructs</Filter>
+    </ClCompile>
     <ClCompile Include="Source\DataStructs\Vector2f.cpp">
+      <Filter>DataStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DataStructs\VoronoiDiagram.cpp">
       <Filter>DataStructs</Filter>
     </ClCompile>
     <ClCompile Include="Source\Direct2D\Application.cpp">
@@ -177,6 +189,9 @@
     <ClCompile Include="Source\Direct2D\Drawable\Polygon.cpp">
       <Filter>Direct2D\Drawable</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Direct2D\Drawable\QuadBezierCurve.cpp">
+      <Filter>Direct2D\Drawable</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Direct2D\Drawable\Rectangle.cpp">
       <Filter>Direct2D\Drawable</Filter>
     </ClCompile>
@@ -201,6 +216,9 @@
     <ClCompile Include="Source\Loader.cpp" />
     <ClCompile Include="Source\PCH.cpp" />
     <ClCompile Include="Source\UI\IButton.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\ICheckBox.cpp">
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\IComponent.cpp">
@@ -228,23 +246,5 @@
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\DataStructs\BeachLineStatus.cpp">
-      <Filter>DataStructs</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\DataStructs\VoronoiDiagram.cpp">
-      <Filter>DataStructs</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Direct2D\Drawable\QuadBezierCurve.cpp">
-      <Filter>Direct2D\Drawable</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\DataStructs\Vector2D.cpp">
-      <Filter>DataStructs</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\DataStructs\EdgeD.cpp">
-      <Filter>DataStructs</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\ICheckBox.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

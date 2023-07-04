@@ -86,6 +86,7 @@ class App : public Application
 		void startTriangulation();
 		void startVoronoiDiagram();
 	private:
+		void updateAlgorithmTypeDropdown();
 		
 		bool mDragging = false;
 		D2D::Point* pSelectedPoint = nullptr;
@@ -121,6 +122,7 @@ class App : public Application
 		//*******************UI********************//
 		IContainer* pRoot;
 		IDropDown* pAlgorithmDropDown;
+		IDropDown* pAlgorithmTypeDropDown;
 		IButton* pStartButton;
 		IButton* pClearButton;
 		IButton* pPauseButton;

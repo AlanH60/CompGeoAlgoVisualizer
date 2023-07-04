@@ -56,6 +56,14 @@ void IContainer::removeChild(IComponent* child)
 				pFrontChild = node->next;
 			if (node == pBackChild)
 				pBackChild = node->prev;
+
+			//If deleted child currently being pressed, hovered, or dragged, set the pointer with respect to that state to nullptr.
+			if (node->component == pPressed)
+				pPressed = nullptr;
+			if (node->component == pHovered)
+				pHovered = nullptr;
+			if (node->component == pDragged)
+				pDragged = nullptr;
 			delete node;
 			break;
 		}

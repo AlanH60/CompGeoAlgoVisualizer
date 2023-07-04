@@ -40,6 +40,7 @@ void IDropDown::IDropDownOption::onPress(float x, float y, MouseEvent& e)
 		return;
 	pDropDown->setOption(this);
 	e.isConsumed = true;
+	onExit();
 }
 
 void IDropDown::IDropDownOption::onHover(float x, float y, MouseEvent& e)
@@ -160,6 +161,18 @@ void IDropDown::addChild(IComponent* child)
 		IContainer::addChild(child);
 }
 
+void IDropDown::clearOptions(std::wstring newDefault)
+{
+	close();
+	for (IDropDownOption* pOption : mOptions)
+		delete pOption;
+	mSelectedIndex = -1;
+	mOptions.clear();
+	//Add the new default as option and set it as the currently selected option.
+	addOption(newDefault);
+	setOption(mOptions[0]);
+}
+
 void IDropDown::onPress(float x, float y, MouseEvent& e)
 {
 	if (isExpanded)
@@ -210,6 +223,7 @@ void IDropDown::close()
 		for (IDropDownOption* pOption : mOptions)
 			removeChild(pOption);
 		isExpanded = false;
+
 	}
 }
 

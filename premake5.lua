@@ -44,3 +44,4 @@ project "CompGeoAlgoVisualizer"
     filter { "configurations:Release" }
         defines { "NDEBUG" }
         optimize "On"
+        kind "WindowedApp"

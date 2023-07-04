@@ -28,18 +28,18 @@ class AlgorithmVisualizer
 		};
 		enum class ConvexHullAlgorithm
 		{
-			GRAHAM_SCAN,
-			GIFT_WRAPPING,
-			QUICK_HULL
+			GRAHAM_SCAN = 0,
+			GIFT_WRAPPING = 1,
+			QUICK_HULL = 2
 		};
 		enum class TriangulationAlgorithm
 		{
-			EAR_CLIPPING,
-			SWEEP
+			EAR_CLIPPING = 0,
+			SWEEP = 1
 		};
 		enum class VoronoiDiagramAlgorithm
 		{
-			FORTUNE
+			FORTUNE = 0
 		};
 	protected:
 		//EAR-CLIPPING: Contains the index of the previous vertex, next vertex, whether this vertex is an ear, and whether is has been clipped.
