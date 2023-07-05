@@ -9,7 +9,7 @@ project "CompGeoAlgoVisualizer"
     location "%{prj.name}"
     kind "ConsoleApp"
     language "C++"
-    cppdialect "C++20"
+    cppdialect "C++latest"
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputDir .. "/%{prj.name}")
 
@@ -45,3 +45,4 @@ project "CompGeoAlgoVisualizer"
         defines { "NDEBUG" }
         optimize "On"
         kind "WindowedApp"
+        targetdir("")
