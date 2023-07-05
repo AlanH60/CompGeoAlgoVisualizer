@@ -200,6 +200,8 @@ class AlgorithmVisualizer
 		bool mVisualize = true;
 		//Flag that indicates whether or not to the algorithm visualizer should be paused.
 		bool mShouldPause = false;
+		//Mutex used to protect mShouldPause
+		std::mutex mShouldPauseMutex;
 		//State of the algorithm visualizer.
 		State mState = State::IDLE;
 		//Pointer to the thread that this algorithm will run on.

@@ -111,10 +111,12 @@ App::App()
 			switch (mState)
 			{
 				case State::CONVEX_HULL:
-					startConvexHull();
+					if (!startConvexHull())
+						return;
 					break;
 				case State::TRIANGULATE:
-					startTriangulation();
+					if (!startTriangulation())
+						return;
 					break;
 				case State::VORONOI:
 					startVoronoiDiagram();
@@ -677,7 +679,7 @@ void App::voronoiDiagramEventHandler(Event& e)
 	}
 }
 
-void App::startConvexHull()
+bool App::startConvexHull()
 {
 	deleteAndClear(mHullLines);
 	std::vector<Vector2f> points = std::vector<Vector2f>();
@@ -686,11 +688,15 @@ void App::startConvexHull()
 		for (Drawable* d : a.second)
 			points.push_back({ d->getPos().x, d->getPos().y });
 	}
+	//There must be at least 3 points for a convex hull to exist.
+	if (points.size() < 3)
+		return false;
 	mCHAlgorithm = (AlgorithmVisualizer::ConvexHullAlgorithm)(pAlgorithmTypeDropDown->getSelectedIndex());
 	pVisualizer->computeConvexHull(points, mCHAlgorithm);
+	return true;
 }
 
-void App::startTriangulation()
+bool App::startTriangulation()
 {
 	deleteAndClear(mTriangulationLines);
 	if (isValidPolygon && mPolygon.size() >= 3 && mPolygon[0] == mPolygon[mPolygon.size() - 1])
@@ -716,7 +722,9 @@ void App::startTriangulation()
 		mTriAlgorithm = (AlgorithmVisualizer::TriangulationAlgorithm)(pAlgorithmTypeDropDown->getSelectedIndex());
 		pVisualizer->computeTriangulation(mPolygon, edges, mTriAlgorithm);
 		mPolygon.push_back(mPolygon[0]);
+		return true;
 	}
+	return false;
 }
 
 void App::startVoronoiDiagram()

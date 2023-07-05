@@ -7,6 +7,7 @@
 #include <memory>
 #include <chrono>
 #include <thread>
+#include <mutex>
 
 #include <string>
 #include <vector>

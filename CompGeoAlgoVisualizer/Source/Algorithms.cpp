@@ -72,7 +72,9 @@ void AlgorithmVisualizer::setVisualization(bool visualize)
 
 void AlgorithmVisualizer::setShouldPause(bool shouldPause)
 {
+	mShouldPauseMutex.lock();
 	mShouldPause = shouldPause;
+	mShouldPauseMutex.unlock();
 }
 
 
@@ -108,8 +110,6 @@ std::vector<D2D::QuadBezierCurve*>& AlgorithmVisualizer::getArcs()
 
 void AlgorithmVisualizer::computeConvexHull(std::vector<Vector2f>& points, ConvexHullAlgorithm algorithm)
 {
-	if (points.size() == 0)
-		return;
 	clear();
 	if (mThread->joinable())
 		mThread->join();
@@ -211,7 +211,16 @@ void AlgorithmVisualizer::wait(float multiplier)
 	mState = State::SLEEPING;
 	//std::cout << "[Visualizer] --- Sleeping" << std::endl;
 	std::this_thread::sleep_for(std::chrono::milliseconds((long)(multiplier * 1000 / mSpeed)));
-	while (mShouldPause) {} //If it is pausing, continue sleeping.
+	while (true) //If it is pausing, continue sleeping.
+	{ 
+		mShouldPauseMutex.lock(); 
+		if (!mShouldPause) 
+		{
+			mShouldPauseMutex.unlock();
+			break;
+		}
+		mShouldPauseMutex.unlock();
+	} 
 	while (pApp->isDrawingAlgorithmVisualize()) {} //Wait until app is done drawing before continuing to run.
 	mState = State::RUNNING;
 	//std::cout << "[Visualizer] --- Running" << std::endl;

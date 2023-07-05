@@ -82,8 +82,8 @@ class App : public Application
 		
 		void voronoiDiagramEventHandler(Event& e);
 
-		void startConvexHull();
-		void startTriangulation();
+		bool startConvexHull();
+		bool startTriangulation();
 		void startVoronoiDiagram();
 	private:
 		void updateAlgorithmTypeDropdown();
