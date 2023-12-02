@@ -285,11 +285,10 @@ void App::onUpdate()
 		pClearButton->setVisibleFlag(true);
 		pPauseButton->setVisibleFlag(false);
 	}
+	//Update the speed of the visualizer if UI changed its value.
+	pVisualizer->setSpeed(mVisualizerSpeed);
 	if (pVisualizer->isIdle())
 	{
-		//Update the speed of the visualizer if UI changed its value.
-		pVisualizer->setSpeed(mVisualizerSpeed);
-
 		//Update the algorithm depending on which drop down option the user chooses.
 		if ((int)mState != pAlgorithmDropDown->getSelectedIndex())
 		{
@@ -297,11 +296,6 @@ void App::onUpdate()
 			updateAlgorithmTypeDropdown();
 			clear();
 		}
-	}
-	else if (pVisualizer->isSleeping())
-	{
-		//Update the speed of the visualizer if UI changed its value.
-		pVisualizer->setSpeed(mVisualizerSpeed);
 	}
 }
 
@@ -349,12 +343,11 @@ void App::onDraw()
 
 
 	//Algorithm Visualizer
-	if ((pVisualizer->isRunning() || pVisualizer->isSleeping()) && pVisualizer->shouldVisualize())
+	if (pVisualizer->isRunning() && pVisualizer->shouldVisualize())
 	{
-		isDrawingAlgo = true;
-		//Wait until the algorithm is sleeping to draw.
-		while (!pVisualizer->isSleeping()) {}
-		//std::cout << "[App] --- Drawing" << std::endl;
+		//Block till we're able to draw
+		pVisualizer->getDrawMutex().lock();
+	
 		std::vector<Point*>& points = pVisualizer->getPoints();
 		std::vector<Line*>& lines = pVisualizer->getLines();
 		std::vector<QuadBezierCurve*>& arcs = pVisualizer->getArcs();
@@ -364,10 +357,10 @@ void App::onDraw()
 			points[i]->draw();
 		for (int i = 0; i < arcs.size(); i ++)
 			arcs[i]->draw();
-		isDrawingAlgo = false;
-		//std::cout << "[App] --- Done Drawing" << std::endl;
-	}
 
+		pVisualizer->getDrawMutex().unlock();
+	}
+	
 
 	//UI
 	pRoot->draw(0, 0);
@@ -461,11 +454,6 @@ bool App::deletePoint(Point* pPoint)
 		return true;
 	}
 	return false;
-}
-
-bool App::isDrawingAlgorithmVisualize()
-{
-	return isDrawingAlgo;
 }
 
 void App::convexHullEventHandler(Event& e)

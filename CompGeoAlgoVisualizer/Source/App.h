@@ -60,7 +60,6 @@ class App : public Application
 		void addPoint(D2D::Point* pPoint);
 		bool removePoint(D2D::Point* pPoint);
 		bool deletePoint(D2D::Point* pPoint);
-		bool isDrawingAlgorithmVisualize();
 		D2D::Point* getPoint(FLOAT2 pos);
 
 		int getWidth();
@@ -115,7 +114,6 @@ class App : public Application
 		AlgorithmVisualizer::ConvexHullAlgorithm mCHAlgorithm = AlgorithmVisualizer::ConvexHullAlgorithm::QUICK_HULL;
 		AlgorithmVisualizer::TriangulationAlgorithm mTriAlgorithm = AlgorithmVisualizer::TriangulationAlgorithm::EAR_CLIPPING;
 		AlgorithmVisualizer::VoronoiDiagramAlgorithm mVoronoiAlgorithm = AlgorithmVisualizer::VoronoiDiagramAlgorithm::FORTUNE;
-		bool isDrawingAlgo = false;
 
 		
 

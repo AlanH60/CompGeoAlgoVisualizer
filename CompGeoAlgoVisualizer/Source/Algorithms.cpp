@@ -8,7 +8,6 @@
 #include "Direct2D/Drawable/QuadBezierCurve.h"
 #include "DataStructs/BeachLineStatus.h"
 
-
 using D2D::Drawable;
 using D2D::Point;
 using D2D::Line;
@@ -29,25 +28,27 @@ AlgorithmVisualizer::~AlgorithmVisualizer()
 	delete mThread;
 }
 
+AlgorithmVisualizer::State AlgorithmVisualizer::getState() {
+	mStateMutex.lock();
+	State state = mState;
+	mStateMutex.unlock();
+	return state;
+}
+
 bool AlgorithmVisualizer::isIdle()
 {
-	return mState == State::IDLE;
+	return getState() == State::IDLE;
 }
 
 
 bool AlgorithmVisualizer::isRunning()
 {
-	return mState == State::RUNNING;
+	return getState() == State::RUNNING;
 }
 
 bool AlgorithmVisualizer::isFinished()
 {
-	return mState == State::FINISHED;
-}
-
-bool AlgorithmVisualizer::isSleeping()
-{
-	return mState == State::SLEEPING;
+	return getState() == State::FINISHED;
 }
 
 bool AlgorithmVisualizer::shouldVisualize()
@@ -57,12 +58,18 @@ bool AlgorithmVisualizer::shouldVisualize()
 
 bool AlgorithmVisualizer::shouldPause()
 {
-	return mShouldPause;
+	mShouldPauseMutex.lock();
+	bool shouldPause = mShouldPause;
+	mShouldPauseMutex.unlock();
+	return shouldPause;
 }
 
 float AlgorithmVisualizer::getSpeed()
 {
-	return mSpeed;
+	mSpeedMutex.lock();
+	float speed = mSpeed;
+	mSpeedMutex.unlock();
+	return speed;
 }
 
 void AlgorithmVisualizer::setVisualization(bool visualize)
@@ -80,16 +87,20 @@ void AlgorithmVisualizer::setShouldPause(bool shouldPause)
 
 void AlgorithmVisualizer::setSpeed(float speed)
 {
+	mSpeedMutex.lock();
 	mSpeed = speed;
+	mSpeedMutex.unlock();
 }
 
 void AlgorithmVisualizer::addSpeed(float modifier)
 {
+	mSpeedMutex.lock();
 	mSpeed += modifier;
 	if (mSpeed < 1)
 		mSpeed = 1;
 	if (mSpeed > 10)
 		mSpeed = 10;
+	mSpeedMutex.unlock();
 }
 
 std::vector<D2D::Line*>& AlgorithmVisualizer::getLines()
@@ -113,6 +124,7 @@ void AlgorithmVisualizer::computeConvexHull(std::vector<Vector2f>& points, Conve
 	clear();
 	if (mThread->joinable())
 		mThread->join();
+	setState(State::RUNNING);
 	switch (algorithm)
 	{
 		case ConvexHullAlgorithm::GIFT_WRAPPING:
@@ -143,6 +155,7 @@ void AlgorithmVisualizer::computeTriangulation(std::vector<Vector2f>& polygon, s
 	clear();
 	if (mThread->joinable())
 		mThread->join();
+	setState(State::RUNNING);
 	switch (algorithm)
 	{
 		case TriangulationAlgorithm::EAR_CLIPPING:
@@ -165,6 +178,7 @@ void AlgorithmVisualizer::computeVoronoiDiagram(std::vector<Vector2f>& points, V
 	clear();
 	if (mThread->joinable())
 		mThread->join();
+	setState(State::RUNNING);
 	switch (algorithm)
 	{
 		case VoronoiDiagramAlgorithm::FORTUNE:
@@ -178,14 +192,27 @@ void AlgorithmVisualizer::computeVoronoiDiagram(std::vector<Vector2f>& points, V
 
 std::vector<Edge> AlgorithmVisualizer::getResult()
 {
-	if (mState == State::FINISHED)
+	if (isFinished())
 	{
-		mState = State::IDLE;
+		setState(State::IDLE);
 		std::vector<Edge> ret = std::move(mResult);
 		mResult.clear();
 		return ret;
 	}
 	return std::vector<Edge>();
+}
+
+
+std::mutex& AlgorithmVisualizer::getDrawMutex()
+{
+	return mDrawMutex;
+}
+
+void AlgorithmVisualizer::setState(State state)
+{
+	mStateMutex.lock();
+	mState = state;
+	mStateMutex.unlock();
 }
 
 void AlgorithmVisualizer::clear()
@@ -201,41 +228,20 @@ void AlgorithmVisualizer::clear()
 	mArcs.clear();
 }
 
-void AlgorithmVisualizer::wait()
-{
-	wait(1);
-}
-
 void AlgorithmVisualizer::wait(float multiplier)
 {
-	mState = State::SLEEPING;
-	//std::cout << "[Visualizer] --- Sleeping" << std::endl;
-	std::this_thread::sleep_for(std::chrono::milliseconds((long)(multiplier * 1000 / mSpeed)));
-	while (true) //If it is pausing, continue sleeping.
-	{ 
-		mShouldPauseMutex.lock(); 
-		if (!mShouldPause) 
-		{
-			mShouldPauseMutex.unlock();
-			break;
-		}
-		mShouldPauseMutex.unlock();
-	} 
-	while (pApp->isDrawingAlgorithmVisualize()) {} //Wait until app is done drawing before continuing to run.
-	mState = State::RUNNING;
-	//std::cout << "[Visualizer] --- Running" << std::endl;
+	std::this_thread::sleep_for(std::chrono::milliseconds((long)(multiplier * 1000 / getSpeed())));
+	while (shouldPause()); //If it is pausing, continue waiting.
 }
 
 void AlgorithmVisualizer::finish()
 {
-	this->mState = State::SLEEPING;
-	while (pApp->isDrawingAlgorithmVisualize()) {};
-	this->mState = State::FINISHED;
+	setState(State::FINISHED);
 }
 
 void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points)
 {
-	pVisualizer->mState = State::RUNNING;
+	pVisualizer->mDrawMutex.lock();
 
 	int minY = 0;
 	std::vector<Vector2f> convexHull = std::vector<Vector2f>();
@@ -270,7 +276,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 		//Update the lowest point and line.
 		pLowestPoint->setPos(points[minY]);
 		pLowestLine->setPoints({ 0, points[minY].y }, { 10000, points[minY].y });
-		pVisualizer->wait();
+		WAIT(pVisualizer, 1);
 	}
 	//Lowest line no longer needed.
 	pLowestLine->setVisibility(false);
@@ -294,7 +300,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 				continue;
 			pCurrLine->setPoints(convexHull[i], points[j]);
 			pCurrPoint->setPos(points[j]);
-			pVisualizer->wait(0.5f);
+			WAIT(pVisualizer, 0.5f);
 			//If we find a point that is to the right of our current right-most edge, 
 			//we set the edge from that point to the most recent convex hull vertex as the new right-most edge.
 			if (!leftOf(convexHull[i], points[nextPoint], points[j]))
@@ -303,7 +309,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 				pNextPoint->setPos(points[j]);
 				pNextLine->setPoints(convexHull[i], points[j]);
 			}
-			pVisualizer->wait();
+			WAIT(pVisualizer, 1);
 		}
 		convexHull.push_back(points[nextPoint]);
 		usedPoints[nextPoint] = true;
@@ -314,6 +320,7 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 	for (int i = 0; i < convexHull.size() - 1; i++)
 		pVisualizer->mResult.push_back({ convexHull[i], convexHull[i + 1] });
 	pVisualizer->finish();
+	pVisualizer->mDrawMutex.unlock();
 }
 
 //Graham Scan- O(nlogn) - we choose an extreme point, pivot, that is guaranteed to be on the convex hull.
@@ -321,7 +328,8 @@ void AlgorithmVisualizer::convexHullGW(AlgorithmVisualizer* pVisualizer, std::ve
 //We can then use left tests and "wrap" the points in sorted counter-clockwise order.
 void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points)
 {
-	pVisualizer->mState = State::RUNNING;
+	pVisualizer->mDrawMutex.lock();
+
 	//Current lines and points that the algorithm is evaluating
 	Line* pCurrLine = new Line({ 0, 0 }, { 0, 0 }, Color{ 0, 0.5f, 0.5f, 1 });
 	Point* pCurrPoint = new Point({ 0, 0 }, Color{ 0, 0.5f, 0.5f, 1 });
@@ -349,7 +357,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 		//Update the lowest point and line.
 		pLowestPoint->setPos(points[pivot]);
 		pLowestLine->setPoints({ 0, points[pivot].y }, { 10000, points[pivot].y });
-		pVisualizer->wait();
+		WAIT(pVisualizer, 1);
 	}
 	//Lowest line no longer needed.
 	pLowestLine->setVisibility(false);
@@ -380,7 +388,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 	{
 		pCurrPoint->setPos(sortedPoints[i]);
 		pCurrLine->setPoints(hull[hull.size() - 1], sortedPoints[i]);
-		pVisualizer->wait();
+		WAIT(pVisualizer, 1);
 		if (!leftOf(hull[hull.size() - 2], hull[hull.size() - 1], sortedPoints[i]))
 		{
 			//Remove from the end of the hull "stack" until the point satisfies the left test.
@@ -392,7 +400,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 				Line* l = *--pVisualizer->mLines.end();
 				pVisualizer->mLines.erase(--pVisualizer->mLines.end());
 				pVisualizer->mPoints.erase(--pVisualizer->mPoints.end());
-				pVisualizer->wait(); //Wait to delete the lines bc main thread might be drawing.
+				WAIT(pVisualizer, 1); //Wait to delete the lines bc main thread might be drawing.
 				delete p;
 				delete l;
 			} while (hull.size() > 2 && !leftOf(hull[hull.size() - 2], hull[hull.size() - 1], sortedPoints[i]));
@@ -405,6 +413,7 @@ void AlgorithmVisualizer::convexHullGraham(AlgorithmVisualizer* pVisualizer, std
 	for (int i = 0; i < hull.size() - 1; i++)
 		pVisualizer->mResult.push_back({ hull[i], hull[i + 1] });
 	pVisualizer->finish();
+	pVisualizer->mDrawMutex.unlock();
 }
 
 void AlgorithmVisualizer::quickSortAngle(std::vector<Vector2f>& points, std::vector<float>& dots, size_t start, size_t end)
@@ -445,6 +454,7 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 	//Base case, no points remaining.
 	if (points.empty())
 		return std::vector<Vector2f>();
+
 	Point* pTopPoint = new Point({ 0, 0 }, Color{ 0, 1, 0, 1 });
 	Line* pTopLine = new Line({ 0, 0 }, { 0, 0 }, Color{ 0, 1, 0, 1 });
 	Point* pCurrPoint = new Point({ 0, 0 }, Color{ 0, 0.5f, 0.5f, 1 });
@@ -467,7 +477,7 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 
 		pCurrLine->setPoints(Vector2f(projection + left), p);
 		pCurrPoint->setPos(p);
-		pVisualizer->wait();
+		WAIT(pVisualizer, 1);
 
 		//Maximize this y component to find the next vertex of the hull.
 		if (dist > maxDist)
@@ -477,7 +487,7 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 			pTopLine->setPoints(Vector2f(projection + left), p);
 			pTopPoint->setPos(p);
 		}
-		pVisualizer->wait();
+		WAIT(pVisualizer, 1);
 	}
 	pCurrPoint->setVisibility(false);
 	pCurrLine->setColor({ 0, 1, 0, 1 });
@@ -515,7 +525,7 @@ std::vector<Vector2f> AlgorithmVisualizer::quickHullHelper(AlgorithmVisualizer* 
 //Quick Hull- Average - O(nlogn), Worse - O(n^2)
 void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points)
 {
-	pVisualizer->mState = State::RUNNING;
+	pVisualizer->mDrawMutex.lock();
 	Vector2f left = points[0];
 	Vector2f right = points[0];
 	Point* pCurrPoint = new Point({ 0, 0 }, Color{ 0, 0.5f, 0.5f, 1 });
@@ -553,7 +563,7 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 		pLeftLine->setPoints({ left.x, 0 }, { left.x, 10000 });
 		pRightLine->setPoints({ right.x, 0 }, { right.x, 10000 });
 
-		pVisualizer->wait();
+		WAIT(pVisualizer, 1);
 	}
 	pCurrPoint->setVisibility(false);
 	pLeftLine->setVisibility(false);
@@ -588,12 +598,13 @@ void AlgorithmVisualizer::convexHullQuickHull(AlgorithmVisualizer* pVisualizer, 
 		pVisualizer->mResult.push_back({ hull[i], hull[i + 1] });
 
 	pVisualizer->finish();
+	pVisualizer->mDrawMutex.unlock();
 }
 
 //Ear-Clipping triangulation algorithm.  Cut off ears and update ear status of adjacent vertices.  Loop around the polygon until triangulation is done.
 void AlgorithmVisualizer::triangulateEarClipping(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> polygon)
 {
-	pVisualizer->mState = State::RUNNING;
+	pVisualizer->mDrawMutex.lock();
 	//Vector of VertexStatus of each vertex of the polygon
 	std::vector<VertexStatus> vertexStatus = std::vector<VertexStatus>(polygon.size());
 	//Intialize the VertexStatus of each vertex - O(n^2)
@@ -618,7 +629,7 @@ void AlgorithmVisualizer::triangulateEarClipping(AlgorithmVisualizer* pVisualize
 			if (vertexStatus[i].isEar)
 			{
 				pCurrLine->setColor({ 0, 0.5f, 0.5f, 1 });
-				pVisualizer->wait(2);
+				WAIT(pVisualizer, 2);
 				VertexStatus& v = vertexStatus[i];
 				pVisualizer->mResult.push_back({ polygon[v.prev], polygon[v.next] });
 				pVisualizer->mLines.push_back(new Line(polygon[v.prev], polygon[v.next], {0, 1, 0, 1}));
@@ -633,12 +644,13 @@ void AlgorithmVisualizer::triangulateEarClipping(AlgorithmVisualizer* pVisualize
 			else
 				pCurrLine->setColor({ 1, 0, 0, 1 });
 
-			pVisualizer->wait(2);
+			WAIT(pVisualizer, 2);
 		}
 		i++;
 	}
 
 	pVisualizer->finish();
+	pVisualizer->mDrawMutex.unlock();
 }
 
 bool AlgorithmVisualizer::diagonalCrossPolygon(std::vector<Vector2f>& polygon, Vector2f a, Vector2f b)
@@ -662,7 +674,7 @@ bool AlgorithmVisualizer::isEar(std::vector<Vector2f>& polygon, int idx, int pre
 
 void AlgorithmVisualizer::triangulateSweep(AlgorithmVisualizer* pVisualizer, std::unordered_map<Vector2f, std::vector<Vector2f>> edges)
 {
-	pVisualizer->mState = State::RUNNING;
+	pVisualizer->mDrawMutex.lock();
 	TriSweepLineStatus sweepLineStatus;
 	//Event queue will sort the points in order of greatest y.
 	std::priority_queue<Vector2f, std::vector<Vector2f>, VertexCompareY> eventQueue;
@@ -686,7 +698,7 @@ void AlgorithmVisualizer::triangulateSweep(AlgorithmVisualizer* pVisualizer, std
 
 		//Update sweep line
 		line->setPoints({ 0, vertex.y }, { 10000, vertex.y });
-		pVisualizer->wait();
+		WAIT(pVisualizer, 1);
 
 		//Remove all edges above vertex.
 		for (Vector2f& v : edges[vertex])
@@ -719,7 +731,7 @@ void AlgorithmVisualizer::triangulateSweep(AlgorithmVisualizer* pVisualizer, std
 					edges[trapezoids[leftEdge].second].push_back(vertex);
 				}
 				leftFound = true;
-				pVisualizer->wait();
+				WAIT(pVisualizer, 1);
 			}
 		}
 		if (res.second)
@@ -735,7 +747,7 @@ void AlgorithmVisualizer::triangulateSweep(AlgorithmVisualizer* pVisualizer, std
 					edges[trapezoids[rightEdge].first].push_back(vertex);
 				}
 				rightFound = true;
-				pVisualizer->wait();
+				WAIT(pVisualizer, 1);
 			}
 		}
 		//Update trapezoids map after checking both edges(In case right edge's trapezoid is defined by the same vertex as left edge)
@@ -773,6 +785,7 @@ void AlgorithmVisualizer::triangulateSweep(AlgorithmVisualizer* pVisualizer, std
 		triangulateMonotoneMountain(pVisualizer, face);
 
 	pVisualizer->finish();
+	pVisualizer->mDrawMutex.unlock();
 }
 
 void AlgorithmVisualizer::triangulateMonotoneMountain(AlgorithmVisualizer* pVisualizer, DCEL::Face* face)
@@ -816,7 +829,7 @@ void AlgorithmVisualizer::triangulateMonotoneMountain(AlgorithmVisualizer* pVisu
 			stack.erase(--stack.end());
 			pVisualizer->mLines.push_back(new Line{ *--stack.end(), next, {0, 1, 0, 1} });
 			pVisualizer->mResult.push_back({ *--stack.end(), next });
-			pVisualizer->wait();
+			WAIT(pVisualizer, 1);
 		}
 		e = e->next;
 	}
@@ -825,7 +838,7 @@ void AlgorithmVisualizer::triangulateMonotoneMountain(AlgorithmVisualizer* pVisu
 
 void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points)
 {
-	pVisualizer->mState = State::RUNNING;
+	pVisualizer->mDrawMutex.lock();
 	BeachLineStatus beachLine(100000);
 	//Event queue will sort the points in order of greatest y.
 	std::priority_queue<BeachLineStatus::Event*, std::vector<BeachLineStatus::Event*>, BeachLineStatus::EventCompare> eventQueue;
@@ -872,6 +885,7 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 	for (EdgeD& e : beachLine.getEdges())
 		pVisualizer->mResult.push_back(e);
 	pVisualizer->finish();
+	pVisualizer->mDrawMutex.unlock();
 }
 
 void AlgorithmVisualizer::arcsToBenzier(AlgorithmVisualizer* pVisualizer, BeachLineStatus& beachLine)
@@ -945,5 +959,5 @@ void AlgorithmVisualizer::drawVoronoiStatus(AlgorithmVisualizer* pVisualizer, Be
 			lines[i]->setPoints(pHalfEdge->v1, pHalfEdge->v2);
 	}
 	arcsToBenzier(pVisualizer, beachLine);
-	pVisualizer->wait(0.1f);
+	WAIT(pVisualizer, 0.1f);
 }

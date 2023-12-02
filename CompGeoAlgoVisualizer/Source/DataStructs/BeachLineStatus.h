@@ -13,7 +13,7 @@ class BeachLineStatus
 			bool isCircle; //Flag whether this event is a circle event.
 			bool isValid = true; //Flag whether this is still a valid circle event.
 
-			Event(const Vector2D& point) : point(point), isCircle(false) {}
+			Event(const Vector2D& point) : point(point), isCircle(false), arc(nullptr) {}
 			Event(Arc* arc, const Vector2D& point, const Vector2D& center) : arc(arc), point(point), center(center), isCircle(true) {}
 		};
 		//Comparison class used to sort the events in the queue.
