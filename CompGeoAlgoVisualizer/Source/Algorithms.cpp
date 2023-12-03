@@ -7,6 +7,7 @@
 #include "Direct2D/Drawable/Line.h"
 #include "Direct2D/Drawable/QuadBezierCurve.h"
 #include "DataStructs/BeachLineStatus.h"
+#include "DataStructs/FortuneEventQueue.h"
 
 using D2D::Drawable;
 using D2D::Point;
@@ -22,10 +23,11 @@ AlgorithmVisualizer::AlgorithmVisualizer(App* pApp)
 
 AlgorithmVisualizer::~AlgorithmVisualizer()
 {
-	clear();
+	setShouldTerminate(true);
 	if (mThread->joinable())
 		mThread->join();
 	delete mThread;
+	clear();
 }
 
 AlgorithmVisualizer::State AlgorithmVisualizer::getState() {
@@ -64,6 +66,14 @@ bool AlgorithmVisualizer::shouldPause()
 	return shouldPause;
 }
 
+bool AlgorithmVisualizer::shouldTerminate()
+{
+	mShouldTerminateMutex.lock();
+	bool shouldTerminate = mShouldTerminate;
+	mShouldTerminateMutex.unlock();
+	return shouldTerminate;
+}
+
 float AlgorithmVisualizer::getSpeed()
 {
 	mSpeedMutex.lock();
@@ -82,6 +92,13 @@ void AlgorithmVisualizer::setShouldPause(bool shouldPause)
 	mShouldPauseMutex.lock();
 	mShouldPause = shouldPause;
 	mShouldPauseMutex.unlock();
+}
+
+void AlgorithmVisualizer::setShouldTerminate(bool shouldTerminate)
+{
+	mShouldTerminateMutex.lock();
+	mShouldTerminate = shouldTerminate;
+	mShouldTerminateMutex.unlock();
 }
 
 
@@ -125,6 +142,7 @@ void AlgorithmVisualizer::computeConvexHull(std::vector<Vector2f>& points, Conve
 	if (mThread->joinable())
 		mThread->join();
 	setState(State::RUNNING);
+	setShouldTerminate(false);
 	switch (algorithm)
 	{
 		case ConvexHullAlgorithm::GIFT_WRAPPING:
@@ -156,6 +174,7 @@ void AlgorithmVisualizer::computeTriangulation(std::vector<Vector2f>& polygon, s
 	if (mThread->joinable())
 		mThread->join();
 	setState(State::RUNNING);
+	setShouldTerminate(false);
 	switch (algorithm)
 	{
 		case TriangulationAlgorithm::EAR_CLIPPING:
@@ -179,6 +198,7 @@ void AlgorithmVisualizer::computeVoronoiDiagram(std::vector<Vector2f>& points, V
 	if (mThread->joinable())
 		mThread->join();
 	setState(State::RUNNING);
+	setShouldTerminate(false);
 	switch (algorithm)
 	{
 		case VoronoiDiagramAlgorithm::FORTUNE:
@@ -230,8 +250,10 @@ void AlgorithmVisualizer::clear()
 
 void AlgorithmVisualizer::wait(float multiplier)
 {
-	std::this_thread::sleep_for(std::chrono::milliseconds((long)(multiplier * 1000 / getSpeed())));
-	while (shouldPause()); //If it is pausing, continue waiting.
+	if (mVisualize) {
+		std::this_thread::sleep_for(std::chrono::milliseconds((long)(multiplier * 1000 / getSpeed())));
+		while (shouldPause() && !shouldTerminate()); //If it is pausing, continue waiting. If should be terminated, terminate.
+	}
 }
 
 void AlgorithmVisualizer::finish()
@@ -839,9 +861,12 @@ void AlgorithmVisualizer::triangulateMonotoneMountain(AlgorithmVisualizer* pVisu
 void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::vector<Vector2f> points)
 {
 	pVisualizer->mDrawMutex.lock();
+	//The y coordinate of the directrix in the previous draw
+	double prevDraw = 100000;
+
 	BeachLineStatus beachLine(100000);
 	//Event queue will sort the points in order of greatest y.
-	std::priority_queue<BeachLineStatus::Event*, std::vector<BeachLineStatus::Event*>, BeachLineStatus::EventCompare> eventQueue;
+	FortuneEventQueue eventQueue;
 	//Push all points into events queue.
 	for (auto& p : points)
 		eventQueue.push(new BeachLineStatus::Event((Vector2D)p));
@@ -856,6 +881,9 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 
 	while (!eventQueue.empty())
 	{
+		//Check whether we should draw for this iteration
+		bool shouldDraw = beachLine.getDirectrix() < (prevDraw - 2 * pVisualizer->getSpeed());
+
 		BeachLineStatus::Event* e = eventQueue.top();
 		eventQueue.pop();
 		//If an event is no longer valid, delete it and continue
@@ -866,7 +894,10 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 		//Visually move the sweepline
 		sweepLine->setPoints({ 0, (float)e->point.y }, { 2000, (float)e->point.y });
 		//Draw the current status of the algorithm(All arcs and edges)
-		drawVoronoiStatus(pVisualizer, beachLine, lines, halfEdgePtrs);
+		if (shouldDraw) {
+			prevDraw = beachLine.getDirectrix();
+			drawVoronoiStatus(pVisualizer, beachLine, lines, halfEdgePtrs);
+		}
 
 		//Flag used to determine whether a circle event was successfully(Arc removed).
 		bool success = true;
@@ -874,9 +905,12 @@ void AlgorithmVisualizer::voronoiFortune(AlgorithmVisualizer* pVisualizer, std::
 			BeachLineStatus::Arc* arc = beachLine.addArc(e->point, eventQueue);
 		else
 			success = beachLine.remove(e->arc, eventQueue);
-		if (success) //If an arc was removed, we redraw the scene.
+		if (success && shouldDraw) //If an arc was removed, we redraw the scene.
 			drawVoronoiStatus(pVisualizer, beachLine, lines, halfEdgePtrs);
-
+		
+		//Set arc's circle event to nullptr before deleting it
+		if (e->arc)
+			e->arc->circleEvent = nullptr;
 		delete e;
 	}
 	//Resolve the edges of the arcs that go off to infinity.

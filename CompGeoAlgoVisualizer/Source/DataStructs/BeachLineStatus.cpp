@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "BeachLineStatus.h"
+#include "FortuneEventQueue.h"
 
 BeachLineStatus::~BeachLineStatus()
 {
@@ -73,7 +74,7 @@ void BeachLineStatus::insertAfter(Arc* arc, Arc* newArc)
 	validateTreePostInsertion(newArc);
 }
 
-bool BeachLineStatus::remove(Arc* arc, std::priority_queue<Event*, std::vector<Event*>, EventCompare>& eventQueue)
+bool BeachLineStatus::remove(Arc* arc, FortuneEventQueue& eventQueue)
 {
 	bool r =  __remove(arc, eventQueue, true);
 	if (r)
@@ -86,7 +87,7 @@ void BeachLineStatus::setDirectrix(double directrix)
 	mDirectrix = directrix;
 }
 
-BeachLineStatus::Arc* BeachLineStatus::addArc(const Vector2D& site, std::priority_queue<Event*, std::vector<Event*>, EventCompare>& eventQueue)
+BeachLineStatus::Arc* BeachLineStatus::addArc(const Vector2D& site, FortuneEventQueue& eventQueue)
 {
 	Arc* newArc = new Arc();
 	newArc->face = mVoronoi.getFace(site);
@@ -248,24 +249,25 @@ void BeachLineStatus::updateEdges()
 		Vector2D rightPoint = {};
 		while (arc->next)
 		{
-			if (arc->prev)
-				arc->leftEdge->v2 = rightPoint;
 			double right = getRightX(arc);
 			rightPoint = { right, getY(arc, right) };
 			arc->rightEdge->v1 = rightPoint;
 			arc = arc->next;
+
+			arc->leftEdge->v2 = rightPoint;
 		}
 	}
 }
 
-bool BeachLineStatus::__remove(Arc* arc, std::priority_queue<Event*, std::vector<Event*>, EventCompare>& eventQueue, bool dealloc)
+bool BeachLineStatus::__remove(Arc* arc, FortuneEventQueue& eventQueue, bool dealloc)
 {
 	//If we're not deallocating the arc, it is still in the beachline.  It is just getting moved around in the tree bc of replacing a deleted arc.
 	if (dealloc) 
 	{
 		double x1 = getRightX(arc);
 		double x2 = getLeftX(arc);
-		if (!EQUALD(x1, arc->circleEvent->center.x) || !EQUALD(x2, arc->circleEvent->center.x) || EQUALD(arc->face->site.y, arc->circleEvent->point.y)) //If the arc's right boundary(or left) isn't at the center of the circle event, then this circle event is invalid.
+		//If the arc's right boundary(or left) isn't at the center of the circle event, then this circle event is invalid.
+		if (!EQUALD(x1, arc->circleEvent->center.x) || !EQUALD(x2, arc->circleEvent->center.x) || EQUALD(arc->face->site.y, arc->circleEvent->point.y)) 
 			return false;
 
 		VoronoiDiagram::Vertex* vertex = mVoronoi.getVertex(arc->circleEvent->center);
@@ -323,7 +325,9 @@ bool BeachLineStatus::__remove(Arc* arc, std::priority_queue<Event*, std::vector
 
 		arc->prev->next = arc->next;
 		arc->next->prev = arc->prev;
-		//Circle Events
+		//Add new circle events(left-left left and right, or left, right, and right-right)
+
+		//if left-left arc exists and does not have the same site/face as the current arc
 		if (arc->prev->prev && arc->prev->prev->face != arc->face)
 		{
 			if (arc->prev->circleEvent)
@@ -332,6 +336,7 @@ bool BeachLineStatus::__remove(Arc* arc, std::priority_queue<Event*, std::vector
 			if (arc->prev->circleEvent)
 				eventQueue.push(arc->prev->circleEvent);
 		}
+		//If right-right arc exists and does not have the same site/face as the current arc
 		if (arc->next->next && arc->next->next->face != arc->face)
 		{
 			if (arc->next->circleEvent)
@@ -754,22 +759,10 @@ BeachLineStatus::Event* BeachLineStatus::getCircleEvent(Arc* arc)
 	Vector2D v2 = arc->face->site;
 	Vector2D v3 = arc->next->face->site;
 
-	//Vector2D dv2 = { v2.x - v1.x, v2.y - v1.y };
-	//Vector2D dv3 = { v3.x - v1.x, v3.y - v1.y };
-
-	//Vector2D dv22 = { dv2.x * dv2.x, dv2.y * dv2.y };
-	//Vector2D dv32 = { dv3.x * dv3.x, dv3.y * dv3.y };
-
-	//double deno = 2 * (dv2.x * dv3.y - dv3.x * dv2.y);
-
-	//double x = v1.x + (dv22.x * dv3.y - dv32.x * dv2.y + dv22.y * dv3.y - dv32.y * dv2.y) / deno;
-	//double y = v1.y + (dv22.x * dv3.x - dv32.x * dv2.x + dv22.y * dv3.x - dv32.y * dv2.x) / -deno;
-
-
 	double s1 = -(v1.x - v2.x) / (v1.y - v2.y);
 	double s2 = -(v2.x - v3.x) / (v2.y - v3.y);
 
-	if (EQUALD(s1,s2)) //Arc sites are collinear.
+	if (EQUALD(s1, s2)) //Arc sites are collinear.
 		return nullptr;
 
 	double x = 0;
@@ -785,8 +778,9 @@ BeachLineStatus::Event* BeachLineStatus::getCircleEvent(Arc* arc)
 		x = (v1.x + v2.x) / 2;
 		y = s2 * (x - (v2.x + v3.x) / 2) + (v2.y + v3.y) / 2;
 	}
-	else if (isinf(s1) && isinf(s2))//Arc sites all have the same y-value.
+	else if (isinf(s1) && isinf(s2)) {//Arc sites all have the same y-value.
 		return nullptr;
+	}
 	else //normal
 	{
 		x = ((s1 * v1.x - s2 * v3.x + v3.y - v1.y) / (s1 - s2) + v2.x) / 2;
@@ -797,10 +791,13 @@ BeachLineStatus::Event* BeachLineStatus::getCircleEvent(Arc* arc)
 	double yDiff = v1.y - y;
 	double r = sqrt(xDiff * xDiff + yDiff * yDiff);
 
-	if (GREATERD(y - r, mDirectrix)) //Invalid circle event.
+	//Invalid circle event, don't let the directrix go back(within margin of error)
+	if (GREATERD(y - r, mDirectrix))
 		return nullptr;
+		
 
 	Event* e = new Event(arc, { x, y - r }, { x, y });
+
 	return e;
 }
 

@@ -131,6 +131,9 @@
     <ClInclude Include="Source\UI\ITabbedPanel.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\DataStructs\FortuneEventQueue.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Algorithms.cpp" />
@@ -246,5 +249,8 @@
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\DataStructs\FortuneEventQueue.cpp">
+      <Filter>DataStructs</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

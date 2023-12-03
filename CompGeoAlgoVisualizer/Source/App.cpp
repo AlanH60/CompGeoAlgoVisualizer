@@ -108,6 +108,14 @@ App::App()
 	pStartButton->setOnClick([this]()-> void {
 		if (pVisualizer->isIdle())
 		{
+			//Unselect selected point if exists
+			if (pSelectedPoint)
+			{
+				if (pSelectedOutline)
+					delete pSelectedOutline;
+				pSelectedOutline = nullptr;
+				pSelectedPoint = nullptr;
+			}
 			switch (mState)
 			{
 				case State::CONVEX_HULL:

@@ -62,7 +62,8 @@
       <AdditionalIncludeDirectories>Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <FloatingPointModel>Strict</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -83,6 +84,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <FloatingPointModel>Strict</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -98,6 +100,7 @@
     <ClInclude Include="Source\DataStructs\DCEL.h" />
     <ClInclude Include="Source\DataStructs\Edge.h" />
     <ClInclude Include="Source\DataStructs\EdgeD.h" />
+    <ClInclude Include="Source\DataStructs\FortuneEventQueue.h" />
     <ClInclude Include="Source\DataStructs\RedBlackTree.h" />
     <ClInclude Include="Source\DataStructs\TriSweepLineStatus.h" />
     <ClInclude Include="Source\DataStructs\Vector2D.h" />
@@ -141,6 +144,7 @@
     <ClCompile Include="Source\DataStructs\DCEL.cpp" />
     <ClCompile Include="Source\DataStructs\Edge.cpp" />
     <ClCompile Include="Source\DataStructs\EdgeD.cpp" />
+    <ClCompile Include="Source\DataStructs\FortuneEventQueue.cpp" />
     <ClCompile Include="Source\DataStructs\RedBlackTree.cpp" />
     <ClCompile Include="Source\DataStructs\TriSweepLineStatus.cpp" />
     <ClCompile Include="Source\DataStructs\Vector2D.cpp" />

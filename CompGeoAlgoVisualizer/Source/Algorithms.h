@@ -4,12 +4,13 @@
 #include "DataStructs/DCEL.h"
 #include "DataStructs/BeachLineStatus.h"
 
-#define WAIT(pVisualizer, multiplier)			\
-do												\
-{												\
-	pVisualizer->getDrawMutex().unlock();		\
-	pVisualizer->wait(multiplier);				\
-	pVisualizer->getDrawMutex().lock();			\
+#define WAIT(pVisualizer, multiplier)													\
+do																						\
+{																						\
+	pVisualizer->getDrawMutex().unlock();												\
+	pVisualizer->wait(multiplier);														\
+	if (pVisualizer->shouldTerminate()) { pVisualizer->finish(); exit(0); }				\
+	pVisualizer->getDrawMutex().lock();													\
 } while (false)
 
 class App;
@@ -105,6 +106,12 @@ class AlgorithmVisualizer
 		bool shouldPause();
 
 		/**
+		* Check whether the algorithm visualizer is to be termianted.
+		* @returns true if algorithm visualizer should be terminated.
+		*/
+		bool shouldTerminate();
+
+		/**
 		* Set the should visualize flag
 		* @param visualize the new value of the flag.
 		*/
@@ -114,6 +121,11 @@ class AlgorithmVisualizer
 		* @param shouldPause flag whether the visualizer should be paused.
 		*/
 		void setShouldPause(bool shouldPause);
+		/**
+		* Set the should terminate flag.
+		* @param shouldTerminate flag whether the visualizer should terminate.
+		*/
+		void setShouldTerminate(bool shouldTerminate);
 		/**
 		* Get the speed of the algorithm
 		* @returns speed of the algorithm(1 - 10)
@@ -214,6 +226,8 @@ class AlgorithmVisualizer
 		bool mVisualize = true;
 		//Flag that indicates whether or not to the algorithm visualizer should be paused.
 		bool mShouldPause = false;
+		//Flag that indicates whether or not the algorithm visualizer should terminate.
+		bool mShouldTerminate = false;
 		//Mutex used to protect mShouldPause
 		std::mutex mShouldPauseMutex;
 		//Mutex used to protect mState
@@ -222,6 +236,8 @@ class AlgorithmVisualizer
 		std::mutex mSpeedMutex;
 		//Mutex used to protect geometry(mLines, mPoints, mArcs)
 		std::mutex mDrawMutex;
+		//Mutex used to protect shouldTerminate
+		std::mutex mShouldTerminateMutex;
 		//State of the algorithm visualizer.
 		State mState = State::IDLE;
 		//Pointer to the thread that this algorithm will run on.
