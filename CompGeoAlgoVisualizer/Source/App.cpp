@@ -24,6 +24,8 @@ using D2D::Polygon;
 using D2D::Text;
 using D2D::QuadBezierCurve;
 
+#define POINT_CLICK_RADIUS 10
+
 App::App()
 {
 	pVisualizer = new AlgorithmVisualizer(this);
@@ -341,10 +343,10 @@ void App::onDraw()
 	{
 		if (pSelectedOutline)
 			delete pSelectedOutline;
-		FLOAT2 f[4] = { {pSelectedPoint->getPos().x - 15, pSelectedPoint->getPos().y - 15 },
-						{pSelectedPoint->getPos().x + 15, pSelectedPoint->getPos().y - 15 },
-						{pSelectedPoint->getPos().x + 15, pSelectedPoint->getPos().y + 15 },
-						{pSelectedPoint->getPos().x - 15, pSelectedPoint->getPos().y + 15 } };
+		FLOAT2 f[4] = { {pSelectedPoint->getPos().x - POINT_CLICK_RADIUS, pSelectedPoint->getPos().y - POINT_CLICK_RADIUS },
+						{pSelectedPoint->getPos().x + POINT_CLICK_RADIUS, pSelectedPoint->getPos().y - POINT_CLICK_RADIUS },
+						{pSelectedPoint->getPos().x + POINT_CLICK_RADIUS, pSelectedPoint->getPos().y + POINT_CLICK_RADIUS },
+						{pSelectedPoint->getPos().x - POINT_CLICK_RADIUS, pSelectedPoint->getPos().y + POINT_CLICK_RADIUS } };
 		pSelectedOutline = new D2D::Polygon(f, 4, false, { 0.0f, 0.5f, 1.0f, 0.8f });
 		pSelectedOutline->draw();
 	}
@@ -405,7 +407,7 @@ Point* App::getPoint(FLOAT2 pos)
 	for (Point* pPoint : mPoints[pos])
 	{
 		FLOAT2 diff = pPoint->getPos() - pos;
-		if (abs(diff.x) <= 20 && abs(diff.y) <= 20)
+		if (abs(diff.x) <= POINT_CLICK_RADIUS && abs(diff.y) <= POINT_CLICK_RADIUS)
 			p = pPoint;
 	}
 	//If can't find it in current chunk, check the chunk's neighbors.
